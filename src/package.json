@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@base-ui-components/react": "^1.0.0-rc.0",
     "@blocknote/core": "^0.45.0",
     "@blocknote/mantine": "^0.45.0",
     "@blocknote/react": "^0.45.0",

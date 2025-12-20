@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { RepositorySelector } from './repository-selector';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 
@@ -34,7 +34,20 @@ describe('RepositorySelector', () => {
     expect(screen.getByPlaceholderText('Select a repository...')).toBeDefined();
   });
 
-  it('renders repository options and handles selection', () => {
+  it('renders selected repository name in input', () => {
+    vi.mocked(useRepository).mockReturnValue({
+      repositories: mockRepos,
+      selectedRepositoryId: '1',
+      isLoading: false,
+      actions: mockActions,
+    });
+
+    render(<RepositorySelector />);
+    const input = screen.getByPlaceholderText('Select a repository...') as HTMLInputElement;
+    expect(input.value).toBe('user/repo-1');
+  });
+
+  it('opens dropdown and shows repository options', async () => {
     vi.mocked(useRepository).mockReturnValue({
       repositories: mockRepos,
       selectedRepositoryId: null,
@@ -44,17 +57,53 @@ describe('RepositorySelector', () => {
 
     render(<RepositorySelector />);
     
-    // Simulate opening the dropdown (Base UI Autocomplete usually opens on focus/click)
     const input = screen.getByPlaceholderText('Select a repository...');
-    fireEvent.click(input);
-    fireEvent.change(input, { target: { value: 'repo' } }); // Filter to ensure options appear
+    fireEvent.focus(input);
 
-    // Since Base UI renders via Portal or specific structure, we verify if options are present
-    // Note: Base UI architecture might render options conditionally. 
-    // For this mock test, we mainly check if the component renders without crashing and mock is called.
+    await waitFor(() => {
+      expect(screen.getByText('user/repo-1')).toBeDefined();
+      expect(screen.getByText('user/repo-2')).toBeDefined();
+    });
+  });
+
+  it('filters repositories based on search input', async () => {
+    vi.mocked(useRepository).mockReturnValue({
+      repositories: mockRepos,
+      selectedRepositoryId: null,
+      isLoading: false,
+      actions: mockActions,
+    });
+
+    render(<RepositorySelector />);
     
-    // Check if options are rendered (might need to check how Base UI renders items, possibly role="option")
-    // For now, let's assume standard behavior or just check render.
-    expect(screen.getByPlaceholderText('Select a repository...')).toBeDefined();
+    const input = screen.getByPlaceholderText('Select a repository...');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: 'repo-1' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('user/repo-1')).toBeDefined();
+      expect(screen.queryByText('user/repo-2')).toBeNull();
+    });
+  });
+
+  it('calls selectRepository when repository is selected', async () => {
+    vi.mocked(useRepository).mockReturnValue({
+      repositories: mockRepos,
+      selectedRepositoryId: null,
+      isLoading: false,
+      actions: mockActions,
+    });
+
+    render(<RepositorySelector />);
+    
+    const input = screen.getByPlaceholderText('Select a repository...');
+    fireEvent.focus(input);
+
+    await waitFor(() => {
+      const repo1Option = screen.getByText('user/repo-1');
+      fireEvent.click(repo1Option);
+    });
+
+    expect(mockActions.selectRepository).toHaveBeenCalledWith('1');
   });
 });
