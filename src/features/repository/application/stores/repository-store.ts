@@ -39,7 +39,7 @@ export const createRepositoryStore = () => {
     notify();
   };
 
-  const selectRepository = (id: string) => {
+  const selectRepository = (id: string | null) => {
     state = {
       ...state,
       selectedRepositoryId: id
