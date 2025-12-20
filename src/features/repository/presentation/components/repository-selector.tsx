@@ -3,8 +3,9 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { Repository } from '@/features/repository/domain/models/repository';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +14,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { getUserRepositories } from '@/app/_actions/repository';
+import { cloneRepositoryUseCase } from '@/features/repository/application/services/clone-service';
 
-export function RepositorySelector() {
+interface RepositorySelectorProps {
+  accessToken?: string;
+}
+
+export function RepositorySelector({ accessToken }: RepositorySelectorProps) {
   const { repositories, selectedRepositoryId, isLoading, actions } = useRepository();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isCloning, setIsCloning] = useState(false);
+  const [cloneError, setCloneError] = useState<string | null>(null);
   const hasFetchedRef = useRef(false);
 
   // コンポーネントマウント時にリポジトリ一覧を取得
@@ -67,6 +75,30 @@ export function RepositorySelector() {
     actions.selectRepository(repo.id);
     setOpen(false);
     setSearchValue('');
+  };
+
+  const handleClone = async () => {
+    if (!selectedRepo || !accessToken) {
+      setCloneError('Repository or access token is missing');
+      return;
+    }
+
+    setIsCloning(true);
+    setCloneError(null);
+
+    try {
+      await cloneRepositoryUseCase(selectedRepo, accessToken);
+      // クローン完了後にファイルツリーを更新するためのイベントを発火
+      window.dispatchEvent(new CustomEvent('repository-cloned', { 
+        detail: { repositoryId: selectedRepo.id } 
+      }));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to clone repository';
+      setCloneError(errorMessage);
+      console.error('Failed to clone repository:', err);
+    } finally {
+      setIsCloning(false);
+    }
   };
 
   return (
@@ -128,6 +160,35 @@ export function RepositorySelector() {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      
+      {/* Clone Button */}
+      {selectedRepo && (
+        <div className="mt-3 px-2">
+          <Button
+            onClick={handleClone}
+            disabled={isCloning || !accessToken}
+            className="w-full"
+            size="sm"
+          >
+            {isCloning ? (
+              <>
+                <Download className="mr-2 h-4 w-4 animate-spin" />
+                Cloning...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Clone
+              </>
+            )}
+          </Button>
+          {cloneError && (
+            <div className="mt-2 text-xs text-destructive text-center">
+              {cloneError}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

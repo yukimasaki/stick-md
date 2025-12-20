@@ -71,7 +71,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
           <SidebarGroupContent>
              <div className="px-2 py-2">
                 {session ? (
-                    <RepositorySelector />
+                    <RepositorySelector accessToken={session.accessToken as string | undefined} />
                 ) : (
                     <div className="text-xs text-muted-foreground text-center py-4">
                         Please sign in to select a repository.
