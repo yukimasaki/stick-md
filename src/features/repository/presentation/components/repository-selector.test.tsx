@@ -6,6 +6,11 @@ import { useRepository } from '@/features/repository/presentation/hooks/use-repo
 // Mock useRepository
 vi.mock('@/features/repository/presentation/hooks/use-repository');
 
+// Mock Server Action
+vi.mock('@/app/_actions/repository', () => ({
+  getUserRepositories: vi.fn(),
+}));
+
 afterEach(() => {
   cleanup();
 });

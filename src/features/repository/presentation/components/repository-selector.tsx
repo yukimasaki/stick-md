@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { Repository } from '@/features/repository/domain/models/repository';
 import { ChevronDown, Check } from 'lucide-react';
@@ -12,11 +12,44 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { getUserRepositories } from '@/app/_actions/repository';
 
 export function RepositorySelector() {
-  const { repositories, selectedRepositoryId, actions } = useRepository();
+  const { repositories, selectedRepositoryId, isLoading, actions } = useRepository();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const hasFetchedRef = useRef(false);
+
+  // コンポーネントマウント時にリポジトリ一覧を取得
+  // useEffectは外部システム（GitHub API）との同期に使用
+  useEffect(() => {
+    const fetchRepositories = async () => {
+      // 既にリポジトリが取得済み、または既に取得処理を実行済みの場合はスキップ
+      if (repositories.length > 0 || hasFetchedRef.current) {
+        return;
+      }
+
+      hasFetchedRef.current = true;
+
+      try {
+        actions.setLoading(true);
+        setError(null);
+        const repos = await getUserRepositories();
+        actions.setRepositories(repos);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch repositories';
+        setError(errorMessage);
+        console.error('Failed to fetch repositories:', err);
+        hasFetchedRef.current = false; // エラー時は再試行可能にする
+      } finally {
+        actions.setLoading(false);
+      }
+    };
+
+    fetchRepositories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 初回マウント時のみ実行
 
   const selectedRepo = repositories.find(r => r.id === selectedRepositoryId) || null;
 
@@ -37,12 +70,12 @@ export function RepositorySelector() {
   };
 
   return (
-    <div className="w-full max-w-sm px-4">
+    <div className="w-full px-2">
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <div className="relative">
             <Input
-              className="w-full flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10"
+              className="w-full flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 truncate"
               placeholder="Select a repository..."
               aria-label="Repository Selection"
               value={searchValue || selectedRepo?.full_name || ''}
@@ -61,7 +94,15 @@ export function RepositorySelector() {
           className="max-h-60 w-[var(--radix-dropdown-menu-trigger-width)] overflow-auto"
           align="start"
         >
-          {filteredRepositories.length === 0 ? (
+          {isLoading ? (
+            <div className="p-2 text-sm text-center text-muted-foreground">
+              Loading repositories...
+            </div>
+          ) : error ? (
+            <div className="p-2 text-sm text-center text-destructive">
+              {error}
+            </div>
+          ) : filteredRepositories.length === 0 ? (
             <div className="p-2 text-sm text-center text-muted-foreground">
               No repositories found
             </div>
@@ -76,11 +117,11 @@ export function RepositorySelector() {
                   selectedRepositoryId === repo.id && "bg-accent text-accent-foreground"
                 )}
               >
-                <div className="flex items-center gap-2 flex-1">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
                   {selectedRepositoryId === repo.id && (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-4 w-4 flex-shrink-0" />
                   )}
-                  <span>{repo.full_name}</span>
+                  <span className="truncate">{repo.full_name}</span>
                 </div>
               </DropdownMenuItem>
             ))
