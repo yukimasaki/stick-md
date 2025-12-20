@@ -1,26 +1,16 @@
-'use client';
-
-import dynamic from 'next/dynamic';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
-import { Toolbar } from '@/features/editor/presentation/components/toolbar/toolbar';
+import { EditorContainer } from '@/features/editor/presentation/components/editor-container';
 import { Menu } from 'lucide-react';
+import { auth } from '@/auth';
 
-const MarkdownEditor = dynamic(() => import('@/features/editor/presentation/components/markdown-editor/markdown-editor').then(mod => mod.MarkdownEditor), { ssr: false });
+export default async function Home() {
+  const session = await auth();
 
-export default function Home() {
   return (
     <SidebarProvider>
       <SidebarInset>
-        <main className="flex h-screen w-full flex-col overflow-hidden bg-background text-foreground">
-          {/* Editor Area */}
-          <div className="flex-1 overflow-hidden relative">
-            <MarkdownEditor />
-          </div>
-
-          {/* Floating Toolbar (Cursor) */}
-          <Toolbar />
-        </main>
+        <EditorContainer />
         
         {/* Floating Sidebar Trigger (Bottom Right) */}
         <div className="fixed bottom-6 right-6 z-50">
@@ -30,7 +20,7 @@ export default function Home() {
         </div>
       </SidebarInset>
       
-      <AppSidebar />
+      <AppSidebar session={session} />
     </SidebarProvider>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Save, Github } from "lucide-react"
+import { Save, Github, LogOut, User } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +13,14 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { RepositorySelector } from "@/features/repository/presentation/components/repository-selector"
+import { login, logout } from "@/app/_actions/auth"
+import type { Session } from "next-auth"
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  session: Session | null
+}
+
+export function AppSidebar({ session }: AppSidebarProps) {
   return (
     <Sidebar side="right" collapsible="offcanvas">
       <SidebarContent>
@@ -32,15 +38,28 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* GitHub Integration */}
-              <SidebarMenuItem>
-                 <SidebarMenuButton asChild>
-                  <a href="#" target="_blank" rel="noopener noreferrer">
-                    <Github />
-                    <span>GitHub Integration</span>
-                  </a>
-                 </SidebarMenuButton>
-              </SidebarMenuItem>
+              {/* GitHub Integration / Auth */}
+              {session ? (
+                 <>
+                   <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <button onClick={() => console.log('Sync triggered')}>
+                        <Github />
+                        <span>Sync with GitHub</span>
+                      </button>
+                     </SidebarMenuButton>
+                   </SidebarMenuItem>
+                 </>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <button onClick={() => login()}>
+                      <Github />
+                      <span>Sign in with GitHub</span>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -51,16 +70,46 @@ export function AppSidebar() {
           <SidebarGroupLabel>Repository</SidebarGroupLabel>
           <SidebarGroupContent>
              <div className="px-2 py-2">
-                <RepositorySelector />
+                {session ? (
+                    <RepositorySelector />
+                ) : (
+                    <div className="text-xs text-muted-foreground text-center py-4">
+                        Please sign in to select a repository.
+                    </div>
+                )}
              </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       
       <SidebarFooter>
-         <div className="text-xs text-muted-foreground p-4">
-            Stick-MD v0.1.0
-         </div>
+         {session ? (
+            <div className="p-2 border-t mt-auto">
+                <div className="flex items-center gap-2 mb-2 px-2">
+                    {session.user?.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full" />
+                    ) : (
+                        <User className="w-6 h-6" />
+                    )}
+                    <span className="text-sm font-medium truncate">{session.user?.name}</span>
+                </div>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            <button onClick={() => logout()} className="text-red-500 hover:text-red-600">
+                                <LogOut />
+                                <span>Sign out</span>
+                            </button>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </div>
+         ) : (
+            <div className="text-xs text-muted-foreground p-4">
+                Stick-MD v0.1.0
+            </div>
+         )}
       </SidebarFooter>
     </Sidebar>
   )
