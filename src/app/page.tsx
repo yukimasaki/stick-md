@@ -10,7 +10,7 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <RepositoryProvider>
+    <RepositoryProvider accessToken={session?.accessToken as string | undefined}>
       <SidebarProvider>
         <div className="flex h-screen w-full overflow-hidden">
           <AppSidebar session={session} />

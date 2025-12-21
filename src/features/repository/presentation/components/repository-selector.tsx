@@ -7,7 +7,6 @@ import { Repository } from '@/features/repository/domain/models/repository';
 import { ChevronDown, Check, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getUserRepositories } from '@/app/_actions/repository';
 import { cloneRepositoryUseCase } from '@/features/repository/application/services/clone-service';
 
 interface RepositorySelectorProps {
@@ -24,40 +23,11 @@ export function RepositorySelector({ accessToken }: RepositorySelectorProps) {
   const [isCloning, setIsCloning] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const hasFetchedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // コンポーネントマウント時にリポジトリ一覧を取得
-  // useEffectは外部システム（GitHub API）との同期に使用
-  useEffect(() => {
-    const fetchRepositories = async () => {
-      // 既にリポジトリが取得済み、または既に取得処理を実行済みの場合はスキップ
-      if (repositories.length > 0 || hasFetchedRef.current) {
-        return;
-      }
-
-      hasFetchedRef.current = true;
-
-      try {
-        actions.setLoading(true);
-        setError(null);
-        const repos = await getUserRepositories();
-        actions.setRepositories(repos);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch repositories';
-        setError(errorMessage);
-        console.error('Failed to fetch repositories:', err);
-        hasFetchedRef.current = false; // エラー時は再試行可能にする
-      } finally {
-        actions.setLoading(false);
-      }
-    };
-
-    fetchRepositories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 初回マウント時のみ実行
+  // リポジトリ一覧の取得はRepositoryProviderで行われるため、ここでは不要
 
   const selectedRepo = repositories.find(r => r.id === selectedRepositoryId) || null;
 
