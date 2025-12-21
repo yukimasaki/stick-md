@@ -22,7 +22,7 @@ function FileTreeItem({
   onFileSelect?: (path: string) => void;
   selectedPath?: string;
 }) {
-  const [isOpen, setIsOpen] = useState(level < 2); // 最初の2レベルは開く
+  const [isOpen, setIsOpen] = useState(false); // デフォルトで閉じた状態
 
   const isSelected = selectedPath === node.path;
   const hasChildren = node.children && node.children.length > 0;

@@ -2,6 +2,7 @@ import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import LightningFS from '@isomorphic-git/lightning-fs';
 import { Repository } from '@/features/repository/domain/models/repository';
+import type { FileSystemEntry } from '@/features/repository/domain/models/file-tree';
 
 /**
  * LightningFSインスタンスを管理
@@ -60,18 +61,54 @@ export async function cloneRepository(
 }
 
 /**
- * リポジトリのファイルツリーを取得
- * Infrastructure Layer: isomorphic-gitを使用したファイル一覧取得
+ * リポジトリのファイルツリーを取得（ファイルとディレクトリを区別）
+ * Infrastructure Layer: ファイルシステムを直接走査してファイルとディレクトリを区別
  */
 export async function getRepositoryTree(
   repository: Repository
-): Promise<string[]> {
+): Promise<FileSystemEntry[]> {
   const fs = getFileSystem();
   const dir = getRepositoryPath(repository);
 
   try {
-    const files = await git.listFiles({ fs, dir });
-    return files;
+    // ファイルシステムを直接走査してファイルとディレクトリを区別
+    const walkDirectory = async (currentDir: string, basePath: string = ''): Promise<FileSystemEntry[]> => {
+      const results: FileSystemEntry[] = [];
+      try {
+        const items = await fs.promises.readdir(currentDir);
+        
+        for (const item of items) {
+          // .gitディレクトリは除外
+          if (item === '.git') {
+            continue;
+          }
+
+          const itemPath = basePath ? `${basePath}/${item}` : item;
+          const fullPath = `${currentDir}/${item}`;
+          
+          try {
+            const stat = await fs.promises.stat(fullPath);
+            if (stat.isDirectory()) {
+              results.push({ path: itemPath, type: 'directory' });
+              // 再帰的に子ディレクトリを走査
+              const children = await walkDirectory(fullPath, itemPath);
+              results.push(...children);
+            } else {
+              results.push({ path: itemPath, type: 'file' });
+            }
+          } catch {
+            // アクセスできない場合はスキップ
+            continue;
+          }
+        }
+      } catch {
+        // ディレクトリが読めない場合は空配列を返す
+      }
+      
+      return results;
+    };
+
+    return await walkDirectory(dir);
   } catch (error) {
     // リポジトリがクローンされていない場合
     return [];

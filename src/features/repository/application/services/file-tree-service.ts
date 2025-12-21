@@ -9,7 +9,7 @@ import { buildFileTree, FileTreeNode } from '@/features/repository/domain/models
 export async function getRepositoryFileTree(
   repository: Repository
 ): Promise<FileTreeNode[]> {
-  const files = await getRepositoryTree(repository);
-  return buildFileTree(files);
+  const entries = await getRepositoryTree(repository);
+  return buildFileTree(entries);
 }
 

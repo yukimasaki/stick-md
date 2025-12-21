@@ -10,17 +10,28 @@ export interface FileTreeNode {
 }
 
 /**
- * ファイルパスからファイルツリー構造を構築
+ * ファイルシステムエントリの型
  */
-export function buildFileTree(files: string[]): FileTreeNode[] {
+export interface FileSystemEntry {
+  path: string;
+  type: 'file' | 'directory';
+}
+
+/**
+ * ファイルシステムエントリからファイルツリー構造を構築
+ * ディレクトリとファイルを正しく区別してツリーを構築
+ */
+export function buildFileTree(entries: FileSystemEntry[]): FileTreeNode[] {
   const tree: FileTreeNode[] = [];
   const pathMap = new Map<string, FileTreeNode>();
 
-  // ファイルパスをソート
-  const sortedFiles = [...files].sort();
+  // ディレクトリを先に処理し、その後ファイルを処理する
+  const directories = entries.filter(e => e.type === 'directory').sort((a, b) => a.path.localeCompare(b.path));
+  const files = entries.filter(e => e.type === 'file').sort((a, b) => a.path.localeCompare(b.path));
+  const sortedEntries = [...directories, ...files];
 
-  for (const filePath of sortedFiles) {
-    const parts = filePath.split('/').filter(Boolean);
+  for (const entry of sortedEntries) {
+    const parts = entry.path.split('/').filter(Boolean);
     let currentPath = '';
 
     for (let i = 0; i < parts.length; i++) {
@@ -29,12 +40,16 @@ export function buildFileTree(files: string[]): FileTreeNode[] {
       currentPath = currentPath ? `${currentPath}/${part}` : part;
 
       if (!pathMap.has(currentPath)) {
-        const isFile = i === parts.length - 1;
+        // 現在のエントリがこのパス自体の場合、そのタイプを使用
+        // そうでない場合（親ディレクトリ）、ディレクトリとして扱う
+        const isCurrentEntry = currentPath === entry.path;
+        const nodeType = isCurrentEntry ? entry.type : 'directory';
+        
         const node: FileTreeNode = {
           path: currentPath,
           name: part,
-          type: isFile ? 'file' : 'directory',
-          children: isFile ? undefined : [],
+          type: nodeType,
+          children: nodeType === 'directory' ? [] : undefined,
         };
 
         pathMap.set(currentPath, node);
@@ -51,6 +66,20 @@ export function buildFileTree(files: string[]): FileTreeNode[] {
     }
   }
 
-  return tree;
+  // ツリーをソート（ディレクトリを先に、その後ファイル）
+  const sortTree = (nodes: FileTreeNode[]): FileTreeNode[] => {
+    return nodes.sort((a, b) => {
+      // ディレクトリを先に
+      if (a.type === 'directory' && b.type === 'file') return -1;
+      if (a.type === 'file' && b.type === 'directory') return 1;
+      // 同じタイプの場合は名前でソート
+      return a.name.localeCompare(b.name);
+    }).map(node => ({
+      ...node,
+      children: node.children ? sortTree(node.children) : undefined,
+    }));
+  };
+
+  return sortTree(tree);
 }
 
