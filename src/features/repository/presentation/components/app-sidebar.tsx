@@ -114,3 +114,4 @@ export function AppSidebar({ session }: AppSidebarProps) {
     </Sidebar>
   )
 }
+

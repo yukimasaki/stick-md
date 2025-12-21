@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { FileExplorerSidebar } from "@/components/file-explorer-sidebar"
+import { AppSidebar } from "@/features/repository/presentation/components/app-sidebar"
+import { FileExplorerSidebar } from "@/features/repository/presentation/components/file-explorer-sidebar"
 import { EditorContainer } from '@/features/editor/presentation/components/editor-container';
 import { Menu } from 'lucide-react';
 import { auth } from '@/auth';
