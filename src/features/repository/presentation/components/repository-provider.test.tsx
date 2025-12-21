@@ -3,11 +3,31 @@ import { render } from '@testing-library/react';
 import { RepositoryProvider } from './repository-provider';
 import { repositoryStore } from '@/features/repository/application/stores/repository-store';
 
+// next-authをモック（next/serverの依存を回避）
+vi.mock('next-auth', () => ({
+  default: vi.fn(),
+}));
+
+// next/serverをモック
+vi.mock('next/server', () => ({}));
+
+// Server Actionをモック
+vi.mock('@/app/_actions/repository', () => ({
+  getUserRepositories: vi.fn(),
+}));
+
 // repositoryStoreをモック
 vi.mock('@/features/repository/application/stores/repository-store', () => ({
   repositoryStore: {
-    initialize: vi.fn()
-  }
+    initialize: vi.fn(),
+    getSnapshot: vi.fn(() => ({
+      repositories: [],
+      selectedRepositoryId: null,
+      isLoading: false,
+    })),
+    setRepositories: vi.fn(),
+    setLoading: vi.fn(),
+  },
 }));
 
 describe('RepositoryProvider', () => {

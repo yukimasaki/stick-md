@@ -36,7 +36,7 @@ describe('RepositorySelector', () => {
     });
 
     render(<RepositorySelector />);
-    expect(screen.getByPlaceholderText('Select a repository...')).toBeDefined();
+    expect(screen.getByPlaceholderText('Search or select a repository...')).toBeDefined();
   });
 
   it('renders selected repository name in input', () => {
@@ -48,7 +48,7 @@ describe('RepositorySelector', () => {
     });
 
     render(<RepositorySelector />);
-    const input = screen.getByPlaceholderText('Select a repository...') as HTMLInputElement;
+    const input = screen.getByRole('combobox') as HTMLInputElement;
     expect(input.value).toBe('user/repo-1');
   });
 
@@ -62,7 +62,7 @@ describe('RepositorySelector', () => {
 
     render(<RepositorySelector />);
     
-    const input = screen.getByPlaceholderText('Select a repository...');
+    const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
     await waitFor(() => {
@@ -81,7 +81,7 @@ describe('RepositorySelector', () => {
 
     render(<RepositorySelector />);
     
-    const input = screen.getByPlaceholderText('Select a repository...');
+    const input = screen.getByRole('combobox');
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: 'repo-1' } });
 
@@ -101,7 +101,7 @@ describe('RepositorySelector', () => {
 
     render(<RepositorySelector />);
     
-    const input = screen.getByPlaceholderText('Select a repository...');
+    const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
     await waitFor(() => {

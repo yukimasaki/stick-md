@@ -132,3 +132,70 @@ export async function isRepositoryCloned(
   }
 }
 
+/**
+ * ディレクトリが存在することを確認し、存在しない場合は作成
+ * Infrastructure Layer: LightningFSを使用したディレクトリ作成
+ */
+export async function ensureDirectoryExists(
+  repository: Repository,
+  dirPath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const repoDir = getRepositoryPath(repository);
+  
+  // パスを正規化（先頭の/を削除、末尾の/を削除）
+  const normalizedPath = dirPath.replace(/^\/+|\/+$/g, '');
+  const fullPath = normalizedPath ? `${repoDir}/${normalizedPath}` : repoDir;
+
+  try {
+    // ディレクトリが存在するか確認
+    await fs.promises.stat(fullPath);
+    // 既に存在する場合は何もしない
+    return;
+  } catch {
+    // ディレクトリが存在しない場合、親ディレクトリを再帰的に作成
+    const parts = normalizedPath.split('/').filter(Boolean);
+    let currentPath = repoDir;
+
+    for (const part of parts) {
+      currentPath = `${currentPath}/${part}`;
+      try {
+        await fs.promises.stat(currentPath);
+      } catch {
+        // ディレクトリが存在しない場合は作成
+        await fs.promises.mkdir(currentPath);
+      }
+    }
+  }
+}
+
+/**
+ * ファイルを作成
+ * Infrastructure Layer: LightningFSを使用したファイル作成
+ */
+export async function createFile(
+  repository: Repository,
+  filePath: string,
+  content: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const repoDir = getRepositoryPath(repository);
+  
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+  const fullPath = `${repoDir}/${normalizedPath}`;
+
+  // 親ディレクトリを取得
+  const pathParts = normalizedPath.split('/');
+  const fileName = pathParts.pop();
+  const dirPath = pathParts.join('/');
+
+  // 親ディレクトリが存在することを確認（存在しない場合は作成）
+  if (dirPath) {
+    await ensureDirectoryExists(repository, dirPath);
+  }
+
+  // ファイルを作成
+  await fs.promises.writeFile(fullPath, content, 'utf8');
+}
+

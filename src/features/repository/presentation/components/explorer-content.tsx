@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { FileTree } from '@/features/repository/presentation/components/file-tree';
+import { FileNameEditDialog } from '@/features/repository/presentation/components/file-name-edit-dialog';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { getRepositoryFileTree } from '@/features/repository/application/services/file-tree-service';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
@@ -12,6 +13,8 @@ export function ExplorerContent() {
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string | undefined>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [targetDirectoryPath, setTargetDirectoryPath] = useState<string>('');
 
   const selectedRepo = repositories.find(r => r.id === selectedRepositoryId) || null;
 
@@ -59,9 +62,21 @@ export function ExplorerContent() {
     console.log('Selected file:', path);
   };
 
+  const handleFileCreate = (directoryPath: string) => {
+    setTargetDirectoryPath(directoryPath);
+    setIsDialogOpen(true);
+  };
+
+  const handleFileCreated = async (filePath: string) => {
+    // ファイルツリーを再読み込み
+    await loadFileTree();
+    // 作成されたファイルを選択状態にする
+    setSelectedPath(filePath);
+  };
+
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">
+    <div className="flex flex-col h-full gap-2 p-2">
+      <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground shrink-0">
         {selectedRepo ? selectedRepo.name : 'File Explorer'}
       </div>
       {isLoading ? (
@@ -69,11 +84,25 @@ export function ExplorerContent() {
           Loading...
         </div>
       ) : (
-        <FileTree
-          tree={fileTree}
-          onFileSelect={handleFileSelect}
-          selectedPath={selectedPath}
-        />
+        <>
+          <div className="flex-1 min-h-0">
+            <FileTree
+              tree={fileTree}
+              onFileSelect={handleFileSelect}
+              selectedPath={selectedPath}
+              onFileCreate={selectedRepo ? handleFileCreate : undefined}
+            />
+          </div>
+          {selectedRepo && (
+            <FileNameEditDialog
+              open={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
+              repository={selectedRepo}
+              directoryPath={targetDirectoryPath}
+              onFileCreated={handleFileCreated}
+            />
+          )}
+        </>
       )}
     </div>
   );
