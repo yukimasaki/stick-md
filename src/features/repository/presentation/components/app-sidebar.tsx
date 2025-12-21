@@ -1,19 +1,18 @@
 'use client';
 
-import { Save, Github, LogOut, User } from "lucide-react"
+import { LogOut, User, Folder, Github } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { RepositorySelector } from "@/features/repository/presentation/components/repository-selector"
-import { login, logout } from "@/app/_actions/auth"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
+import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
+import { logout } from "@/app/_actions/auth"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -22,64 +21,28 @@ interface AppSidebarProps {
 
 export function AppSidebar({ session }: AppSidebarProps) {
   return (
-    <Sidebar side="right" collapsible="offcanvas">
+    <Sidebar side="left" collapsible="offcanvas">
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {/* Save */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <button onClick={() => console.log('Save triggered')}>
-                    <Save />
-                    <span>Save</span>
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+        <Tabs defaultValue="explorer" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 m-2">
+            <TabsTrigger value="explorer" className="flex items-center gap-2">
+              <Folder className="h-4 w-4" />
+              <span>Explorer</span>
+            </TabsTrigger>
+            <TabsTrigger value="repository" className="flex items-center gap-2">
+              <Github className="h-4 w-4" />
+              <span>Repository</span>
+            </TabsTrigger>
+          </TabsList>
 
-              {/* GitHub Integration / Auth */}
-              {session ? (
-                 <>
-                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <button onClick={() => console.log('Sync triggered')}>
-                        <Github />
-                        <span>Sync with GitHub</span>
-                      </button>
-                     </SidebarMenuButton>
-                   </SidebarMenuItem>
-                 </>
-              ) : (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <button onClick={() => login()}>
-                      <Github />
-                      <span>Sign in with GitHub</span>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+          <TabsContent value="explorer" className="mt-0">
+            <ExplorerContent />
+          </TabsContent>
 
-        <div className="mx-4 my-2 border-t" />
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Repository</SidebarGroupLabel>
-          <SidebarGroupContent>
-             <div className="px-2 py-2">
-                {session ? (
-                    <RepositorySelector accessToken={session.accessToken as string | undefined} />
-                ) : (
-                    <div className="text-xs text-muted-foreground text-center py-4">
-                        Please sign in to select a repository.
-                    </div>
-                )}
-             </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+          <TabsContent value="repository" className="mt-0">
+            <RepositoryContent session={session} />
+          </TabsContent>
+        </Tabs>
       </SidebarContent>
       
       <SidebarFooter>

@@ -2,8 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import {
-  Sidebar,
-  SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
@@ -12,7 +10,7 @@ import { useRepository } from '@/features/repository/presentation/hooks/use-repo
 import { getRepositoryFileTree } from '@/features/repository/application/services/file-tree-service';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
 
-export function FileExplorerSidebar() {
+export function ExplorerContent() {
   const { repositories, selectedRepositoryId } = useRepository();
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,26 +63,22 @@ export function FileExplorerSidebar() {
   };
 
   return (
-    <Sidebar side="left" collapsible="offcanvas">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            {selectedRepo ? selectedRepo.name : 'File Explorer'}
-          </SidebarGroupLabel>
-          {isLoading ? (
-            <div className="p-4 text-sm text-muted-foreground text-center">
-              Loading...
-            </div>
-          ) : (
-            <FileTree
-              tree={fileTree}
-              onFileSelect={handleFileSelect}
-              selectedPath={selectedPath}
-            />
-          )}
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <SidebarGroup>
+      <SidebarGroupLabel>
+        {selectedRepo ? selectedRepo.name : 'File Explorer'}
+      </SidebarGroupLabel>
+      {isLoading ? (
+        <div className="p-4 text-sm text-muted-foreground text-center">
+          Loading...
+        </div>
+      ) : (
+        <FileTree
+          tree={fileTree}
+          onFileSelect={handleFileSelect}
+          selectedPath={selectedPath}
+        />
+      )}
+    </SidebarGroup>
   );
 }
 
