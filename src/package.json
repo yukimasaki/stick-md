@@ -30,6 +30,7 @@
     "@tiptap/starter-kit": "^3.14.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fp-ts": "^2.16.11",
     "framer-motion": "^12.23.26",
     "isomorphic-git": "^1.36.1",
     "lucide-react": "^0.562.0",
