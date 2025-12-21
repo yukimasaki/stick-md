@@ -1,18 +1,12 @@
 'use client';
 
 import { LogOut, User, Folder, Github } from "lucide-react"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarFooter,
-} from "@/components/ui/sidebar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
 import { logout } from "@/app/_actions/auth"
+import { cn } from "@/lib/utils"
+import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -20,10 +14,19 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ session }: AppSidebarProps) {
+  const { isOpen } = useSidebar();
+
   return (
-    <Sidebar side="left" collapsible="offcanvas">
-      <SidebarContent>
-        <Tabs defaultValue="explorer" className="w-full">
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 w-80 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
+        "flex flex-col h-screen transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
+      {/* サイドバーコンテンツ */}
+      <div className="flex-1 overflow-y-auto">
+        <Tabs defaultValue="explorer" className="w-full h-full flex flex-col">
           <TabsList className="grid w-full grid-cols-2 m-2">
             <TabsTrigger value="explorer" className="flex items-center gap-2">
               <Folder className="h-4 w-4" />
@@ -35,19 +38,20 @@ export function AppSidebar({ session }: AppSidebarProps) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="explorer" className="mt-0">
+          <TabsContent value="explorer" className="mt-0 flex-1 overflow-y-auto">
             <ExplorerContent />
           </TabsContent>
 
-          <TabsContent value="repository" className="mt-0">
+          <TabsContent value="repository" className="mt-0 flex-1 overflow-y-auto">
             <RepositoryContent session={session} />
           </TabsContent>
         </Tabs>
-      </SidebarContent>
+      </div>
       
-      <SidebarFooter>
+      {/* フッター */}
+      <div className="border-t border-sidebar-border mt-auto">
          {session ? (
-            <div className="p-2 border-t mt-auto">
+            <div className="p-2">
                 <div className="flex items-center gap-2 mb-2 px-2">
                     {session.user?.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -57,24 +61,29 @@ export function AppSidebar({ session }: AppSidebarProps) {
                     )}
                     <span className="text-sm font-medium truncate">{session.user?.name}</span>
                 </div>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <button onClick={() => logout()} className="text-red-500 hover:text-red-600">
-                                <LogOut />
-                                <span>Sign out</span>
-                            </button>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <ul className="space-y-1">
+                    <li>
+                        <button
+                            onClick={() => logout()}
+                            className={cn(
+                                "flex w-full items-center gap-2 rounded-md p-2 text-sm",
+                                "text-red-500 hover:bg-sidebar-accent hover:text-red-600",
+                                "transition-colors"
+                            )}
+                        >
+                            <LogOut className="h-4 w-4" />
+                            <span>Sign out</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
          ) : (
             <div className="text-xs text-muted-foreground p-4">
                 Stick-MD v0.1.0
             </div>
          )}
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </aside>
   )
 }
 

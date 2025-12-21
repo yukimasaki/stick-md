@@ -1,14 +1,11 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-} from '@/components/ui/sidebar';
 import { FileTree } from '@/features/repository/presentation/components/file-tree';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { getRepositoryFileTree } from '@/features/repository/application/services/file-tree-service';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
+import { cn } from '@/lib/utils';
 
 export function ExplorerContent() {
   const { repositories, selectedRepositoryId } = useRepository();
@@ -63,10 +60,10 @@ export function ExplorerContent() {
   };
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>
+    <div className="flex flex-col gap-2 p-2">
+      <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">
         {selectedRepo ? selectedRepo.name : 'File Explorer'}
-      </SidebarGroupLabel>
+      </div>
       {isLoading ? (
         <div className="p-4 text-sm text-muted-foreground text-center">
           Loading...
@@ -78,7 +75,7 @@ export function ExplorerContent() {
           selectedPath={selectedPath}
         />
       )}
-    </SidebarGroup>
+    </div>
   );
 }
 
