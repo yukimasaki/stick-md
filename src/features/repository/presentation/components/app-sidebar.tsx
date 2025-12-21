@@ -25,18 +25,20 @@ export function AppSidebar({ session }: AppSidebarProps) {
       )}
     >
       {/* サイドバーコンテンツ */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <Tabs defaultValue="explorer" className="w-full h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-2 m-2">
-            <TabsTrigger value="explorer" className="flex items-center gap-2">
-              <Folder className="h-4 w-4" />
-              <span>Explorer</span>
-            </TabsTrigger>
-            <TabsTrigger value="repository" className="flex items-center gap-2">
-              <Github className="h-4 w-4" />
-              <span>Repository</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="p-2">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="explorer" className="flex items-center justify-center gap-1.5 min-w-0">
+                <Folder className="h-4 w-4 shrink-0" />
+                <span className="truncate">Explorer</span>
+              </TabsTrigger>
+              <TabsTrigger value="repository" className="flex items-center justify-center gap-1.5 min-w-0">
+                <Github className="h-4 w-4 shrink-0" />
+                <span className="truncate">Repository</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="explorer" className="mt-0 flex-1 overflow-y-auto">
             <ExplorerContent />
