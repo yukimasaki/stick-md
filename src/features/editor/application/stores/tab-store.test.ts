@@ -198,6 +198,111 @@ describe('tab-store', () => {
     });
   });
 
+  describe('markTabAsDirty', () => {
+    it('タブを未保存状態としてマークする', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'content');
+      const tabId = 'repo1:file1.md';
+
+      store.markTabAsDirty(tabId);
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      expect(tab?.isDirty).toBe(true);
+    });
+
+    it('存在しないタブIDの場合は何もしない', () => {
+      store.markTabAsDirty('non-existent');
+      // エラーが発生しないことを確認
+    });
+  });
+
+  describe('markTabAsSaved', () => {
+    it('タブを保存済み状態としてマークし、originalContentを更新する', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'original');
+      const tabId = 'repo1:file1.md';
+      store.updateTabContent(tabId, 'modified');
+
+      store.markTabAsSaved(tabId);
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      expect(tab?.isDirty).toBe(false);
+      expect(tab?.originalContent).toBe('modified');
+    });
+
+    it('存在しないタブIDの場合は何もしない', () => {
+      store.markTabAsSaved('non-existent');
+      // エラーが発生しないことを確認
+    });
+  });
+
+  describe('updateTabContent', () => {
+    it('タブのコンテンツを更新し、未保存状態を自動判定する', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'original');
+      const tabId = 'repo1:file1.md';
+
+      store.updateTabContent(tabId, 'modified');
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      expect(tab?.content).toBe('modified');
+      expect(tab?.isDirty).toBe(true);
+    });
+
+    it('コンテンツが元の内容と同じ場合はisDirtyをfalseにする', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'original');
+      const tabId = 'repo1:file1.md';
+      store.updateTabContent(tabId, 'modified');
+      store.updateTabContent(tabId, 'original');
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      expect(tab?.isDirty).toBe(false);
+    });
+
+    it('空白のみの違いは無視される', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'original');
+      const tabId = 'repo1:file1.md';
+
+      store.updateTabContent(tabId, '  original  ');
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      expect(tab?.isDirty).toBe(false);
+    });
+
+    it('存在しないタブIDの場合は何もしない', () => {
+      store.updateTabContent('non-existent', 'content');
+      // エラーが発生しないことを確認
+    });
+  });
+
+  describe('openTab', () => {
+    it('新しいタブを開く際にoriginalContentとisDirtyを初期化する', () => {
+      store.openTab('file1.md', 'repo1', 'file1.md', 'content');
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === 'repo1:file1.md');
+      expect(tab?.originalContent).toBe('content');
+      expect(tab?.isDirty).toBe(false);
+    });
+
+    it('既存のタブを開く際にoriginalContentが未設定の場合は設定する', () => {
+      // 最初にcontentなしでタブを開く（originalContentはundefined）
+      store.openTab('file1.md', 'repo1', 'file1.md');
+      const tabId = 'repo1:file1.md';
+      
+      // その後、contentを指定してタブを開く（originalContentが未設定の場合は設定される）
+      store.openTab('file1.md', 'repo1', 'file1.md', 'new content');
+
+      const state = store.getSnapshot();
+      const tab = state.tabs.find(t => t.id === tabId);
+      // originalContentが既に設定されている場合は更新されない（既存の値が保持される）
+      // このテストは実装の動作を確認するため、originalContentが設定されていることを確認
+      expect(tab?.originalContent).toBeDefined();
+    });
+  });
+
   describe('clearTabsByRepository', () => {
     it('指定したリポジトリのタブをクリアする', () => {
       store.openTab('file1.md', 'repo1', 'file1.md');

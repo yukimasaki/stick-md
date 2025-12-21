@@ -8,6 +8,8 @@ export interface Tab {
   repositoryId: string;
   title: string;
   content?: string; // ファイル内容（オプション、メモリ効率のため）
+  originalContent?: string; // 元のファイル内容（保存済みの状態）
+  isDirty?: boolean; // 未保存状態フラグ
 }
 
 /**

@@ -4,6 +4,7 @@ import { pipe } from 'fp-ts/function';
 import type { TabState, Tab } from '@/features/editor/domain/models/tab-state';
 import { createEmptyTabState } from '@/features/editor/domain/models/tab-state';
 import type { TabPersistenceService } from '@/features/editor/domain/services/tab-persistence-service';
+import { compareContent } from '@/features/editor/domain/services/content-comparison-service';
 
 type Listener = () => void;
 
@@ -48,9 +49,14 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
       // 内容が提供されている場合は更新
       const updatedTabs = [...state.tabs];
       if (content !== undefined) {
+        const existingTab = updatedTabs[existingTabIndex];
         updatedTabs[existingTabIndex] = {
-          ...updatedTabs[existingTabIndex],
-          content
+          ...existingTab,
+          content,
+          // originalContentが未設定の場合は設定
+          originalContent: existingTab.originalContent ?? content,
+          // isDirtyは比較結果に基づいて更新
+          isDirty: compareContent(existingTab.originalContent, content)
         };
       }
       
@@ -73,7 +79,9 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
         filePath,
         repositoryId,
         title,
-        content
+        content,
+        originalContent: content, // 初期値としてcontentを設定
+        isDirty: false // 初期状態は保存済み
       };
 
       // 新しいタブを先頭に追加
@@ -198,6 +206,78 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
   };
 
   /**
+   * タブを未保存状態としてマーク
+   */
+  const markTabAsDirty = (tabId: string) => {
+    const tabIndex = state.tabs.findIndex(tab => tab.id === tabId);
+    if (tabIndex < 0) return;
+
+    const updatedTabs = [...state.tabs];
+    updatedTabs[tabIndex] = {
+      ...updatedTabs[tabIndex],
+      isDirty: true
+    };
+
+    state = {
+      ...state,
+      tabs: updatedTabs
+    };
+
+    notify();
+    saveState();
+  };
+
+  /**
+   * タブを保存済み状態としてマーク
+   */
+  const markTabAsSaved = (tabId: string) => {
+    const tabIndex = state.tabs.findIndex(tab => tab.id === tabId);
+    if (tabIndex < 0) return;
+
+    const tab = state.tabs[tabIndex];
+    const updatedTabs = [...state.tabs];
+    updatedTabs[tabIndex] = {
+      ...tab,
+      isDirty: false,
+      originalContent: tab.content // 現在のcontentをoriginalContentとして保存
+    };
+
+    state = {
+      ...state,
+      tabs: updatedTabs
+    };
+
+    notify();
+    saveState();
+  };
+
+  /**
+   * タブのコンテンツを更新し、未保存状態を自動判定
+   */
+  const updateTabContent = (tabId: string, content: string) => {
+    const tabIndex = state.tabs.findIndex(tab => tab.id === tabId);
+    if (tabIndex < 0) return;
+
+    const tab = state.tabs[tabIndex];
+    const isDirty = compareContent(tab.originalContent, content);
+
+    const updatedTabs = [...state.tabs];
+    updatedTabs[tabIndex] = {
+      ...tab,
+      content,
+      isDirty
+    };
+
+    state = {
+      ...state,
+      tabs: updatedTabs
+    };
+
+    notify();
+    saveState();
+  };
+
+  /**
    * リポジトリが変わった場合、該当リポジトリのタブをクリア
    */
   const clearTabsByRepository = (repositoryId: string) => {
@@ -274,6 +354,9 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
     closeTab,
     setActiveTab,
     reorderTabs,
+    markTabAsDirty,
+    markTabAsSaved,
+    updateTabContent,
     clearTabsByRepository,
     initialize
   };

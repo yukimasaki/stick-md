@@ -42,6 +42,24 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
     loadContent();
   }, [editor, activeTab?.id, activeTab?.content]);
 
+  // エディタの変更を検知してタブのコンテンツを更新
+  useEffect(() => {
+    if (!editor || !activeTab) return;
+
+    const cleanup = editor.onChange(async () => {
+      try {
+        const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
+        tabStore.updateTabContent(activeTab.id, markdownContent);
+      } catch (error) {
+        console.error('Failed to convert blocks to markdown:', error);
+      }
+    });
+
+    return () => {
+      cleanup();
+    };
+  }, [editor, activeTab?.id]);
+
   // Handle cursor movement from Toolbar
   useEffect(() => {
     if (!editor || !lastCursorMove.direction) return;

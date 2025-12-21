@@ -62,6 +62,12 @@ export function SortableTabItem({
       >
         {tab.title}
       </span>
+      {tab.isDirty && (
+        <span
+          className="h-2 w-2 rounded-full bg-yellow-500 shrink-0"
+          aria-label="Unsaved changes"
+        />
+      )}
       <button
         onClick={(e) => {
           e.stopPropagation();

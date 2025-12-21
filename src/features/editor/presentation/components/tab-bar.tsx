@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useSyncExternalStore } from 'react';
 import { X, Layers } from 'lucide-react';
 import {
@@ -19,6 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { SortableTabItem } from './sortable-tab-item';
+import { UnsavedChangesDialog } from './unsaved-changes-dialog';
 import { cn } from '@/lib/utils';
 import {
   Popover,
@@ -34,6 +36,9 @@ export function TabBar() {
     tabStore.getSnapshot,
     tabStore.getSnapshot
   );
+
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false);
+  const [pendingTabId, setPendingTabId] = useState<string | null>(null);
 
   const visibleTabs = state.tabs.filter(tab => state.visibleTabIds.includes(tab.id));
   const hiddenTabs = state.tabs.filter(tab => !state.visibleTabIds.includes(tab.id));
@@ -55,7 +60,34 @@ export function TabBar() {
 
   const handleTabClose = (e: React.MouseEvent, tabId: string) => {
     e.stopPropagation();
-    tabStore.closeTab(tabId);
+    
+    const tab = state.tabs.find(t => t.id === tabId);
+    
+    // 未保存状態の場合はDialogを表示
+    if (tab?.isDirty) {
+      setPendingTabId(tabId);
+      setUnsavedDialogOpen(true);
+    } else {
+      // 保存済みの場合は直接閉じる
+      tabStore.closeTab(tabId);
+    }
+  };
+
+  const handleSave = () => {
+    if (pendingTabId) {
+      // TODO: 保存処理を実装（後で実装予定）
+      // 現時点では保存済みとしてマークしてタブを閉じる
+      tabStore.markTabAsSaved(pendingTabId);
+      tabStore.closeTab(pendingTabId);
+      setPendingTabId(null);
+    }
+  };
+
+  const handleDiscard = () => {
+    if (pendingTabId) {
+      tabStore.closeTab(pendingTabId);
+      setPendingTabId(null);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -156,6 +188,12 @@ export function TabBar() {
                   }}
                 >
                   <span className="truncate flex-1 text-left">{tab.title}</span>
+                  {tab.isDirty && (
+                    <span
+                      className="h-2 w-2 rounded-full bg-yellow-500 shrink-0"
+                      aria-label="Unsaved changes"
+                    />
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -171,6 +209,17 @@ export function TabBar() {
             </div>
           </PopoverContent>
         </Popover>
+      )}
+
+      {/* 未保存変更の警告Dialog */}
+      {pendingTabId && (
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onSave={handleSave}
+          onDiscard={handleDiscard}
+          fileName={state.tabs.find(t => t.id === pendingTabId)?.title || ''}
+        />
       )}
     </div>
   );
