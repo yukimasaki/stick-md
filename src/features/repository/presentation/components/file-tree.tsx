@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
-import { File, Folder, FolderOpen, ChevronRight, ChevronDown, FilePlus } from 'lucide-react';
+import { File, Folder, FolderOpen, ChevronRight, ChevronDown, FilePlus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   ContextMenu,
@@ -20,6 +20,7 @@ interface FileTreeProps {
   onFileSelect?: (path: string) => void;
   selectedPath?: string;
   onFileCreate?: (directoryPath: string) => void;
+  onFileDelete?: (filePath: string, isDirectory: boolean) => void;
 }
 
 function FileTreeItem({
@@ -28,12 +29,14 @@ function FileTreeItem({
   onFileSelect,
   selectedPath,
   onFileCreate,
+  onFileDelete,
 }: {
   node: FileTreeNode;
   level?: number;
   onFileSelect?: (path: string) => void;
   selectedPath?: string;
   onFileCreate?: (directoryPath: string) => void;
+  onFileDelete?: (filePath: string, isDirectory: boolean) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false); // デフォルトで閉じた状態
 
@@ -52,6 +55,12 @@ function FileTreeItem({
   const handleCreateFile = () => {
     if (onFileCreate && isDirectory) {
       onFileCreate(node.path);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onFileDelete) {
+      onFileDelete(node.path, isDirectory);
     }
   };
 
@@ -88,8 +97,10 @@ function FileTreeItem({
     </div>
   );
 
-  // ディレクトリの場合はコンテキストメニューを追加
-  if (isDirectory && onFileCreate) {
+  // コンテキストメニューが必要な場合（onFileCreateまたはonFileDeleteが提供されている場合）
+  const needsContextMenu = onFileCreate || onFileDelete;
+
+  if (needsContextMenu) {
     return (
       <div>
         <ContextMenu>
@@ -97,17 +108,28 @@ function FileTreeItem({
             {content}
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuSub>
-              <ContextMenuSubTrigger>
-                <FilePlus className="mr-2 h-4 w-4" />
-                <span>New</span>
-              </ContextMenuSubTrigger>
-              <ContextMenuSubContent>
-                <ContextMenuItem onClick={handleCreateFile}>
-                  Markdown (.md)
+            {onFileCreate && isDirectory && (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <FilePlus className="mr-2 h-4 w-4" />
+                  <span>New</span>
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent>
+                  <ContextMenuItem onClick={handleCreateFile}>
+                    Markdown (.md)
+                  </ContextMenuItem>
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            )}
+            {onFileDelete && (
+              <>
+                {onFileCreate && isDirectory && <ContextMenuSeparator />}
+                <ContextMenuItem onClick={handleDelete} variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  <span>Delete</span>
                 </ContextMenuItem>
-              </ContextMenuSubContent>
-            </ContextMenuSub>
+              </>
+            )}
           </ContextMenuContent>
         </ContextMenu>
         {isDirectory && hasChildren && isOpen && (
@@ -120,6 +142,7 @@ function FileTreeItem({
                 onFileSelect={onFileSelect}
                 selectedPath={selectedPath}
                 onFileCreate={onFileCreate}
+                onFileDelete={onFileDelete}
               />
             ))}
           </div>
@@ -128,15 +151,30 @@ function FileTreeItem({
     );
   }
 
-  // ファイルの場合は通常の表示
+  // コンテキストメニューが不要な場合は通常の表示
   return (
     <div>
       {content}
+      {isDirectory && hasChildren && isOpen && (
+        <div>
+          {node.children!.map((child) => (
+            <FileTreeItem
+              key={child.path}
+              node={child}
+              level={level + 1}
+              onFileSelect={onFileSelect}
+              selectedPath={selectedPath}
+              onFileCreate={onFileCreate}
+              onFileDelete={onFileDelete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate }: FileTreeProps) {
+export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFileDelete }: FileTreeProps) {
   if (tree.length === 0) {
     return (
       <ContextMenu>
@@ -179,6 +217,7 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate }: Fil
               onFileSelect={onFileSelect}
               selectedPath={selectedPath}
               onFileCreate={onFileCreate}
+              onFileDelete={onFileDelete}
             />
           ))}
         </div>

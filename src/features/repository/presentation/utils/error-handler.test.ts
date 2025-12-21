@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleFileCreationError } from './error-handler';
+import { handleFileCreationError, handleFileDeletionError } from './error-handler';
 import { toast } from 'sonner';
 import type { FileCreationError } from '@/features/repository/domain/services/file-creation-error';
+import type { FileDeletionError } from '@/features/repository/domain/services/file-deletion-error';
 
 // sonnerをモック
 vi.mock('sonner', () => ({
@@ -92,6 +93,79 @@ describe('handleFileCreationError', () => {
     handleFileCreationError(error);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
+      description: 'An unexpected error occurred',
+    });
+  });
+});
+
+describe('handleFileDeletionError', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('REPOSITORY_NOT_FOUNDの場合、適切なtoastエラーを表示する', () => {
+    const error: FileDeletionError = {
+      type: 'REPOSITORY_NOT_FOUND',
+      message: 'Repository is not cloned',
+    };
+
+    handleFileDeletionError(error);
+
+    expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
+      description: 'Repository is not cloned',
+    });
+  });
+
+  it('FILE_NOT_FOUNDの場合、適切なtoastエラーを表示する', () => {
+    const error: FileDeletionError = {
+      type: 'FILE_NOT_FOUND',
+      message: 'File or directory not found: test.md',
+      filePath: 'test.md',
+    };
+
+    handleFileDeletionError(error);
+
+    expect(toast.error).toHaveBeenCalledWith('File Not Found', {
+      description: 'File or directory not found: test.md',
+    });
+  });
+
+  it('FILE_SYSTEM_ERRORの場合、適切なtoastエラーを表示する', () => {
+    const error: FileDeletionError = {
+      type: 'FILE_SYSTEM_ERROR',
+      message: 'Failed to delete file: test.md',
+      filePath: 'test.md',
+    };
+
+    handleFileDeletionError(error);
+
+    expect(toast.error).toHaveBeenCalledWith('File System Error', {
+      description: 'Failed to delete file: test.md',
+    });
+  });
+
+  it('UNKNOWN_ERRORの場合、適切なtoastエラーを表示する', () => {
+    const error: FileDeletionError = {
+      type: 'UNKNOWN_ERROR',
+      message: 'An unexpected error occurred',
+    };
+
+    handleFileDeletionError(error);
+
+    expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
+      description: 'An unexpected error occurred',
+    });
+  });
+
+  it('予期しないエラータイプの場合、デフォルトのtoastエラーを表示する', () => {
+    const error = {
+      type: 'UNEXPECTED_TYPE',
+      message: 'Unexpected error',
+    } as unknown as FileDeletionError;
+
+    handleFileDeletionError(error);
+
+    expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred',
     });
   });

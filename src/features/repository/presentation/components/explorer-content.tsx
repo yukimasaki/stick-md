@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { FileTree } from '@/features/repository/presentation/components/file-tree';
 import { FileNameEditDialog } from '@/features/repository/presentation/components/file-name-edit-dialog';
+import { FileDeletionDialog } from '@/features/repository/presentation/components/file-deletion-dialog';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { getRepositoryFileTree } from '@/features/repository/application/services/file-tree-service';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
@@ -15,6 +16,9 @@ export function ExplorerContent() {
   const [selectedPath, setSelectedPath] = useState<string | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [targetDirectoryPath, setTargetDirectoryPath] = useState<string>('');
+  const [isDeletionDialogOpen, setIsDeletionDialogOpen] = useState(false);
+  const [deletionTargetPath, setDeletionTargetPath] = useState<string>('');
+  const [deletionTargetIsDirectory, setDeletionTargetIsDirectory] = useState(false);
 
   const selectedRepo = repositories.find(r => r.id === selectedRepositoryId) || null;
 
@@ -74,6 +78,21 @@ export function ExplorerContent() {
     setSelectedPath(filePath);
   };
 
+  const handleFileDelete = (filePath: string, isDirectory: boolean) => {
+    setDeletionTargetPath(filePath);
+    setDeletionTargetIsDirectory(isDirectory);
+    setIsDeletionDialogOpen(true);
+  };
+
+  const handleFileDeleted = async () => {
+    // 削除されたファイルが選択されている場合、選択を解除
+    if (selectedPath === deletionTargetPath || selectedPath?.startsWith(`${deletionTargetPath}/`)) {
+      setSelectedPath(undefined);
+    }
+    // ファイルツリーを再読み込み
+    await loadFileTree();
+  };
+
   return (
     <div className="flex flex-col h-full gap-2 p-2">
       <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground shrink-0">
@@ -91,16 +110,27 @@ export function ExplorerContent() {
               onFileSelect={handleFileSelect}
               selectedPath={selectedPath}
               onFileCreate={selectedRepo ? handleFileCreate : undefined}
+              onFileDelete={selectedRepo ? handleFileDelete : undefined}
             />
           </div>
           {selectedRepo && (
-            <FileNameEditDialog
-              open={isDialogOpen}
-              onOpenChange={setIsDialogOpen}
-              repository={selectedRepo}
-              directoryPath={targetDirectoryPath}
-              onFileCreated={handleFileCreated}
-            />
+            <>
+              <FileNameEditDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                repository={selectedRepo}
+                directoryPath={targetDirectoryPath}
+                onFileCreated={handleFileCreated}
+              />
+              <FileDeletionDialog
+                open={isDeletionDialogOpen}
+                onOpenChange={setIsDeletionDialogOpen}
+                repository={selectedRepo}
+                filePath={deletionTargetPath}
+                isDirectory={deletionTargetIsDirectory}
+                onDeleted={handleFileDeleted}
+              />
+            </>
           )}
         </>
       )}

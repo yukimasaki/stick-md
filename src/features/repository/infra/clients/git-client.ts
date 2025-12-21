@@ -23,7 +23,7 @@ export function getFileSystem(): LightningFS {
 /**
  * リポジトリのクローン先ディレクトリパスを生成
  */
-function getRepositoryPath(repository: Repository): string {
+export function getRepositoryPath(repository: Repository): string {
   return `/repos/${repository.full_name}`;
 }
 
@@ -197,5 +197,76 @@ export async function createFile(
 
   // ファイルを作成
   await fs.promises.writeFile(fullPath, content, 'utf8');
+}
+
+/**
+ * ファイルを削除
+ * Infrastructure Layer: LightningFSを使用したファイル削除
+ */
+export async function deleteFile(
+  repository: Repository,
+  filePath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const repoDir = getRepositoryPath(repository);
+  
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+  const fullPath = `${repoDir}/${normalizedPath}`;
+
+  // ファイルを削除
+  await fs.promises.unlink(fullPath);
+}
+
+/**
+ * ディレクトリを再帰的に削除
+ * Infrastructure Layer: LightningFSを使用したディレクトリ削除
+ */
+export async function deleteDirectory(
+  repository: Repository,
+  dirPath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const repoDir = getRepositoryPath(repository);
+  
+  // パスを正規化（先頭の/を削除、末尾の/を削除）
+  const normalizedPath = dirPath.replace(/^\/+|\/+$/g, '');
+  const fullPath = normalizedPath ? `${repoDir}/${normalizedPath}` : repoDir;
+
+  /**
+   * ディレクトリを再帰的に削除する内部関数
+   */
+  const removeDirectoryRecursive = async (currentPath: string): Promise<void> => {
+    try {
+      const items = await fs.promises.readdir(currentPath);
+      
+      // ディレクトリ内の全アイテムを削除
+      for (const item of items) {
+        const itemPath = `${currentPath}/${item}`;
+        
+        try {
+          const stat = await fs.promises.stat(itemPath);
+          
+          if (stat.isDirectory()) {
+            // サブディレクトリの場合は再帰的に削除
+            await removeDirectoryRecursive(itemPath);
+          } else {
+            // ファイルの場合は削除
+            await fs.promises.unlink(itemPath);
+          }
+        } catch {
+          // アクセスできない場合はスキップ
+          continue;
+        }
+      }
+      
+      // ディレクトリ内が空になったらディレクトリ自体を削除
+      await fs.promises.rmdir(currentPath);
+    } catch {
+      // ディレクトリが読めない、または既に削除されている場合は何もしない
+    }
+  };
+
+  await removeDirectoryRecursive(fullPath);
 }
 
