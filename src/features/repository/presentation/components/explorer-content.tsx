@@ -4,9 +4,17 @@ import { useEffect, useState, useCallback } from 'react';
 import { FileTree } from '@/features/repository/presentation/components/file-tree';
 import { FileNameEditDialog } from '@/features/repository/presentation/components/file-name-edit-dialog';
 import { FileDeletionDialog } from '@/features/repository/presentation/components/file-deletion-dialog';
+import { UnsupportedFileDialog } from '@/features/editor/presentation/components/unsupported-file-dialog';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { getRepositoryFileTree } from '@/features/repository/application/services/file-tree-service';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
+import { isSupportedFileFormat } from '@/features/editor/domain/services/file-format-service';
+import { readFileContent } from '@/features/editor/application/services/file-read-service';
+import { tabStore } from '@/features/editor/application/stores/tab-store';
+import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
+import { toast } from 'sonner';
+import * as E from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
 import { cn } from '@/lib/utils';
 
 export function ExplorerContent() {
@@ -19,6 +27,8 @@ export function ExplorerContent() {
   const [isDeletionDialogOpen, setIsDeletionDialogOpen] = useState(false);
   const [deletionTargetPath, setDeletionTargetPath] = useState<string>('');
   const [deletionTargetIsDirectory, setDeletionTargetIsDirectory] = useState(false);
+  const [isUnsupportedFileDialogOpen, setIsUnsupportedFileDialogOpen] = useState(false);
+  const [unsupportedFilePath, setUnsupportedFilePath] = useState<string>('');
 
   const selectedRepo = repositories.find(r => r.id === selectedRepositoryId) || null;
 
@@ -45,6 +55,19 @@ export function ExplorerContent() {
     loadFileTree();
   }, [loadFileTree]);
 
+  // リポジトリが変わった場合、該当リポジトリのタブをクリア
+  useEffect(() => {
+    if (selectedRepo) {
+      const tabState = tabStore.getSnapshot();
+      // 他のリポジトリのタブをクリア（現在のリポジトリ以外）
+      tabState.tabs.forEach(tab => {
+        if (tab.repositoryId !== selectedRepo.id) {
+          tabStore.clearTabsByRepository(tab.repositoryId);
+        }
+      });
+    }
+  }, [selectedRepo?.id]);
+
   // クローン完了イベントをリッスン
   useEffect(() => {
     const handleRepositoryCloned = (event: CustomEvent<{ repositoryId: string }>) => {
@@ -60,10 +83,45 @@ export function ExplorerContent() {
     };
   }, [selectedRepo, loadFileTree]);
 
-  const handleFileSelect = (path: string) => {
+  const handleFileSelect = async (path: string) => {
+    if (!selectedRepo) {
+      return;
+    }
+
     setSelectedPath(path);
-    // TODO: ファイルを開く処理を実装
-    console.log('Selected file:', path);
+
+    // ファイル形式チェック
+    if (!isSupportedFileFormat(path)) {
+      setUnsupportedFilePath(path);
+      setIsUnsupportedFileDialogOpen(true);
+      return;
+    }
+
+    // ファイルを読み込んでタブを開く
+    try {
+      const result = await readFileContent(selectedRepo, path)();
+
+      pipe(
+        result,
+        E.fold(
+          (error) => {
+            handleFileReadError(error);
+          },
+          (content) => {
+            // ファイル名を取得（パスから最後の部分を抽出）
+            const fileName = path.split('/').pop() || path;
+            
+            // タブを開く（ファイル内容も保存）
+            tabStore.openTab(path, selectedRepo.id, fileName, content);
+          }
+        )
+      );
+    } catch (error) {
+      handleFileReadError({
+        type: 'UNKNOWN_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
   };
 
   const handleFileCreate = (directoryPath: string) => {
@@ -89,6 +147,16 @@ export function ExplorerContent() {
     if (selectedPath === deletionTargetPath || selectedPath?.startsWith(`${deletionTargetPath}/`)) {
       setSelectedPath(undefined);
     }
+    
+    // 削除されたファイルが開いているタブの場合、タブを閉じる
+    const tabState = tabStore.getSnapshot();
+    const deletedTab = tabState.tabs.find(
+      tab => tab.filePath === deletionTargetPath && tab.repositoryId === selectedRepo?.id
+    );
+    if (deletedTab) {
+      tabStore.closeTab(deletedTab.id);
+    }
+    
     // ファイルツリーを再読み込み
     await loadFileTree();
   };
@@ -132,6 +200,11 @@ export function ExplorerContent() {
               />
             </>
           )}
+          <UnsupportedFileDialog
+            open={isUnsupportedFileDialogOpen}
+            onOpenChange={setIsUnsupportedFileDialogOpen}
+            filePath={unsupportedFilePath}
+          />
         </>
       )}
     </div>

@@ -2,15 +2,44 @@
 
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useSyncExternalStore } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
+import { tabStore } from '@/features/editor/application/stores/tab-store';
 
 // Dynamic import of the wrapper component
 const Editor = dynamic(() => import('./editor-wrapper'), { ssr: false });
 
-export function MarkdownEditor() {
+interface MarkdownEditorProps {
+  tabId?: string;
+}
+
+export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   const editor = useCreateBlockNote();
   const { lastCursorMove } = useEditor();
+  const tabState = useSyncExternalStore(
+    tabStore.subscribe,
+    tabStore.getSnapshot,
+    tabStore.getSnapshot
+  );
+  
+  const activeTab = tabState.tabs.find(tab => tab.id === tabId || tab.id === tabState.activeTabId);
+
+  // アクティブタブの内容をエディタに読み込む
+  useEffect(() => {
+    if (!editor || !activeTab?.content) return;
+
+    async function loadContent() {
+      try {
+        const blocks = await editor.tryParseMarkdownToBlocks(activeTab.content!);
+        editor.replaceBlocks(editor.document, blocks);
+      } catch (error) {
+        console.error('Failed to load markdown content:', error);
+      }
+    }
+
+    loadContent();
+  }, [editor, activeTab?.id, activeTab?.content]);
 
   // Handle cursor movement from Toolbar
   useEffect(() => {

@@ -270,3 +270,22 @@ export async function deleteDirectory(
   await removeDirectoryRecursive(fullPath);
 }
 
+/**
+ * ファイルを読み込み
+ * Infrastructure Layer: LightningFSを使用したファイル読み込み
+ */
+export async function readFile(
+  repository: Repository,
+  filePath: string
+): Promise<string> {
+  const fs = getFileSystem();
+  const repoDir = getRepositoryPath(repository);
+  
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+  const fullPath = `${repoDir}/${normalizedPath}`;
+
+  // ファイルを読み込み（UTF-8エンコーディング）
+  return await fs.promises.readFile(fullPath, 'utf8');
+}
+
