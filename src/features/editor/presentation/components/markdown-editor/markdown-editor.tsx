@@ -31,7 +31,8 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
 
     async function loadContent() {
       try {
-        const blocks = await editor.tryParseMarkdownToBlocks(activeTab.content!);
+        if (!activeTab?.content) return;
+        const blocks = await editor.tryParseMarkdownToBlocks(activeTab.content);
         editor.replaceBlocks(editor.document, blocks);
       } catch (error) {
         console.error('Failed to load markdown content:', error);

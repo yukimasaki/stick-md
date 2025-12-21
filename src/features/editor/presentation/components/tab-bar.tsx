@@ -2,7 +2,23 @@
 
 import { useSyncExternalStore } from 'react';
 import { X, Layers } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
+import { SortableTabItem } from './sortable-tab-item';
 import { cn } from '@/lib/utils';
 import {
   Popover,
@@ -22,6 +38,17 @@ export function TabBar() {
   const visibleTabs = state.tabs.filter(tab => state.visibleTabIds.includes(tab.id));
   const hiddenTabs = state.tabs.filter(tab => !state.visibleTabIds.includes(tab.id));
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px以上移動した場合のみドラッグを開始
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const handleTabClick = (tabId: string) => {
     tabStore.setActiveTab(tabId);
   };
@@ -31,48 +58,61 @@ export function TabBar() {
     tabStore.closeTab(tabId);
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = state.visibleTabIds.indexOf(active.id as string);
+    const newIndex = state.visibleTabIds.indexOf(over.id as string);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      // visibleTabIdsの順序を更新
+      const newVisibleTabIds = arrayMove(state.visibleTabIds, oldIndex, newIndex);
+      
+      // 全タブの順序を更新（visibleTabIdsの順序に従って）
+      const allTabIds = [
+        ...newVisibleTabIds,
+        ...state.tabs
+          .filter(tab => !newVisibleTabIds.includes(tab.id))
+          .map(tab => tab.id)
+      ];
+      
+      tabStore.reorderTabs(allTabIds);
+    }
+  };
+
   if (state.tabs.length === 0) {
     return null;
   }
 
   return (
     <div className="flex items-center gap-1 border-b bg-background px-2 py-1">
-      {/* 表示中のタブ（横スクロール可能） */}
-      <div className="flex items-center gap-1 overflow-x-auto flex-1 min-w-0">
-        {visibleTabs.map((tab) => (
-          <div
-            key={tab.id}
-            onClick={() => handleTabClick(tab.id)}
-            className={cn(
-              'group flex items-center gap-1.5 px-3 py-1.5 rounded-t-md text-sm font-medium transition-colors cursor-pointer',
-              'hover:bg-accent',
-              state.activeTabId === tab.id
-                ? 'bg-background border-b-2 border-b-primary text-foreground'
-                : 'text-muted-foreground border-b border-transparent'
-            )}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleTabClick(tab.id);
-              }
-            }}
-          >
-            <span className="truncate max-w-[200px]">{tab.title}</span>
-            <button
-              onClick={(e) => handleTabClose(e, tab.id)}
-              className={cn(
-                'transition-opacity',
-                'hover:bg-accent rounded p-0.5'
-              )}
-              aria-label="Close tab"
-            >
-              <X className="h-3 w-3" />
-            </button>
+      {/* 表示中のタブ（横スクロール可能、ドラッグ&ドロップ対応） */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={state.visibleTabIds}
+          strategy={horizontalListSortingStrategy}
+        >
+          <div className="flex items-center gap-1 overflow-x-auto flex-1 min-w-0">
+            {visibleTabs.map((tab) => (
+              <SortableTabItem
+                key={tab.id}
+                tab={tab}
+                isActive={state.activeTabId === tab.id}
+                onTabClick={handleTabClick}
+                onTabClose={handleTabClose}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
 
       {/* メニューボタン（4つ目以降のタブ） */}
       {hiddenTabs.length > 0 && (

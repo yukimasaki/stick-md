@@ -178,9 +178,19 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
     const remainingTabs = state.tabs.filter(tab => !tabIds.includes(tab.id));
     const newTabs = [...orderedTabs, ...remainingTabs];
 
+    // visibleTabIdsの順序も更新（表示中のタブの順序を維持）
+    const newVisibleTabIds = state.visibleTabIds
+      .filter(id => tabIds.includes(id))
+      .sort((a, b) => {
+        const indexA = tabIds.indexOf(a);
+        const indexB = tabIds.indexOf(b);
+        return indexA - indexB;
+      });
+
     state = {
       ...state,
-      tabs: newTabs
+      tabs: newTabs,
+      visibleTabIds: newVisibleTabIds
     };
 
     notify();
