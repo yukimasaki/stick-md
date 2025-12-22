@@ -43,6 +43,8 @@ export function MenuBar() {
       toast.success('File saved', {
         description: 'The file has been saved successfully',
       });
+      // GitステータスUIに再読み込みを通知
+      window.dispatchEvent(new CustomEvent('git-status-changed'));
     }
   }, [tabState, repositoryState.repositories]);
 

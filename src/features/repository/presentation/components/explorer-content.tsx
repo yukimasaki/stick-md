@@ -148,13 +148,9 @@ export function ExplorerContent() {
       setSelectedPath(undefined);
     }
     
-    // 削除されたファイルが開いているタブの場合、タブを閉じる
-    const tabState = tabStore.getSnapshot();
-    const deletedTab = tabState.tabs.find(
-      tab => tab.filePath === deletionTargetPath && tab.repositoryId === selectedRepo?.id
-    );
-    if (deletedTab) {
-      tabStore.closeTab(deletedTab.id);
+    // 削除されたファイルが開いているタブの場合、タブを削除済み状態としてマーク
+    if (selectedRepo) {
+      tabStore.markTabAsDeleted(deletionTargetPath, selectedRepo.id);
     }
     
     // ファイルツリーを再読み込み

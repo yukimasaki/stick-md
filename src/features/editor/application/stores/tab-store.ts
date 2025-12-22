@@ -278,6 +278,29 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
   };
 
   /**
+   * ファイルパスとリポジトリIDから該当するタブを削除済み状態としてマーク
+   */
+  const markTabAsDeleted = (filePath: string, repositoryId: string) => {
+    const tabId = generateTabId(filePath, repositoryId);
+    const tabIndex = state.tabs.findIndex(tab => tab.id === tabId);
+    if (tabIndex < 0) return;
+
+    const updatedTabs = [...state.tabs];
+    updatedTabs[tabIndex] = {
+      ...updatedTabs[tabIndex],
+      isDeleted: true
+    };
+
+    state = {
+      ...state,
+      tabs: updatedTabs
+    };
+
+    notify();
+    saveState();
+  };
+
+  /**
    * リポジトリが変わった場合、該当リポジトリのタブをクリア
    */
   const clearTabsByRepository = (repositoryId: string) => {
@@ -357,6 +380,7 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
     markTabAsDirty,
     markTabAsSaved,
     updateTabContent,
+    markTabAsDeleted,
     clearTabsByRepository,
     initialize
   };

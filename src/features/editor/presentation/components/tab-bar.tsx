@@ -187,7 +187,14 @@ export function TabBar() {
                     }
                   }}
                 >
-                  <span className="truncate flex-1 text-left">{tab.title}</span>
+                  <span
+                    className={cn(
+                      'truncate flex-1 text-left',
+                      tab.isDeleted && 'text-destructive line-through'
+                    )}
+                  >
+                    {tab.title}
+                  </span>
                   {tab.isDirty && (
                     <span
                       className="h-2 w-2 rounded-full bg-yellow-500 shrink-0"

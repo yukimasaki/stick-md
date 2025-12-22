@@ -57,7 +57,10 @@ export function SortableTabItem({
       tabIndex={0}
     >
       <span
-        className="truncate max-w-[200px] flex-1"
+        className={cn(
+          'truncate max-w-[200px] flex-1',
+          tab.isDeleted && 'text-destructive line-through'
+        )}
         onClick={() => onTabClick(tab.id)}
       >
         {tab.title}

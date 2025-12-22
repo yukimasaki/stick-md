@@ -1,8 +1,16 @@
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import LightningFS from '@isomorphic-git/lightning-fs';
+import type { ReadCommitResult } from 'isomorphic-git';
 import { Repository } from '@/features/repository/domain/models/repository';
 import type { FileSystemEntry } from '@/features/repository/domain/models/file-tree';
+
+/**
+ * Gitステータス結果の型定義
+ * statusMatrixの戻り値: Array<[filepath: string, headStatus: number, workdirStatus: number, indexStatus: number]>
+ * isomorphic-gitのstatusMatrixの実際の順序: [filepath, headStatus, workdirStatus, indexStatus]
+ */
+export type StatusResult = Array<[string, number, number, number]>;
 
 /**
  * LightningFSインスタンスを管理
@@ -287,5 +295,131 @@ export async function readFile(
 
   // ファイルを読み込み（UTF-8エンコーディング）
   return await fs.promises.readFile(fullPath, 'utf8');
+}
+
+/**
+ * Gitステータスを取得
+ * Infrastructure Layer: isomorphic-gitを使用したGitステータス取得
+ * 
+ * @returns StatusResult - [filepath, headStatus, workdirStatus, indexStatus]の配列
+ */
+export async function getStatus(repository: Repository): Promise<StatusResult> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  const statusMatrix = await git.statusMatrix({
+    fs,
+    dir,
+    filter: (f) => f !== '.git',
+  });
+
+  return statusMatrix;
+}
+
+/**
+ * ファイルをステージングに追加
+ * Infrastructure Layer: isomorphic-gitを使用したステージング追加
+ */
+export async function addFile(
+  repository: Repository,
+  filePath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+
+  await git.add({
+    fs,
+    dir,
+    filepath: normalizedPath,
+  });
+}
+
+/**
+ * ファイルをステージングから削除
+ * Infrastructure Layer: isomorphic-gitを使用したステージング削除
+ */
+export async function resetFile(
+  repository: Repository,
+  filePath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+
+  await git.resetIndex({
+    fs,
+    dir,
+    filepath: normalizedPath,
+  });
+}
+
+/**
+ * ファイルの変更を破棄
+ * Infrastructure Layer: isomorphic-gitを使用した変更破棄
+ */
+export async function checkoutFile(
+  repository: Repository,
+  filePath: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  // パスを正規化（先頭の/を削除）
+  const normalizedPath = filePath.replace(/^\/+/, '');
+
+  await git.checkout({
+    fs,
+    dir,
+    filepaths: [normalizedPath],
+  });
+}
+
+/**
+ * コミットを作成
+ * Infrastructure Layer: isomorphic-gitを使用したコミット作成
+ */
+export async function commit(
+  repository: Repository,
+  message: string
+): Promise<string> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  const sha = await git.commit({
+    fs,
+    dir,
+    message,
+    author: {
+      name: 'Stick MD',
+      email: 'stick-md@example.com',
+    },
+  });
+
+  return sha;
+}
+
+/**
+ * コミット履歴を取得
+ * Infrastructure Layer: isomorphic-gitを使用したコミット履歴取得
+ */
+export async function getLog(
+  repository: Repository,
+  limit: number = 10
+): Promise<ReadCommitResult[]> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  const commits = await git.log({
+    fs,
+    dir,
+    depth: limit,
+  });
+
+  return commits;
 }
 
