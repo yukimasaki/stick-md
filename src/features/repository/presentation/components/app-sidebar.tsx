@@ -4,9 +4,11 @@ import { LogOut, User, Folder, Github } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
+import { MobileSaveButton } from "@/features/editor/presentation/components/mobile-save-button"
 import { logout } from "@/app/_actions/auth"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
+import { useIsMobile } from "@/hooks/use-mobile"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -15,18 +17,27 @@ interface AppSidebarProps {
 
 export function AppSidebar({ session }: AppSidebarProps) {
   const { isOpen } = useSidebar();
+  const isMobile = useIsMobile();
 
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-40 w-80 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
-        "flex flex-col h-screen transition-transform duration-300 ease-in-out",
+        "fixed left-0 z-40 w-80 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
+        "flex flex-col transition-transform duration-300 ease-in-out",
+        // PC時はメニューバーの下（top-[36px]）、モバイル時は上端（top-0）
+        isMobile ? "inset-y-0 h-screen" : "top-[36px] bottom-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
       {/* サイドバーコンテンツ */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <Tabs defaultValue="explorer" className="w-full h-full flex flex-col">
+          {/* Mobile Save Button */}
+          {isMobile && (
+            <div className="p-2 border-b">
+              <MobileSaveButton />
+            </div>
+          )}
           <div className="p-2">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="explorer" className="flex items-center justify-center gap-1.5 min-w-0">
