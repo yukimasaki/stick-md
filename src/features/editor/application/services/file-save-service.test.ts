@@ -4,11 +4,11 @@ import * as TE from 'fp-ts/TaskEither';
 import { saveFile } from './file-save-service';
 import type { TabState, Tab } from '@/features/editor/domain/models/tab-state';
 import { Repository } from '@/features/repository/domain/models/repository';
-import * as gitClient from '@/features/repository/infra/clients/git-client';
+import * as gitClient from '@/features/shared/infra/clients/git-client';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 
 // git-clientをモック
-vi.mock('@/features/repository/infra/clients/git-client', () => ({
+vi.mock('@/features/shared/infra/clients/git-client', () => ({
   createFile: vi.fn(),
 }));
 

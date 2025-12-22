@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as E from 'fp-ts/Either';
 import { deleteFileOrDirectory } from './file-deletion-service';
 import { Repository } from '@/features/repository/domain/models/repository';
-import * as gitClient from '@/features/repository/infra/clients/git-client';
+import * as gitClient from '@/features/shared/infra/clients/git-client';
 import LightningFS from '@isomorphic-git/lightning-fs';
 
 // git-clientをモック
-vi.mock('@/features/repository/infra/clients/git-client', () => ({
+vi.mock('@/features/shared/infra/clients/git-client', () => ({
   isRepositoryCloned: vi.fn(),
   getFileSystem: vi.fn(),
   getRepositoryPath: vi.fn(),

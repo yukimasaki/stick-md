@@ -4,7 +4,7 @@ import { pipe } from 'fp-ts/function';
 import type { TabState } from '@/features/editor/domain/models/tab-state';
 import type { Repository } from '@/features/repository/domain/models/repository';
 import { validateSaveRequest } from '@/features/editor/domain/services/file-save-service';
-import { createFile } from '@/features/repository/infra/clients/git-client';
+import { createFile } from '@/features/shared/infra/clients/git-client';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import type { FileSaveError } from '@/features/editor/domain/services/file-save-error';
 

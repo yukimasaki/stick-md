@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import { Repository } from '@/features/repository/domain/models/repository';
-import { createFile, ensureDirectoryExists, getRepositoryTree, isRepositoryCloned } from '@/features/repository/infra/clients/git-client';
+import { createFile, ensureDirectoryExists, getRepositoryTree, isRepositoryCloned } from '@/features/shared/infra/clients/git-client';
 import { validateFileName, checkFileExists } from '@/features/repository/domain/services/file-name-validation-service';
 import type { FileCreationError } from '@/features/repository/domain/services/file-creation-error';
 

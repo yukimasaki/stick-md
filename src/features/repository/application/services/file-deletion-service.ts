@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { Repository } from '@/features/repository/domain/models/repository';
-import { deleteFile, deleteDirectory, isRepositoryCloned, getFileSystem, getRepositoryPath } from '@/features/repository/infra/clients/git-client';
+import { deleteFile, deleteDirectory, isRepositoryCloned, getFileSystem, getRepositoryPath } from '@/features/shared/infra/clients/git-client';
 import type { FileDeletionError } from '@/features/repository/domain/services/file-deletion-error';
 
 /**

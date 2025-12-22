@@ -1,5 +1,5 @@
 import { Repository } from '@/features/repository/domain/models/repository';
-import { cloneRepository, isRepositoryCloned } from '@/features/repository/infra/clients/git-client';
+import { cloneRepository, isRepositoryCloned } from '@/features/shared/infra/clients/git-client';
 
 /**
  * リポジトリをクローン

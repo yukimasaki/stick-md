@@ -2,7 +2,7 @@ import * as E from 'fp-ts/Either';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/function';
 import { Repository } from '@/features/repository/domain/models/repository';
-import { readFile, isRepositoryCloned } from '@/features/repository/infra/clients/git-client';
+import { readFile, isRepositoryCloned } from '@/features/shared/infra/clients/git-client';
 import type { FileReadError } from '@/features/editor/domain/services/file-read-error';
 
 /**

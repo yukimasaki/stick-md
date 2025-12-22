@@ -1,5 +1,5 @@
 import { Repository } from '@/features/repository/domain/models/repository';
-import { getRepositoryTree } from '@/features/repository/infra/clients/git-client';
+import { getRepositoryTree } from '@/features/shared/infra/clients/git-client';
 import { buildFileTree, FileTreeNode } from '@/features/repository/domain/models/file-tree';
 
 /**

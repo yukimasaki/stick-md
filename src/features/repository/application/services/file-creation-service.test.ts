@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as E from 'fp-ts/Either';
 import { createMarkdownFile } from './file-creation-service';
 import { Repository } from '@/features/repository/domain/models/repository';
-import * as gitClient from '@/features/repository/infra/clients/git-client';
+import * as gitClient from '@/features/shared/infra/clients/git-client';
 
 // git-clientをモック
-vi.mock('@/features/repository/infra/clients/git-client', () => ({
+vi.mock('@/features/shared/infra/clients/git-client', () => ({
   isRepositoryCloned: vi.fn(),
   getRepositoryTree: vi.fn(),
   ensureDirectoryExists: vi.fn(),
