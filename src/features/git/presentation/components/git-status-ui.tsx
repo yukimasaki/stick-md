@@ -18,6 +18,12 @@ import { readFileContent } from '@/features/editor/application/services/file-rea
 import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
 import { pipe } from 'fp-ts/function';
 import { isSupportedFileFormat } from '@/features/editor/domain/services/file-format-service';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 /**
  * GitステータスUIコンポーネント
@@ -33,6 +39,19 @@ export function GitStatusUI() {
   const [stagedFiles, setStagedFiles] = useState<string[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [accordionValue, setAccordionValue] = useState<string[]>(() => {
+    // localStorageから開閉状態を復元、なければデフォルトで両方開く
+    if (typeof window === 'undefined') return [];
+    const saved = localStorage.getItem('sidebar-accordion-git-status');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return ['staged', 'unstaged'];
+      }
+    }
+    return ['staged', 'unstaged'];
+  });
 
   const selectedRepo = repositoryState.repositories.find(
     (r) => r.id === repositoryState.selectedRepositoryId
@@ -169,54 +188,72 @@ export function GitStatusUI() {
     );
   }
 
+  if (stagedFiles.length === 0 && unstagedFiles.length === 0) {
+    return null;
+  }
+
+  // 存在するセクションのみをフィルタリング（存在しないセクションは削除）
+  const validAccordionValue = accordionValue.filter(v => {
+    if (v === 'staged') return stagedFiles.length > 0;
+    if (v === 'unstaged') return unstagedFiles.length > 0;
+    return false;
+  });
+
+  const handleValueChange = (value: string[]) => {
+    setAccordionValue(value);
+    localStorage.setItem('sidebar-accordion-git-status', JSON.stringify(value));
+  };
+
   return (
-    <div className="flex flex-col gap-4">
+    <Accordion 
+      type="multiple" 
+      className="w-full"
+      value={validAccordionValue}
+      onValueChange={handleValueChange}
+    >
       {/* Staged files */}
       {stagedFiles.length > 0 && (
-        <div className="flex flex-col gap-1">
-          <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">
-            Staged files
-          </div>
-          <div className="flex flex-col gap-0.5">
-            {stagedFiles.map((filePath) => (
-              <FileStatusItem
-                key={filePath}
-                filePath={filePath}
-                onRemove={() => handleRemove(filePath)}
-                onClick={() => handleFileClick(filePath)}
-              />
-            ))}
-          </div>
-        </div>
+        <AccordionItem value="staged" className="border-none">
+          <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
+            Staged files ({stagedFiles.length})
+          </AccordionTrigger>
+          <AccordionContent className="px-0">
+            <div className="flex flex-col gap-0.5">
+              {stagedFiles.map((filePath) => (
+                <FileStatusItem
+                  key={filePath}
+                  filePath={filePath}
+                  onRemove={() => handleRemove(filePath)}
+                  onClick={() => handleFileClick(filePath)}
+                />
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       )}
 
       {/* Unstaged files */}
       {unstagedFiles.length > 0 && (
-        <div className="flex flex-col gap-1">
-          <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">
-            Unstaged files
-          </div>
-          <div className="flex flex-col gap-0.5">
-            {unstagedFiles.map((filePath) => (
-              <FileStatusItem
-                key={filePath}
-                filePath={filePath}
-                onAdd={() => handleAdd(filePath)}
-                onDiscard={() => handleDiscard(filePath)}
-                onClick={() => handleFileClick(filePath)}
-              />
-            ))}
-          </div>
-        </div>
+        <AccordionItem value="unstaged" className="border-none">
+          <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
+            Unstaged files ({unstagedFiles.length})
+          </AccordionTrigger>
+          <AccordionContent className="px-0">
+            <div className="flex flex-col gap-0.5">
+              {unstagedFiles.map((filePath) => (
+                <FileStatusItem
+                  key={filePath}
+                  filePath={filePath}
+                  onAdd={() => handleAdd(filePath)}
+                  onDiscard={() => handleDiscard(filePath)}
+                  onClick={() => handleFileClick(filePath)}
+                />
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       )}
-
-      {/* 変更がない場合 */}
-      {stagedFiles.length === 0 && unstagedFiles.length === 0 && (
-        <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-          No changes
-        </div>
-      )}
-    </div>
+    </Accordion>
   );
 }
 

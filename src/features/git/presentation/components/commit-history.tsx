@@ -7,6 +7,12 @@ import type { ReadCommitResult } from 'isomorphic-git';
 import { repositoryStore } from '@/features/repository/application/stores/repository-store';
 import { getCommitHistory } from '@/features/git/application/services/git-log-service';
 import { handleGitLogError } from '@/features/git/presentation/utils/error-handler';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 /**
  * コミット履歴コンポーネント
  * Presentation Layer: コミット履歴の表示
@@ -20,6 +26,16 @@ export function CommitHistory() {
 
   const [commits, setCommits] = useState<ReadCommitResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [accordionValue, setAccordionValue] = useState<string>(() => {
+    // localStorageから開閉状態を復元、なければデフォルトで開く
+    if (typeof window === 'undefined') return 'history';
+    const saved = localStorage.getItem('sidebar-accordion-history');
+    // nullでない場合（空文字列も含む）は保存された値を使用
+    if (saved !== null) {
+      return saved;
+    }
+    return 'history';
+  });
 
   const selectedRepo = repositoryState.repositories.find(
     (r) => r.id === repositoryState.selectedRepositoryId
@@ -89,22 +105,37 @@ export function CommitHistory() {
     );
   }
 
+  const handleValueChange = (value: string) => {
+    setAccordionValue(value);
+    localStorage.setItem('sidebar-accordion-history', value);
+  };
+
   return (
-    <div className="flex flex-col gap-1">
-      <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground">
-        History
-      </div>
-      <div className="flex flex-col gap-0.5">
-        {commits.map((commit) => (
-          <div
-            key={commit.oid}
-            className="px-2 py-1.5 rounded-md text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-          >
-            {commit.commit.message.split('\n')[0]}
+    <Accordion 
+      type="single" 
+      collapsible 
+      value={accordionValue}
+      onValueChange={handleValueChange}
+      className="w-full"
+    >
+      <AccordionItem value="history" className="border-none">
+        <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
+          History ({commits.length})
+        </AccordionTrigger>
+        <AccordionContent className="px-0">
+          <div className="flex flex-col gap-0.5">
+            {commits.map((commit) => (
+              <div
+                key={commit.oid}
+                className="px-2 py-1.5 rounded-md text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+              >
+                {commit.commit.message.split('\n')[0]}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
