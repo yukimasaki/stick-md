@@ -1,9 +1,10 @@
 'use client';
 
-import { LogOut, User, Folder, Github, X, ChevronDown } from "lucide-react"
+import { LogOut, User, Folder, Github, X, ChevronDown, GitBranch } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
+import { RepositorySelector } from "@/features/repository/presentation/components/repository-selector"
 import { MobileSaveButton } from "@/features/editor/presentation/components/mobile-save-button"
 import { login, logout } from "@/app/_actions/auth"
 import { cn } from "@/lib/utils"
@@ -37,6 +38,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
   const { isOpen, close } = useSidebar();
   const isMobile = useIsMobile();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
 
   const handleLogout = () => {
     setShowLogoutDialog(false);
@@ -120,6 +122,13 @@ export function AppSidebar({ session }: AppSidebarProps) {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
+                                    onClick={() => setShowRepositoryDialog(true)}
+                                >
+                                    <GitBranch className="h-4 w-4" />
+                                    <span>Select repository</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
                                     variant="destructive"
                                     onClick={() => setShowLogoutDialog(true)}
                                 >
@@ -200,6 +209,31 @@ export function AppSidebar({ session }: AppSidebarProps) {
               サインアウト
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* リポジトリ選択ダイアログ */}
+      <Dialog open={showRepositoryDialog} onOpenChange={setShowRepositoryDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Select repository</DialogTitle>
+            <DialogDescription>
+              {session ? (
+                "リポジトリを選択してください"
+              ) : (
+                "リポジトリを選択するにはサインインが必要です"
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {session ? (
+              <RepositorySelector accessToken={session.accessToken as string | undefined} />
+            ) : (
+              <div className="text-sm text-muted-foreground text-center py-4">
+                Please sign in to select a repository.
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </aside>

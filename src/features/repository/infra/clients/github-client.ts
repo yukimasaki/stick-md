@@ -46,7 +46,7 @@ function mapGitHubRepoToDomain(repo: any): Repository {
  * 注意: GitHub APIはデフォルトで30件までしか返さないため、ページネーションを実装
  * type=all: すべてのリポジトリ（所有、フォーク、コラボレーター）を取得
  * per_page=100: 1ページあたりの最大件数（GitHub APIの上限）
- * sort=full_name: リポジトリ名でソート
+ * sort=updated: 変更日の新しい順でソート
  */
 export async function getUserRepositories(
   accessToken: string
@@ -57,9 +57,9 @@ export async function getUserRepositories(
 
   while (true) {
     // type=all: すべてのリポジトリ（所有、フォーク、コラボレーター）を取得
-    // sort=full_name: リポジトリ名でソート
+    // sort=updated: 変更日の新しい順でソート
     // per_page=100: 1ページあたりの最大件数
-    const endpoint = `/user/repos?type=all&sort=full_name&per_page=${perPage}&page=${page}`;
+    const endpoint = `/user/repos?type=all&sort=updated&per_page=${perPage}&page=${page}`;
     const response = await fetchWithToken(endpoint, accessToken);
     const data = await response.json();
 
