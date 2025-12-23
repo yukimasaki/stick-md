@@ -16,8 +16,13 @@ import { toast } from 'sonner';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import { cn } from '@/lib/utils';
+import type { Session } from 'next-auth';
 
-export function ExplorerContent() {
+interface ExplorerContentProps {
+  session: Session | null;
+}
+
+export function ExplorerContent({ session }: ExplorerContentProps) {
   const { repositories, selectedRepositoryId } = useRepository();
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +59,14 @@ export function ExplorerContent() {
   useEffect(() => {
     loadFileTree();
   }, [loadFileTree]);
+
+  // sessionがnullのときにファイルツリーをクリア
+  useEffect(() => {
+    if (!session) {
+      setFileTree([]);
+      setSelectedPath(undefined);
+    }
+  }, [session]);
 
   // リポジトリが変わった場合、該当リポジトリのタブをクリア
   useEffect(() => {

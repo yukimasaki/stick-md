@@ -52,7 +52,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
           </div>
 
           <TabsContent value="explorer" className="mt-0 flex-1 overflow-y-auto">
-            <ExplorerContent />
+            <ExplorerContent session={session} />
           </TabsContent>
 
           <TabsContent value="repository" className="mt-0 flex-1 overflow-y-auto">

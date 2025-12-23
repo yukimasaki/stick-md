@@ -96,13 +96,35 @@ export const createRepositoryStore = (persistenceService?: PersistenceService) =
     }
   };
 
+  const clear = () => {
+    state = {
+      repositories: [],
+      selectedRepositoryId: null,
+      isLoading: false
+    };
+    notify();
+
+    // 永続化（副作用を分離）
+    if (persistenceService) {
+      pipe(
+        { selectedRepositoryId: null },
+        persistenceService.save,
+        E.fold(
+          (error) => console.error('Failed to save state:', error),
+          () => {} // 成功時は何もしない
+        )
+      );
+    }
+  };
+
   return {
     getSnapshot,
     subscribe,
     setRepositories,
     selectRepository,
     setLoading,
-    initialize
+    initialize,
+    clear
   };
 };
 

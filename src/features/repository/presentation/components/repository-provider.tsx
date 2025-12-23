@@ -24,10 +24,19 @@ export function RepositoryProvider({ children, accessToken }: RepositoryProvider
 
   // リポジトリ一覧を取得（accessTokenがある場合のみ）
   useEffect(() => {
+    // accessTokenがundefinedの場合はリポジトリ一覧と選択状態のみをクリア
+    // IndexedDBの仮想ファイルシステムは保持する
+    if (!accessToken) {
+      repositoryStore.setRepositories([]);
+      repositoryStore.selectRepository(null);
+      hasFetchedReposRef.current = false;
+      return;
+    }
+
     const fetchRepositories = async () => {
       // 既にリポジトリが取得済み、または既に取得処理を実行済みの場合はスキップ
       const snapshot = repositoryStore.getSnapshot();
-      if (snapshot.repositories.length > 0 || hasFetchedReposRef.current || !accessToken) {
+      if (snapshot.repositories.length > 0 || hasFetchedReposRef.current) {
         return;
       }
 
