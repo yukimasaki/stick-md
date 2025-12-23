@@ -54,7 +54,7 @@ export async function cloneRepository(
     url,
     corsProxy: 'https://cors.isomorphic-git.org',
     singleBranch: true,
-    depth: 1,
+    // depth: 1を削除して全履歴を取得（コミット履歴表示のため）
     onAuth: () => ({
       username: accessToken,
       password: '',
