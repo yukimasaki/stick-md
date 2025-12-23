@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
 
 export function SidebarToggleButton() {
-  const { toggle } = useSidebar();
+  const { toggle, isOpen } = useSidebar();
+
+  // サイドバーが開いている時は非表示
+  if (isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 left-6 z-50">
