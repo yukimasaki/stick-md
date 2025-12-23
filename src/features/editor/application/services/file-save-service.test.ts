@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as E from 'fp-ts/Either';
-import * as TE from 'fp-ts/TaskEither';
 import { saveFile } from './file-save-service';
 import type { TabState, Tab } from '@/features/editor/domain/models/tab-state';
 import { Repository } from '@/features/repository/domain/models/repository';
@@ -144,8 +143,7 @@ describe('saveFile', () => {
       const result = await saveFile(mockTabState, mockRepositories)();
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_SYSTEM_ERROR');
+      if (E.isLeft(result) && result.left.type === 'FILE_SYSTEM_ERROR') {
         expect(result.left.filePath).toBe('test.md');
       }
       expect(tabStore.markTabAsSaved).not.toHaveBeenCalled();
@@ -158,8 +156,7 @@ describe('saveFile', () => {
       const result = await saveFile(mockTabState, mockRepositories)();
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_NOT_FOUND');
+      if (E.isLeft(result) && result.left.type === 'FILE_NOT_FOUND') {
         expect(result.left.filePath).toBe('test.md');
       }
       expect(tabStore.markTabAsSaved).not.toHaveBeenCalled();

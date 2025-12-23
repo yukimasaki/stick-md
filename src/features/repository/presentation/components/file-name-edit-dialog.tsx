@@ -36,24 +36,29 @@ export function FileNameEditDialog({
   const [isCreating, setIsCreating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // モーダルが開いたときにファイル名をリセットしてフォーカス
+  // 外部システム（DOM）との同期: モーダルが開いたときにファイル名をリセットしてフォーカス
   useEffect(() => {
-    if (open) {
-      setFileName('.md');
-      setIsCreating(false);
-      // 次のフレームでフォーカス（DOM更新を待つ）
-      setTimeout(() => {
-        inputRef.current?.focus();
-        // ファイル名の拡張子部分を選択（.mdの前まで）
-        if (inputRef.current) {
-          const input = inputRef.current;
-          const dotIndex = input.value.lastIndexOf('.');
-          if (dotIndex > 0) {
-            input.setSelectionRange(0, dotIndex);
-          }
-        }
-      }, 0);
+    if (!open) {
+      return;
     }
+    // ファイル名をリセット（DOM更新前）
+    // Note: モーダルが開いたときに状態をリセットするのは、外部システム（DOM）との同期のため
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFileName('.md');
+    setIsCreating(false);
+    // 次のフレームでフォーカス（DOM更新を待つ）
+    const timeoutId = setTimeout(() => {
+      inputRef.current?.focus();
+      // ファイル名の拡張子部分を選択（.mdの前まで）
+      if (inputRef.current) {
+        const input = inputRef.current;
+        const dotIndex = input.value.lastIndexOf('.');
+        if (dotIndex > 0) {
+          input.setSelectionRange(0, dotIndex);
+        }
+      }
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [open]);
 
   const handleCreate = async () => {
@@ -109,7 +114,7 @@ export function FileNameEditDialog({
         <DialogHeader>
           <DialogTitle>Create New Markdown File</DialogTitle>
           <DialogDescription>
-            Enter the file name. You can include a directory path (e.g., "dir/file.md").
+            Enter the file name. You can include a directory path (e.g., &quot;dir/file.md&quot;).
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

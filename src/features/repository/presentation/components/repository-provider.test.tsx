@@ -26,6 +26,7 @@ vi.mock('@/features/repository/application/stores/repository-store', () => ({
       isLoading: false,
     })),
     setRepositories: vi.fn(),
+    selectRepository: vi.fn(),
     setLoading: vi.fn(),
   },
 }));

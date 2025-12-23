@@ -1,4 +1,3 @@
-import * as E from 'fp-ts/Either';
 import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/function';
 import { Repository } from '@/features/repository/domain/models/repository';

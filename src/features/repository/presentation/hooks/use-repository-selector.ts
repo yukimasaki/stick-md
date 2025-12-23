@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
-import { Repository } from '@/features/repository/domain/models/repository';
 import { 
   getDisplayRepository, 
   checkRepositoryCloned,

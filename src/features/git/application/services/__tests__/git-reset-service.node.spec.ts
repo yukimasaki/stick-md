@@ -1,10 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import { resetFileFromStage } from '../git-reset-service';
 import { resetFile } from '@/features/shared/infra/clients/git-client';
 import { Repository } from '@/features/repository/domain/models/repository';
-import type { GitResetError } from '@/features/git/domain/services/git-reset-error';
 
 // git-clientをモック
 vi.mock('@/features/shared/infra/clients/git-client', () => ({
@@ -55,8 +53,7 @@ describe('resetFileFromStage', () => {
     const result = await resetFileFromStage(mockRepository, filePath)();
 
     expect(E.isLeft(result)).toBe(true);
-    if (E.isLeft(result)) {
-      expect(result.left.type).toBe('FILE_NOT_FOUND');
+    if (E.isLeft(result) && result.left.type === 'FILE_NOT_FOUND') {
       expect(result.left.message).toBe(`File not found: ${filePath}`);
       expect(result.left.filePath).toBe(filePath);
     }
@@ -71,8 +68,7 @@ describe('resetFileFromStage', () => {
     const result = await resetFileFromStage(mockRepository, filePath)();
 
     expect(E.isLeft(result)).toBe(true);
-    if (E.isLeft(result)) {
-      expect(result.left.type).toBe('GIT_RESET_ERROR');
+    if (E.isLeft(result) && result.left.type === 'GIT_RESET_ERROR') {
       expect(result.left.message).toContain('Failed to reset file from stage');
       expect(result.left.filePath).toBe(filePath);
     }

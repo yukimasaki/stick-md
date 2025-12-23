@@ -117,7 +117,7 @@ export async function getRepositoryTree(
     };
 
     return await walkDirectory(dir);
-  } catch (error) {
+  } catch {
     // リポジトリがクローンされていない場合
     return [];
   }
@@ -195,7 +195,7 @@ export async function createFile(
 
   // 親ディレクトリを取得
   const pathParts = normalizedPath.split('/');
-  const fileName = pathParts.pop();
+  pathParts.pop(); // ファイル名を削除（使用しない）
   const dirPath = pathParts.join('/');
 
   // 親ディレクトリが存在することを確認（存在しない場合は作成）

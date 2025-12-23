@@ -58,7 +58,7 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
     return () => {
       cleanup();
     };
-  }, [editor, activeTab?.id]);
+  }, [editor, activeTab]);
 
   // Handle cursor movement from Toolbar
   useEffect(() => {

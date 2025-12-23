@@ -12,10 +12,8 @@ import { isSupportedFileFormat } from '@/features/editor/domain/services/file-fo
 import { readFileContent } from '@/features/editor/application/services/file-read-service';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
-import { toast } from 'sonner';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import { cn } from '@/lib/utils';
 import type { Session } from 'next-auth';
 
 interface ExplorerContentProps {
@@ -79,7 +77,7 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
         }
       });
     }
-  }, [selectedRepo?.id]);
+  }, [selectedRepo]);
 
   // クローン完了イベントをリッスン
   useEffect(() => {

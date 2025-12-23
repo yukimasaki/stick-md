@@ -4,7 +4,10 @@ import { MobileSaveButton } from './mobile-save-button';
 import * as fileSaveService from '@/features/editor/application/services/file-save-service';
 import * as tabStore from '@/features/editor/application/stores/tab-store';
 import * as repositoryStore from '@/features/repository/application/stores/repository-store';
-import * as E from 'fp-ts/Either';
+import * as TE from 'fp-ts/TaskEither';
+import type { TabState } from '@/features/editor/domain/models/tab-state';
+import type { Repository } from '@/features/repository/domain/models/repository';
+import type { FileSaveError } from '@/features/editor/domain/services/file-save-error';
 
 // モック
 vi.mock('@/features/editor/application/services/file-save-service');
@@ -34,7 +37,13 @@ describe('MobileSaveButton', () => {
     visibleTabIds: ['tab-1'],
   };
 
-  const mockRepositoryState = {
+  interface RepositoryState {
+    repositories: Repository[];
+    selectedRepositoryId: string | null;
+    isLoading: boolean;
+  }
+
+  const mockRepositoryState: RepositoryState = {
     repositories: [
       {
         id: 'repo-1',
@@ -50,9 +59,9 @@ describe('MobileSaveButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(tabStore.tabStore.subscribe).mockImplementation(() => () => {});
-    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(mockTabState as any);
+    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(mockTabState as TabState);
     vi.mocked(repositoryStore.repositoryStore.subscribe).mockImplementation(() => () => {});
-    vi.mocked(repositoryStore.repositoryStore.getSnapshot).mockReturnValue(mockRepositoryState as any);
+    vi.mocked(repositoryStore.repositoryStore.getSnapshot).mockReturnValue(mockRepositoryState as RepositoryState);
   });
 
   it('保存ボタンが表示される', () => {
@@ -63,7 +72,7 @@ describe('MobileSaveButton', () => {
 
   it('ボタンクリックで保存が実行される', async () => {
     vi.mocked(fileSaveService.saveFile).mockReturnValue(
-      async () => E.right(undefined) as any
+      TE.right(undefined) as TE.TaskEither<FileSaveError, void>
     );
 
     render(<MobileSaveButton />);
@@ -81,7 +90,7 @@ describe('MobileSaveButton', () => {
       ...mockTabState,
       activeTabId: null,
     };
-    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(tabStateWithoutActive as any);
+    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(tabStateWithoutActive as TabState);
 
     render(<MobileSaveButton />);
     const buttons = screen.getAllByRole('button');

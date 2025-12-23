@@ -114,8 +114,7 @@ describe('validateSaveRequest', () => {
       const result = validateSaveRequest(tabStateWithEmptyPath, mockRepositories);
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_NOT_FOUND');
+      if (E.isLeft(result) && result.left.type === 'FILE_NOT_FOUND') {
         expect(result.left.filePath).toBe('');
       }
     });

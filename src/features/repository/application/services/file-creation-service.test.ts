@@ -75,8 +75,7 @@ describe('createMarkdownFile', () => {
       const result = await createMarkdownFile(mockRepository, '', 'test.md');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_ALREADY_EXISTS');
+      if (E.isLeft(result) && result.left.type === 'FILE_ALREADY_EXISTS') {
         expect(result.left.filePath).toBe('test.md');
       }
     });
@@ -146,8 +145,7 @@ describe('createMarkdownFile', () => {
       const result = await createMarkdownFile(mockRepository, 'dir', 'test.md');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('DIRECTORY_CREATION_FAILED');
+      if (E.isLeft(result) && result.left.type === 'DIRECTORY_CREATION_FAILED') {
         expect(result.left.directoryPath).toBe('dir');
       }
     });
@@ -181,8 +179,7 @@ describe('createMarkdownFile', () => {
       const result = await createMarkdownFile(mockRepository, '', 'test.md');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_CREATION_FAILED');
+      if (E.isLeft(result) && result.left.type === 'FILE_CREATION_FAILED') {
         expect(result.left.filePath).toBe('test.md');
       }
     });

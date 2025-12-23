@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MenuBar } from './menu-bar';
 import * as fileSaveService from '@/features/editor/application/services/file-save-service';
 import * as tabStore from '@/features/editor/application/stores/tab-store';
 import * as repositoryStore from '@/features/repository/application/stores/repository-store';
-import * as E from 'fp-ts/Either';
+import * as TE from 'fp-ts/TaskEither';
+import type { TabState } from '@/features/editor/domain/models/tab-state';
+import type { Repository } from '@/features/repository/domain/models/repository';
+import type { FileSaveError } from '@/features/editor/domain/services/file-save-error';
 
 // モック
 vi.mock('@/features/editor/application/services/file-save-service');
@@ -34,7 +37,13 @@ describe('MenuBar', () => {
     visibleTabIds: ['tab-1'],
   };
 
-  const mockRepositoryState = {
+  interface RepositoryState {
+    repositories: Repository[];
+    selectedRepositoryId: string | null;
+    isLoading: boolean;
+  }
+
+  const mockRepositoryState: RepositoryState = {
     repositories: [
       {
         id: 'repo-1',
@@ -50,9 +59,9 @@ describe('MenuBar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(tabStore.tabStore.subscribe).mockImplementation(() => () => {});
-    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(mockTabState as any);
+    vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(mockTabState as TabState);
     vi.mocked(repositoryStore.repositoryStore.subscribe).mockImplementation(() => () => {});
-    vi.mocked(repositoryStore.repositoryStore.getSnapshot).mockReturnValue(mockRepositoryState as any);
+    vi.mocked(repositoryStore.repositoryStore.getSnapshot).mockReturnValue(mockRepositoryState as RepositoryState);
   });
 
   it('Fileメニューが表示される', () => {
@@ -63,7 +72,7 @@ describe('MenuBar', () => {
 
   it('Ctrl+Sキーで保存が実行される', async () => {
     vi.mocked(fileSaveService.saveFile).mockReturnValue(
-      async () => E.right(undefined) as any
+      TE.right(undefined) as TE.TaskEither<FileSaveError, void>
     );
 
     render(<MenuBar />);
@@ -88,7 +97,7 @@ describe('MenuBar', () => {
     });
 
     vi.mocked(fileSaveService.saveFile).mockReturnValue(
-      async () => E.right(undefined) as any
+      TE.right(undefined) as TE.TaskEither<FileSaveError, void>
     );
 
     render(<MenuBar />);

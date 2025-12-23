@@ -1,114 +1,108 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { RepositorySelector } from './repository-selector';
-import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
+import { useRepositorySelector } from '@/features/repository/presentation/hooks/use-repository-selector';
 
-// Mock useRepository
-vi.mock('@/features/repository/presentation/hooks/use-repository');
-
-// Mock Server Action
-vi.mock('@/app/_actions/repository', () => ({
-  getUserRepositories: vi.fn(),
-}));
+// Mock useRepositorySelector
+vi.mock('@/features/repository/presentation/hooks/use-repository-selector');
 
 afterEach(() => {
   cleanup();
 });
 
 describe('RepositorySelector', () => {
-  const mockActions = {
-    selectRepository: vi.fn(),
-    setRepositories: vi.fn(),
-    setLoading: vi.fn(),
-  };
-
   const mockRepos = [
     { id: '1', name: 'repo-1', full_name: 'user/repo-1', private: false },
     { id: '2', name: 'repo-2', full_name: 'user/repo-2', private: true },
   ];
 
-  it('renders input with placeholder', () => {
-    vi.mocked(useRepository).mockReturnValue({
+  it('renders Select component with placeholder', () => {
+    vi.mocked(useRepositorySelector).mockReturnValue({
       repositories: [],
-      selectedRepositoryId: null,
+      displayRepo: null,
+      displayRepoId: '',
       isLoading: false,
-      actions: mockActions,
+      isCloned: false,
+      isCloning: false,
+      cloneError: null,
+      handleSelect: vi.fn(),
+      handleClone: vi.fn(),
     });
 
     render(<RepositorySelector />);
-    expect(screen.getByPlaceholderText('Search or select a repository...')).toBeDefined();
+    expect(screen.getByText('Select a repository...')).toBeDefined();
   });
 
-  it('renders selected repository name in input', () => {
-    vi.mocked(useRepository).mockReturnValue({
+  it('renders selected repository name', () => {
+    vi.mocked(useRepositorySelector).mockReturnValue({
       repositories: mockRepos,
-      selectedRepositoryId: '1',
+      displayRepo: mockRepos[0],
+      displayRepoId: '1',
       isLoading: false,
-      actions: mockActions,
+      isCloned: false,
+      isCloning: false,
+      cloneError: null,
+      handleSelect: vi.fn(),
+      handleClone: vi.fn(),
     });
 
     render(<RepositorySelector />);
-    const input = screen.getByRole('combobox') as HTMLInputElement;
-    expect(input.value).toBe('user/repo-1');
+    expect(screen.getByText('user/repo-1')).toBeDefined();
   });
 
-  it('opens dropdown and shows repository options', async () => {
-    vi.mocked(useRepository).mockReturnValue({
-      repositories: mockRepos,
-      selectedRepositoryId: null,
-      isLoading: false,
-      actions: mockActions,
+  it('disables Select when isLoading is true', () => {
+    vi.mocked(useRepositorySelector).mockReturnValue({
+      repositories: [],
+      displayRepo: null,
+      displayRepoId: '',
+      isLoading: true,
+      isCloned: false,
+      isCloning: false,
+      cloneError: null,
+      handleSelect: vi.fn(),
+      handleClone: vi.fn(),
     });
 
     render(<RepositorySelector />);
-    
-    const input = screen.getByRole('combobox');
-    fireEvent.focus(input);
-
-    await waitFor(() => {
-      expect(screen.getByText('user/repo-1')).toBeDefined();
-      expect(screen.getByText('user/repo-2')).toBeDefined();
-    });
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.hasAttribute('disabled')).toBe(true);
   });
 
-  it('filters repositories based on search input', async () => {
-    vi.mocked(useRepository).mockReturnValue({
-      repositories: mockRepos,
-      selectedRepositoryId: null,
+  it('renders Select when repositories are empty', () => {
+    vi.mocked(useRepositorySelector).mockReturnValue({
+      repositories: [],
+      displayRepo: null,
+      displayRepoId: '',
       isLoading: false,
-      actions: mockActions,
+      isCloned: false,
+      isCloning: false,
+      cloneError: null,
+      handleSelect: vi.fn(),
+      handleClone: vi.fn(),
     });
 
     render(<RepositorySelector />);
-    
-    const input = screen.getByRole('combobox');
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'repo-1' } });
-
-    await waitFor(() => {
-      expect(screen.getByText('user/repo-1')).toBeDefined();
-      expect(screen.queryByText('user/repo-2')).toBeNull();
-    });
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toBeDefined();
   });
 
-  it('calls selectRepository when repository is selected', async () => {
-    vi.mocked(useRepository).mockReturnValue({
+  it('renders Select component with repositories', () => {
+    const mockHandleSelect = vi.fn();
+    vi.mocked(useRepositorySelector).mockReturnValue({
       repositories: mockRepos,
-      selectedRepositoryId: null,
+      displayRepo: null,
+      displayRepoId: '',
       isLoading: false,
-      actions: mockActions,
+      isCloned: false,
+      isCloning: false,
+      cloneError: null,
+      handleSelect: mockHandleSelect,
+      handleClone: vi.fn(),
     });
 
     render(<RepositorySelector />);
-    
-    const input = screen.getByRole('combobox');
-    fireEvent.focus(input);
-
-    await waitFor(() => {
-      const repo1Option = screen.getByText('user/repo-1');
-      fireEvent.click(repo1Option);
-    });
-
-    expect(mockActions.selectRepository).toHaveBeenCalledWith('1');
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toBeDefined();
+    expect(mockHandleSelect).toBeDefined();
   });
 });

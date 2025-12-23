@@ -1,10 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import { commitChanges } from '../git-commit-service';
 import { commit } from '@/features/shared/infra/clients/git-client';
 import { Repository } from '@/features/repository/domain/models/repository';
-import type { GitCommitError } from '@/features/git/domain/services/git-commit-error';
 
 // git-clientをモック
 vi.mock('@/features/shared/infra/clients/git-client', () => ({

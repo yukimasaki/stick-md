@@ -1,11 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import { getRepositoryStatus } from '../git-status-service';
 import { getStatus } from '@/features/shared/infra/clients/git-client';
 import { Repository } from '@/features/repository/domain/models/repository';
 import type { StatusResult } from '@/features/shared/infra/clients/git-client';
-import type { GitStatusError } from '@/features/git/domain/services/git-status-error';
 
 // git-clientをモック
 vi.mock('@/features/shared/infra/clients/git-client', () => ({

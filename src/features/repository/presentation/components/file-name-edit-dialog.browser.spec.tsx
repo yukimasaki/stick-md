@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import { FileNameEditDialog } from './file-name-edit-dialog';
 import { Repository } from '@/features/repository/domain/models/repository';
 import * as fileCreationService from '@/features/repository/application/services/file-creation-service';
 import * as errorHandler from '@/features/repository/presentation/utils/error-handler';
+import * as E from 'fp-ts/Either';
+import type { FileCreationError } from '@/features/repository/domain/services/file-creation-error';
 
 // モック
 vi.mock('@/features/repository/application/services/file-creation-service');
@@ -79,10 +81,9 @@ describe('FileNameEditDialog', () => {
 
   describe('ファイル作成', () => {
     it('作成ボタンをクリックするとcreateMarkdownFileが呼ばれる', async () => {
-      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue({
-        _tag: 'Right',
-        right: 'test.md',
-      } as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue(
+        E.right('test.md')
+      );
 
       render(<FileNameEditDialog {...defaultProps} />);
       
@@ -105,10 +106,9 @@ describe('FileNameEditDialog', () => {
       const onFileCreated = vi.fn();
       const onOpenChange = vi.fn();
       
-      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue({
-        _tag: 'Right',
-        right: 'test.md',
-      } as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue(
+        E.right('test.md')
+      );
 
       render(
         <FileNameEditDialog
@@ -136,10 +136,9 @@ describe('FileNameEditDialog', () => {
         message: 'Invalid file name',
       };
       
-      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue({
-        _tag: 'Left',
-        left: error,
-      } as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue(
+        E.left(error)
+      );
 
       render(<FileNameEditDialog {...defaultProps} />);
       
@@ -155,12 +154,12 @@ describe('FileNameEditDialog', () => {
     });
 
     it('ファイル作成中は作成ボタンが「Creating...」と表示され、無効化される', async () => {
-      let resolvePromise: (value: any) => void;
-      const promise = new Promise((resolve) => {
+      let resolvePromise: (value: E.Either<FileCreationError, string>) => void;
+      const promise = new Promise<E.Either<FileCreationError, string>>((resolve) => {
         resolvePromise = resolve;
       });
       
-      vi.mocked(fileCreationService.createMarkdownFile).mockReturnValue(promise as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockReturnValue(promise);
 
       render(<FileNameEditDialog {...defaultProps} />);
       
@@ -208,10 +207,9 @@ describe('FileNameEditDialog', () => {
 
   describe('キーボードショートカット', () => {
     it('Enterキーを押すとファイル作成が実行される', async () => {
-      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue({
-        _tag: 'Right',
-        right: 'test.md',
-      } as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue(
+        E.right('test.md')
+      );
 
       render(<FileNameEditDialog {...defaultProps} />);
       
@@ -238,10 +236,9 @@ describe('FileNameEditDialog', () => {
 
   describe('directoryPathの処理', () => {
     it('directoryPathが指定されている場合、createMarkdownFileに渡される', async () => {
-      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue({
-        _tag: 'Right',
-        right: 'src/test.md',
-      } as any);
+      vi.mocked(fileCreationService.createMarkdownFile).mockResolvedValue(
+        E.right('src/test.md')
+      );
 
       render(
         <FileNameEditDialog

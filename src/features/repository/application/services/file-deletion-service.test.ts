@@ -82,8 +82,7 @@ describe('deleteFileOrDirectory', () => {
       const result = await deleteFileOrDirectory(mockRepository, 'test.md');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_SYSTEM_ERROR');
+      if (E.isLeft(result) && result.left.type === 'FILE_SYSTEM_ERROR') {
         expect(result.left.message).toBe('Failed to delete file: test.md');
         expect(result.left.filePath).toBe('test.md');
       }
@@ -116,8 +115,7 @@ describe('deleteFileOrDirectory', () => {
       const result = await deleteFileOrDirectory(mockRepository, 'src');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_SYSTEM_ERROR');
+      if (E.isLeft(result) && result.left.type === 'FILE_SYSTEM_ERROR') {
         expect(result.left.message).toBe('Failed to delete directory: src');
         expect(result.left.filePath).toBe('src');
       }
@@ -202,8 +200,7 @@ describe('deleteFileOrDirectory', () => {
       const result = await deleteFileOrDirectory(mockRepository, 'nonexistent.md');
 
       expect(E.isLeft(result)).toBe(true);
-      if (E.isLeft(result)) {
-        expect(result.left.type).toBe('FILE_NOT_FOUND');
+      if (E.isLeft(result) && result.left.type === 'FILE_NOT_FOUND') {
         expect(result.left.message).toBe('File or directory not found: nonexistent.md');
         expect(result.left.filePath).toBe('nonexistent.md');
       }

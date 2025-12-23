@@ -20,8 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Note: This token is accessible in the client, so use with caution.
       // We need it for isomorphic-git (client-side) and simple-git (server-side via API).
       if (token.accessToken) {
-         // @ts-ignore - extending session type
-        session.accessToken = token.accessToken as string
+         session.accessToken = token.accessToken as string
       }
       return session
     },

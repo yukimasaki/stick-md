@@ -3,6 +3,17 @@ import { Repository } from '@/features/repository/domain/models/repository';
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 
 /**
+ * GitHub APIのリポジトリレスポンス型
+ * Infrastructure Layer: 外部APIの型定義
+ */
+interface GitHubRepositoryResponse {
+  id: number;
+  name: string;
+  full_name: string;
+  private: boolean;
+}
+
+/**
  * アクセストークンを使用してGitHub APIを呼び出す
  * Infrastructure Layer: 外部サービス（GitHub API）との連携を担当
  */
@@ -30,7 +41,7 @@ async function fetchWithToken(
 /**
  * GitHub APIのレスポンスをドメインモデルに変換
  */
-function mapGitHubRepoToDomain(repo: any): Repository {
+function mapGitHubRepoToDomain(repo: GitHubRepositoryResponse): Repository {
   return {
     id: String(repo.id),
     name: repo.name,

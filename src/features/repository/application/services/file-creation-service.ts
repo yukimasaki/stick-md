@@ -1,16 +1,8 @@
 import * as E from 'fp-ts/Either';
-import { pipe } from 'fp-ts/function';
 import { Repository } from '@/features/repository/domain/models/repository';
 import { createFile, ensureDirectoryExists, getRepositoryTree, isRepositoryCloned } from '@/features/shared/infra/clients/git-client';
 import { validateFileName, checkFileExists } from '@/features/repository/domain/services/file-name-validation-service';
 import type { FileCreationError } from '@/features/repository/domain/services/file-creation-error';
-
-/**
- * リポジトリのルートディレクトリパスを取得
- */
-function getRepositoryPath(repository: Repository): string {
-  return `/repos/${repository.full_name}`;
-}
 
 /**
  * ファイルパスを正規化（先頭・末尾の/を削除、重複する/を統一）
@@ -99,7 +91,7 @@ export async function createMarkdownFile(
     if (finalDirPath) {
       try {
         await ensureDirectoryExists(repository, finalDirPath);
-      } catch (error) {
+      } catch {
         return E.left({
           type: 'DIRECTORY_CREATION_FAILED',
           message: `Failed to create directory: ${finalDirPath}`,
@@ -111,7 +103,7 @@ export async function createMarkdownFile(
     // ファイルを作成（空のコンテンツ）
     try {
       await createFile(repository, filePath, '');
-    } catch (error) {
+    } catch {
       return E.left({
         type: 'FILE_CREATION_FAILED',
         message: `Failed to create file: ${filePath}`,

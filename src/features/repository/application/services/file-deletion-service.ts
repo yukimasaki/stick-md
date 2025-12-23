@@ -45,7 +45,7 @@ export async function deleteFileOrDirectory(
       try {
         await deleteDirectory(repository, normalizedPath);
         return E.right(undefined);
-      } catch (error) {
+      } catch {
         return E.left({
           type: 'FILE_SYSTEM_ERROR',
           message: `Failed to delete directory: ${path}`,
@@ -57,7 +57,7 @@ export async function deleteFileOrDirectory(
       try {
         await deleteFile(repository, normalizedPath);
         return E.right(undefined);
-      } catch (error) {
+      } catch {
         return E.left({
           type: 'FILE_SYSTEM_ERROR',
           message: `Failed to delete file: ${path}`,
