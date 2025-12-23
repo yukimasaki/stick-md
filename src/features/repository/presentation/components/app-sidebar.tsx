@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
 import { MobileSaveButton } from "@/features/editor/presentation/components/mobile-save-button"
-import { logout } from "@/app/_actions/auth"
+import { login, logout } from "@/app/_actions/auth"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -91,8 +91,18 @@ export function AppSidebar({ session }: AppSidebarProps) {
                 </ul>
             </div>
          ) : (
-            <div className="text-xs text-muted-foreground p-4">
-                Stick-MD v0.1.0
+            <div className="p-2">
+                <button
+                    onClick={() => login()}
+                    className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-md p-2 text-sm",
+                        "bg-primary text-primary-foreground hover:bg-primary/90",
+                        "transition-colors"
+                    )}
+                >
+                    <User className="h-4 w-4" />
+                    <span>Sign in</span>
+                </button>
             </div>
          )}
       </div>
