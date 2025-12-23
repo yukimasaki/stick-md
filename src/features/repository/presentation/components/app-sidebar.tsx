@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, User, Folder, Github, X } from "lucide-react"
+import { LogOut, User, Folder, Github, X, ChevronDown } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
@@ -19,6 +19,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -82,30 +90,44 @@ export function AppSidebar({ session }: AppSidebarProps) {
          {session ? (
             <div className="p-3">
                 <div className="flex items-center justify-between gap-3">
-                    {/* 左カラム: Avatar+UserName と Sign Out を横並び */}
-                    <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
-                        {/* Avatar + UserName */}
-                        <div className="flex items-center gap-2 min-w-0">
-                            {session.user?.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full shrink-0" />
-                            ) : (
-                                <User className="w-6 h-6 shrink-0" />
-                            )}
-                            <span className="text-sm font-medium truncate">{session.user?.name}</span>
-                        </div>
-                        {/* Sign Out ボタン */}
-                        <button
-                            onClick={() => setShowLogoutDialog(true)}
-                            className={cn(
-                                "shrink-0 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm",
-                                "text-red-500 hover:bg-sidebar-accent hover:text-red-600",
-                                "transition-colors"
-                            )}
-                        >
-                            <LogOut className="h-4 w-4" />
-                            <span>Sign Out</span>
-                        </button>
+                    {/* 左カラム: Avatar+UserName をdropdown-menu化 */}
+                    <div className="flex-1 min-w-0">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    className={cn(
+                                        "group w-full flex items-center justify-between gap-2 min-w-0 rounded-md px-2 py-1.5 text-sm",
+                                        "hover:bg-sidebar-accent active:bg-sidebar-accent/80 transition-colors",
+                                        "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar",
+                                        "cursor-pointer touch-manipulation" // モバイル向けタップ最適化
+                                    )}
+                                >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        {session.user?.image ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full shrink-0" />
+                                        ) : (
+                                            <User className="w-6 h-6 shrink-0" />
+                                        )}
+                                        <span className="text-sm font-medium truncate">{session.user?.name}</span>
+                                    </div>
+                                    <ChevronDown className="h-4 w-4 shrink-0 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-56">
+                                <DropdownMenuLabel>
+                                    {session.user?.name || "User"}
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => setShowLogoutDialog(true)}
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    <span>Sign Out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                     {/* 右カラム: サイドバーを閉じるボタン */}
                     <button
