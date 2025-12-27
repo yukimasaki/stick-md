@@ -160,9 +160,10 @@ export function UserMenu({ session, avatarOnly = false, buttonClassName }: UserM
                     }}
                     className="flex flex-col max-h-[calc(100vh-2rem)] overflow-y-auto"
                   >
-                    {/* アクセシビリティ用のタイトル（視覚的に非表示） */}
+                    {/* アクセシビリティ用のタイトルと説明（視覚的に非表示） */}
                     <DialogHeader className="sr-only">
                       <DialogTitle>ユーザーメニュー</DialogTitle>
+                      <DialogDescription>ユーザー設定とアカウント管理メニュー</DialogDescription>
                     </DialogHeader>
 
                     {/* ユーザー情報ヘッダー */}
