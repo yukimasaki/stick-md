@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, User, LogOut, ChevronDown, GitBranch } from 'lucide-react';
+import { Menu, User, LogOut, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MenuBar } from '@/features/editor/presentation/components/menu-bar';
 import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
@@ -68,10 +68,10 @@ export function AppHeader({ session }: AppHeaderProps) {
               variant="ghost"
               size="icon"
               onClick={toggle}
-              className="h-9 w-9"
+              className="h-10 w-10"
               aria-label="Toggle Sidebar"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-6 w-6" />
             </Button>
             
             <div className="flex-1 flex items-center justify-center">
@@ -85,20 +85,25 @@ export function AppHeader({ session }: AppHeaderProps) {
                     className={cn(
                       "group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm",
                       "hover:bg-accent active:bg-accent/80 transition-colors",
-                      "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                      "focus:outline-none",
                       "cursor-pointer touch-manipulation"
                     )}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       {session.user?.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full shrink-0" />
+                        <img 
+                          src={session.user.image} 
+                          alt={session.user.name || "User"} 
+                          className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white" 
+                        />
                       ) : (
-                        <User className="w-6 h-6 shrink-0" />
+                        <div className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white flex items-center justify-center">
+                          <User className="w-5 h-5" />
+                        </div>
                       )}
                       <span className="text-sm font-medium truncate hidden sm:inline">{session.user?.name}</span>
                     </div>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -148,20 +153,25 @@ export function AppHeader({ session }: AppHeaderProps) {
                       className={cn(
                         "group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm",
                         "hover:bg-accent active:bg-accent/80 transition-colors",
-                        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                        "focus:outline-none",
                         "cursor-pointer"
                       )}
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {session.user?.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full shrink-0" />
+                          <img 
+                            src={session.user.image} 
+                            alt={session.user.name || "User"} 
+                            className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white" 
+                          />
                         ) : (
-                          <User className="w-6 h-6 shrink-0" />
+                          <div className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white flex items-center justify-center">
+                            <User className="w-5 h-5" />
+                          </div>
                         )}
                         <span className="text-sm font-medium truncate">{session.user?.name}</span>
                       </div>
-                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
