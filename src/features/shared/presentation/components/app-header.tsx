@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { RepositorySelector } from '@/features/repository/presentation/components/repository-selector';
+import { BrandLogo } from '@/features/shared/presentation/components/brand-logo';
 import type { Session } from 'next-auth';
 
 interface AppHeaderProps {
@@ -74,7 +75,7 @@ export function AppHeader({ session }: AppHeaderProps) {
             </Button>
             
             <div className="flex-1 flex items-center justify-center">
-              <span className="text-sm font-semibold">Stick MD</span>
+              <BrandLogo />
             </div>
             
             {session ? (

@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
 import { MobileSaveButton } from "@/features/editor/presentation/components/mobile-save-button"
+import { BrandLogo } from "@/features/shared/presentation/components/brand-logo"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -34,6 +35,13 @@ export function AppSidebar({ session }: AppSidebarProps) {
           : "translate-x-0" // PC: 常時表示
       )}
     >
+      {/* サイドバーヘッダー（モバイル時のみ） */}
+      {isMobile && (
+        <div className="p-4 border-b flex items-center justify-start">
+          <BrandLogo onClick={close} />
+        </div>
+      )}
+
       {/* サイドバーコンテンツ */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <Tabs defaultValue="explorer" className="w-full h-full flex flex-col">
