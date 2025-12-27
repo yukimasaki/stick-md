@@ -12,6 +12,7 @@ import { isSupportedFileFormat } from '@/features/editor/domain/services/file-fo
 import { readFileContent } from '@/features/editor/application/services/file-read-service';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
+import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import type { Session } from 'next-auth';
@@ -22,6 +23,7 @@ interface ExplorerContentProps {
 
 export function ExplorerContent({ session }: ExplorerContentProps) {
   const { repositories, selectedRepositoryId } = useRepository();
+  const { close: closeSidebar } = useSidebar();
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string | undefined>();
@@ -108,6 +110,9 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
       setIsUnsupportedFileDialogOpen(true);
       return;
     }
+
+    // mdファイルの場合、サイドバーを閉じる
+    closeSidebar();
 
     // ファイルを読み込んでタブを開く
     try {
