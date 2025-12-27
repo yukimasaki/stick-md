@@ -205,39 +205,18 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
   }
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
-        <div 
-          className="py-2 h-full"
-        >
-          {tree.map((node) => (
-            <FileTreeItem
-              key={node.path}
-              node={node}
-              onFileSelect={onFileSelect}
-              selectedPath={selectedPath}
-              onFileCreate={onFileCreate}
-              onFileDelete={onFileDelete}
-            />
-          ))}
-        </div>
-      </ContextMenuTrigger>
-      {onFileCreate && (
-        <ContextMenuContent>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>
-              <FilePlus className="mr-2 h-4 w-4" />
-              <span>New</span>
-            </ContextMenuSubTrigger>
-            <ContextMenuSubContent>
-              <ContextMenuItem onClick={() => onFileCreate('')}>
-                Markdown (.md)
-              </ContextMenuItem>
-            </ContextMenuSubContent>
-          </ContextMenuSub>
-        </ContextMenuContent>
-      )}
-    </ContextMenu>
+    <div className="py-2 h-full">
+      {tree.map((node) => (
+        <FileTreeItem
+          key={node.path}
+          node={node}
+          onFileSelect={onFileSelect}
+          selectedPath={selectedPath}
+          onFileCreate={onFileCreate}
+          onFileDelete={onFileDelete}
+        />
+      ))}
+    </div>
   );
 }
 
