@@ -40,7 +40,7 @@ export function RepositorySelector({ accessToken, onCloneSuccess }: RepositorySe
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select a repository..." />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-80">
           {isLoading ? (
             <div className="p-2 text-sm text-center text-muted-foreground">
               Loading repositories...
