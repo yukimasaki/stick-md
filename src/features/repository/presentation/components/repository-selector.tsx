@@ -13,9 +13,10 @@ import { useRepositorySelector } from '@/features/repository/presentation/hooks/
 
 interface RepositorySelectorProps {
   accessToken?: string;
+  onCloneSuccess?: () => void;
 }
 
-export function RepositorySelector({ accessToken }: RepositorySelectorProps) {
+export function RepositorySelector({ accessToken, onCloneSuccess }: RepositorySelectorProps) {
   const {
     repositories,
     displayRepo,
@@ -26,7 +27,7 @@ export function RepositorySelector({ accessToken }: RepositorySelectorProps) {
     cloneError,
     handleSelect,
     handleClone,
-  } = useRepositorySelector(accessToken);
+  } = useRepositorySelector(accessToken, onCloneSuccess);
 
   return (
     <div className="w-full px-2">

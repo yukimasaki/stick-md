@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { login, logout } from '@/app/_actions/auth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RepositorySelector } from '@/features/repository/presentation/components/repository-selector';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
 import type { Session } from 'next-auth';
 
 interface UserMenuProps {
@@ -47,6 +49,7 @@ export function UserMenu({ session, avatarOnly = false, buttonClassName }: UserM
   const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
   const { repositories, selectedRepositoryId } = useRepository();
   const isMobile = useIsMobile();
+  const { open: openSidebar } = useSidebar();
 
   const currentRepository = repositories.find((repo) => repo.id === selectedRepositoryId);
 
@@ -290,7 +293,25 @@ export function UserMenu({ session, avatarOnly = false, buttonClassName }: UserM
           </DialogHeader>
           <div className="py-4">
             {session ? (
-              <RepositorySelector accessToken={session.accessToken as string | undefined} />
+              <RepositorySelector
+                accessToken={session.accessToken as string | undefined}
+                onCloneSuccess={() => {
+                  // クローン成功時の通知
+                  toast.success('リポジトリのクローンが完了しました', {
+                    description: 'エクスプローラーでファイルを確認できます',
+                  });
+                  // モーダルを閉じる
+                  setShowRepositoryDialog(false);
+                  // モバイルの場合、サイドバーを開く
+                  if (isMobile) {
+                    openSidebar();
+                  }
+                  // サイドバーのエクスプローラータブを開くイベントを発火
+                  window.dispatchEvent(new CustomEvent('switch-sidebar-tab', {
+                    detail: { tab: 'explorer' }
+                  }));
+                }}
+              />
             ) : (
               <div className="text-sm text-muted-foreground text-center py-4">
                 リポジトリを選択するにはサインインが必要です

@@ -1,6 +1,7 @@
 'use client';
 
 import { Folder, Github } from "lucide-react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
@@ -39,6 +40,19 @@ function getSidebarClassName(isMobile: boolean, isOpen: boolean) {
 export function AppSidebar({ session }: AppSidebarProps) {
   const { isOpen, close } = useSidebar();
   const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState<string>('explorer');
+
+  // サイドバータブ切り替えイベントをリッスン
+  useEffect(() => {
+    const handleSwitchTab = (event: CustomEvent<{ tab: string }>) => {
+      setActiveTab(event.detail.tab);
+    };
+
+    window.addEventListener('switch-sidebar-tab', handleSwitchTab as EventListener);
+    return () => {
+      window.removeEventListener('switch-sidebar-tab', handleSwitchTab as EventListener);
+    };
+  }, []);
 
   return (
     <aside className={getSidebarClassName(isMobile, isOpen)}>
@@ -49,7 +63,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
 
       {/* サイドバーコンテンツ */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <Tabs defaultValue="explorer" className="w-full h-full flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
           {/* Save Button (PC/Mobile共通) */}
           <div className="p-2 border-b">
             <SaveButton />

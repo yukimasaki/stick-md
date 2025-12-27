@@ -13,7 +13,10 @@ import { cloneRepositoryUseCase } from '@/features/repository/application/servic
  * リポジトリセレクターの状態とロジック
  * Presentation Layer: shadcn/uiのSelectコンポーネント用のフック
  */
-export function useRepositorySelector(accessToken?: string) {
+export function useRepositorySelector(
+  accessToken?: string,
+  onCloneSuccess?: () => void
+) {
   const { repositories, selectedRepositoryId, isLoading, actions } = useRepository();
   
   // ビジネスロジック状態
@@ -86,6 +89,8 @@ export function useRepositorySelector(accessToken?: string) {
       actions.selectRepository(displayRepo.id);
       // 候補リポジトリをクリア（作業リポジトリに設定されたので）
       setPendingRepositoryId(null);
+      // クローン成功時のコールバックを実行
+      onCloneSuccess?.();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to clone repository';
       setCloneError(errorMessage);
