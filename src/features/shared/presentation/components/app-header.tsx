@@ -51,10 +51,13 @@ export function AppHeader({ session }: AppHeaderProps) {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50',
+          'fixed z-50',
           'bg-background border-b',
           'flex items-center',
-          isMobile ? 'h-12 px-4' : 'h-9'
+          'rounded-lg shadow-lg',
+          isMobile 
+            ? 'h-12 px-4 top-4 left-4 right-4' // モバイル: 上下左右に余白、角丸
+            : 'h-9 top-0 left-0 right-0 rounded-b-none' // PC: 上部固定、角丸なし
         )}
       >
         {isMobile ? (

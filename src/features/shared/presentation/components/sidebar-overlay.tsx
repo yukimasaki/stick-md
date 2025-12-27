@@ -18,7 +18,7 @@ export function SidebarOverlay() {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300"
+      className="fixed inset-0 bg-black/30 z-[55] transition-opacity duration-300"
       onClick={close}
       aria-hidden="true"
     />

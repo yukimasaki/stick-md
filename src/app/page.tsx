@@ -17,7 +17,7 @@ export default async function Home() {
           {/* App Header (PC/Mobile共通) */}
           <AppHeader session={session} />
           
-          <div className="flex flex-1 overflow-hidden pt-12 lg:pt-9">
+          <div className="flex flex-1 overflow-hidden pt-16 lg:pt-9">
             <AppSidebar session={session} />
             <SidebarOverlay />
             

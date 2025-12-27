@@ -21,13 +21,13 @@ export function AppSidebar({ session }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed z-40 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
+        "fixed z-[60] bg-sidebar text-sidebar-foreground border-r border-sidebar-border", // z-indexをヘッダーより高くして重ねる
         "flex flex-col transition-transform duration-300 ease-in-out",
         // PC: 常時表示、左側固定
         // モバイル: 左側からスライドイン、オーバーレイ付き（画面の80-90%の幅）
-        // モバイル時のナビゲーションバー高さ: h-12 (48px)
+        // モバイル時のヘッダーと同じ上部余白（top-4）を適用
         isMobile 
-          ? "w-[85%] max-w-sm top-[calc(3rem+1rem)] bottom-4 left-0 rounded-lg shadow-lg" // モバイル: 画面の85%幅、ナビゲーションバー(48px) + 余白(16px)を考慮、角丸、影
+          ? "w-[85%] max-w-sm top-4 bottom-4 left-0 rounded-lg shadow-lg" // モバイル: ヘッダーと同じ上部余白、画面の85%幅、角丸、影
           : "w-80 top-[36px] bottom-0 left-0", // PC: 左側、固定幅
         isMobile 
           ? (isOpen ? "ml-4 translate-x-0" : "-translate-x-[calc(100%+1rem)]") // モバイル: 左側から、閉じた時は完全に隠す
