@@ -2,22 +2,12 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
-import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
-import { cn } from '@/lib/utils';
 
 export function Toolbar() {
   const { actions } = useEditor();
-  const { isOpen } = useSidebar();
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-6 flex -translate-x-1/2 items-center justify-center gap-4 rounded-full bg-accent/80 p-2 shadow-lg backdrop-blur-sm transition-all duration-300",
-        // サイドバーが開いている場合: エディタ領域の中央（画面中央 + サイドバー幅の半分）
-        // サイドバーが閉じている場合: 画面中央
-        isOpen ? "left-[calc(50%+10rem)]" : "left-1/2"
-      )}
-    >
+    <div className="fixed bottom-6 left-1/2 flex -translate-x-1/2 items-center justify-center gap-4 rounded-full bg-accent/80 p-2 shadow-lg backdrop-blur-sm">
       <button
         onClick={() => actions.moveCursor('left')}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm transition-colors hover:bg-accent active:scale-95"

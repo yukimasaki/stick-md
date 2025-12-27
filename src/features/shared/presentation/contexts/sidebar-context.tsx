@@ -13,14 +13,13 @@ interface SidebarContextType {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(true);
   const isMobile = useIsMobile();
+  // 初期状態はfalse（閉じた状態）で統一し、useEffectでisMobileに応じて設定
+  const [isOpen, setIsOpen] = useState(false);
 
-  // PCでは常に開いた状態を維持
+  // モバイルではデフォルトで閉じた状態、PCでは常に開いた状態を維持
   useEffect(() => {
-    if (!isMobile) {
-      setIsOpen(true);
-    }
+    setIsOpen(!isMobile);
   }, [isMobile]);
 
   const toggle = () => {

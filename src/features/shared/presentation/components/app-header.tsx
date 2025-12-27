@@ -1,6 +1,7 @@
 'use client';
 
 import { Menu } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -21,6 +22,17 @@ interface AppHeaderProps {
 export function AppHeader({ session }: AppHeaderProps) {
   const { toggle } = useSidebar();
   const isMobile = useIsMobile();
+  const [mounted, setMounted] = useState(false);
+
+  // クライアントサイドでマウントされたことを確認（Hydrationエラーを防ぐ）
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // マウント前は何も表示しない（Hydrationエラーを防ぐ）
+  if (!mounted) {
+    return null;
+  }
 
   if (!isMobile) {
     return null; // PC時はヘッダーを表示しない
