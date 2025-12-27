@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 interface MainContentWrapperProps {
@@ -9,13 +9,13 @@ interface MainContentWrapperProps {
 }
 
 export function MainContentWrapper({ children }: MainContentWrapperProps) {
-  const { isOpen } = useSidebar();
+  const isMobile = useIsMobile();
 
   return (
     <main
       className={cn(
         "flex-1 overflow-hidden transition-all duration-300",
-        isOpen ? "ml-80" : "ml-0"
+        isMobile ? "ml-0" : "ml-80" // PC: 常にマージン、モバイル: マージンなし
       )}
     >
       {children}

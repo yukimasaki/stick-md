@@ -48,11 +48,17 @@ export function AppSidebar({ session }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 z-40 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
+        "fixed z-40 bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
         "flex flex-col transition-transform duration-300 ease-in-out",
-        // モバイル時は画面全幅、PC時は固定幅
-        isMobile ? "w-full inset-y-0 h-screen" : "w-80 top-[36px] bottom-0",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        // PC: 常時表示、左側固定
+        // モバイル: 左側からスライドイン、オーバーレイ付き（画面の80-90%の幅）
+        // モバイル時のナビゲーションバー高さ: h-12 (48px)
+        isMobile 
+          ? "w-[85%] max-w-sm top-[calc(3rem+1rem)] bottom-4 left-0 rounded-lg shadow-lg" // モバイル: 画面の85%幅、ナビゲーションバー(48px) + 余白(16px)を考慮、角丸、影
+          : "w-80 top-[36px] bottom-0 left-0", // PC: 左側、固定幅
+        isMobile 
+          ? (isOpen ? "ml-4 translate-x-0" : "-translate-x-[calc(100%+1rem)]") // モバイル: 左側から、閉じた時は完全に隠す
+          : "translate-x-0" // PC: 常時表示
       )}
     >
       {/* サイドバーコンテンツ */}
@@ -138,21 +144,23 @@ export function AppSidebar({ session }: AppSidebarProps) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    {/* 右カラム: サイドバーを閉じるボタン */}
-                    <button
-                        onClick={close}
-                        className={cn(
-                            "shrink-0 h-9 w-9 rounded-md",
-                            "flex items-center justify-center",
-                            "text-sidebar-foreground/70 hover:text-sidebar-foreground",
-                            "hover:bg-sidebar-accent",
-                            "transition-colors",
-                            "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
-                        )}
-                        aria-label="Close sidebar"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
+                    {/* 右カラム: サイドバーを閉じるボタン（モバイル時のみ表示） */}
+                    {isMobile && (
+                        <button
+                            onClick={close}
+                            className={cn(
+                                "shrink-0 h-9 w-9 rounded-md",
+                                "flex items-center justify-center",
+                                "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                                "hover:bg-sidebar-accent",
+                                "transition-colors",
+                                "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
+                            )}
+                            aria-label="Close sidebar"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    )}
                 </div>
             </div>
          ) : (
@@ -169,20 +177,23 @@ export function AppSidebar({ session }: AppSidebarProps) {
                         <User className="h-4 w-4" />
                         <span>Sign in</span>
                     </button>
-                    <button
-                        onClick={close}
-                        className={cn(
-                            "shrink-0 h-9 w-9 rounded-md",
-                            "flex items-center justify-center",
-                            "text-sidebar-foreground/70 hover:text-sidebar-foreground",
-                            "hover:bg-sidebar-accent",
-                            "transition-colors",
-                            "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
-                        )}
-                        aria-label="Close sidebar"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
+                    {/* サイドバーを閉じるボタン（モバイル時のみ表示） */}
+                    {isMobile && (
+                        <button
+                            onClick={close}
+                            className={cn(
+                                "shrink-0 h-9 w-9 rounded-md",
+                                "flex items-center justify-center",
+                                "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+                                "hover:bg-sidebar-accent",
+                                "transition-colors",
+                                "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
+                            )}
+                            aria-label="Close sidebar"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    )}
                 </div>
             </div>
          )}

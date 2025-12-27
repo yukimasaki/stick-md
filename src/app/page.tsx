@@ -1,7 +1,7 @@
-import { AppSidebar } from "@/features/repository/presentation/components/app-sidebar"
+import { AppSidebar } from "@/features/shared/presentation/components/app-sidebar"
 import { EditorContainer } from '@/features/editor/presentation/components/editor-container';
-import { MenuBar } from '@/features/editor/presentation/components/menu-bar';
-import { SidebarToggleButton } from '@/features/shared/presentation/components/sidebar-toggle-button';
+import { AppHeader } from '@/features/shared/presentation/components/app-header';
+import { SidebarOverlay } from '@/features/shared/presentation/components/sidebar-overlay';
 import { SidebarProvider } from '@/features/shared/presentation/contexts/sidebar-context';
 import { MainContentWrapper } from '@/features/shared/presentation/components/main-content-wrapper';
 import { RepositoryProvider } from '@/features/repository/presentation/components/repository-provider';
@@ -14,21 +14,17 @@ export default async function Home() {
     <RepositoryProvider accessToken={session?.accessToken as string | undefined}>
       <SidebarProvider>
         <div className="flex h-screen w-full flex-col overflow-hidden">
-          {/* Menu Bar (PC only) - 画面全幅に表示 */}
-          <div className="hidden lg:block border-b">
-            <MenuBar />
-          </div>
+          {/* App Header (PC/Mobile共通) */}
+          <AppHeader session={session} />
           
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-1 overflow-hidden pt-12 lg:pt-9">
             <AppSidebar session={session} />
+            <SidebarOverlay />
             
             <MainContentWrapper>
               <EditorContainer />
             </MainContentWrapper>
           </div>
-          
-          {/* Floating Sidebar Trigger (Bottom Left) */}
-          <SidebarToggleButton />
         </div>
       </SidebarProvider>
     </RepositoryProvider>
