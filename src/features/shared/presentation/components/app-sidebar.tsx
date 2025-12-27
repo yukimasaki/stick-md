@@ -1,33 +1,13 @@
 'use client';
 
-import { LogOut, User, Folder, Github, X, ChevronDown, GitBranch } from "lucide-react"
+import { Folder, Github } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ExplorerContent } from "@/features/repository/presentation/components/explorer-content"
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
-import { RepositorySelector } from "@/features/repository/presentation/components/repository-selector"
 import { MobileSaveButton } from "@/features/editor/presentation/components/mobile-save-button"
-import { login, logout } from "@/app/_actions/auth"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -37,13 +17,6 @@ interface AppSidebarProps {
 export function AppSidebar({ session }: AppSidebarProps) {
   const { isOpen, close } = useSidebar();
   const isMobile = useIsMobile();
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
-
-  const handleLogout = () => {
-    setShowLogoutDialog(false);
-    logout();
-  };
 
   return (
     <aside
@@ -92,161 +65,6 @@ export function AppSidebar({ session }: AppSidebarProps) {
           </TabsContent>
         </Tabs>
       </div>
-      
-      {/* フッター */}
-      <div className="border-t border-sidebar-border mt-auto">
-         {session ? (
-            <div className="p-3">
-                <div className="flex items-center justify-between gap-3">
-                    {/* 左カラム: Avatar+UserName をdropdown-menu化 */}
-                    <div className="flex-1 min-w-0">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button
-                                    className={cn(
-                                        "group w-full flex items-center justify-between gap-2 min-w-0 rounded-md px-2 py-1.5 text-sm",
-                                        "hover:bg-sidebar-accent active:bg-sidebar-accent/80 transition-colors",
-                                        "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar",
-                                        "cursor-pointer touch-manipulation" // モバイル向けタップ最適化
-                                    )}
-                                >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        {session.user?.image ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img src={session.user.image} alt={session.user.name || "User"} className="w-6 h-6 rounded-full shrink-0" />
-                                        ) : (
-                                            <User className="w-6 h-6 shrink-0" />
-                                        )}
-                                        <span className="text-sm font-medium truncate">{session.user?.name}</span>
-                                    </div>
-                                    <ChevronDown className="h-4 w-4 shrink-0 text-sidebar-foreground/60 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-56">
-                                <DropdownMenuLabel>
-                                    {session.user?.name || "User"}
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    onClick={() => setShowRepositoryDialog(true)}
-                                >
-                                    <GitBranch className="h-4 w-4" />
-                                    <span>Select repository</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    variant="destructive"
-                                    onClick={() => setShowLogoutDialog(true)}
-                                >
-                                    <LogOut className="h-4 w-4" />
-                                    <span>Sign Out</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                    {/* 右カラム: サイドバーを閉じるボタン（モバイル時のみ表示） */}
-                    {isMobile && (
-                        <button
-                            onClick={close}
-                            className={cn(
-                                "shrink-0 h-9 w-9 rounded-md",
-                                "flex items-center justify-center",
-                                "text-sidebar-foreground/70 hover:text-sidebar-foreground",
-                                "hover:bg-sidebar-accent",
-                                "transition-colors",
-                                "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
-                            )}
-                            aria-label="Close sidebar"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    )}
-                </div>
-            </div>
-         ) : (
-            <div className="p-3">
-                <div className="flex items-center justify-between gap-3">
-                    <button
-                        onClick={() => login()}
-                        className={cn(
-                            "flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm",
-                            "bg-primary text-primary-foreground hover:bg-primary/90",
-                            "transition-colors"
-                        )}
-                    >
-                        <User className="h-4 w-4" />
-                        <span>Sign in</span>
-                    </button>
-                    {/* サイドバーを閉じるボタン（モバイル時のみ表示） */}
-                    {isMobile && (
-                        <button
-                            onClick={close}
-                            className={cn(
-                                "shrink-0 h-9 w-9 rounded-md",
-                                "flex items-center justify-center",
-                                "text-sidebar-foreground/70 hover:text-sidebar-foreground",
-                                "hover:bg-sidebar-accent",
-                                "transition-colors",
-                                "focus:outline-none focus:ring-2 focus:ring-sidebar-accent focus:ring-offset-2 focus:ring-offset-sidebar"
-                            )}
-                            aria-label="Close sidebar"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    )}
-                </div>
-            </div>
-         )}
-      </div>
-
-      {/* サインアウト確認ダイアログ */}
-      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>サインアウトの確認</DialogTitle>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowLogoutDialog(false)}
-            >
-              キャンセル
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              サインアウト
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* リポジトリ選択ダイアログ */}
-      <Dialog open={showRepositoryDialog} onOpenChange={setShowRepositoryDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Select repository</DialogTitle>
-            <DialogDescription>
-              {session ? (
-                "リポジトリを選択してください"
-              ) : (
-                "リポジトリを選択するにはサインインが必要です"
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {session ? (
-              <RepositorySelector accessToken={session.accessToken as string | undefined} />
-            ) : (
-              <div className="text-sm text-muted-foreground text-center py-4">
-                Please sign in to select a repository.
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </aside>
   )
 }
