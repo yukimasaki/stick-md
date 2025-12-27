@@ -111,14 +111,14 @@ function FileTreeItem({
           <ContextMenuTrigger asChild>
             {content}
           </ContextMenuTrigger>
-          <ContextMenuContent>
+          <ContextMenuContent className="z-75">
             {onFileCreate && isDirectory && (
               <ContextMenuSub>
                 <ContextMenuSubTrigger>
                   <FilePlus className="mr-2 h-4 w-4" />
                   <span>New</span>
                 </ContextMenuSubTrigger>
-                <ContextMenuSubContent>
+                <ContextMenuSubContent className="z-75">
                   <ContextMenuItem onClick={handleCreateFile}>
                     Markdown (.md)
                   </ContextMenuItem>
@@ -192,13 +192,13 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
           </div>
         </ContextMenuTrigger>
         {onFileCreate && (
-          <ContextMenuContent>
+          <ContextMenuContent className="z-75">
             <ContextMenuSub>
               <ContextMenuSubTrigger>
                 <FilePlus className="mr-2 h-4 w-4" />
                 <span>New</span>
               </ContextMenuSubTrigger>
-              <ContextMenuSubContent>
+              <ContextMenuSubContent className="z-75">
                 <ContextMenuItem onClick={() => onFileCreate('')}>
                   Markdown (.md)
                 </ContextMenuItem>
