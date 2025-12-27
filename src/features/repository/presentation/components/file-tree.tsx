@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
 import { File, Folder, FolderOpen, ChevronRight, ChevronDown, FilePlus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,6 +20,8 @@ interface FileTreeProps {
   selectedPath?: string;
   onFileCreate?: (directoryPath: string) => void;
   onFileDelete?: (filePath: string, isDirectory: boolean) => void;
+  expandedPaths?: Set<string>;
+  onToggleExpand?: (path: string) => void;
 }
 
 function FileTreeItem({
@@ -30,6 +31,8 @@ function FileTreeItem({
   selectedPath,
   onFileCreate,
   onFileDelete,
+  expandedPaths,
+  onToggleExpand,
 }: {
   node: FileTreeNode;
   level?: number;
@@ -37,16 +40,17 @@ function FileTreeItem({
   selectedPath?: string;
   onFileCreate?: (directoryPath: string) => void;
   onFileDelete?: (filePath: string, isDirectory: boolean) => void;
+  expandedPaths?: Set<string>;
+  onToggleExpand?: (path: string) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false); // デフォルトで閉じた状態
-
   const isSelected = selectedPath === node.path;
   const hasChildren = node.children && node.children.length > 0;
   const isDirectory = node.type === 'directory';
+  const isOpen = expandedPaths?.has(node.path) ?? false;
 
   const handleClick = () => {
     if (isDirectory && hasChildren) {
-      setIsOpen(!isOpen);
+      onToggleExpand?.(node.path);
     } else if (!isDirectory && onFileSelect) {
       onFileSelect(node.path);
     }
@@ -143,6 +147,8 @@ function FileTreeItem({
                 selectedPath={selectedPath}
                 onFileCreate={onFileCreate}
                 onFileDelete={onFileDelete}
+                expandedPaths={expandedPaths}
+                onToggleExpand={onToggleExpand}
               />
             ))}
           </div>
@@ -174,7 +180,7 @@ function FileTreeItem({
   );
 }
 
-export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFileDelete }: FileTreeProps) {
+export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFileDelete, expandedPaths, onToggleExpand }: FileTreeProps) {
   if (tree.length === 0) {
     return (
       <ContextMenu>
@@ -214,6 +220,8 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
           selectedPath={selectedPath}
           onFileCreate={onFileCreate}
           onFileDelete={onFileDelete}
+          expandedPaths={expandedPaths}
+          onToggleExpand={onToggleExpand}
         />
       ))}
     </div>

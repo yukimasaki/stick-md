@@ -25,6 +25,7 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPath, setSelectedPath] = useState<string | undefined>();
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [targetDirectoryPath, setTargetDirectoryPath] = useState<string>('');
   const [isDeletionDialogOpen, setIsDeletionDialogOpen] = useState(false);
@@ -143,8 +144,39 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
   const handleFileCreated = async (filePath: string) => {
     // ファイルツリーを再読み込み
     await loadFileTree();
+    
+    // 作成されたファイルの親ディレクトリパスを取得
+    const parentDirPath = filePath.split('/').slice(0, -1).join('/');
+    
+    // 親ディレクトリが存在する場合、展開状態に追加
+    if (parentDirPath) {
+      setExpandedPaths(prev => {
+        const next = new Set(prev);
+        // 親ディレクトリとそのすべての親ディレクトリを展開
+        const pathParts = parentDirPath.split('/');
+        let currentPath = '';
+        for (const part of pathParts) {
+          currentPath = currentPath ? `${currentPath}/${part}` : part;
+          next.add(currentPath);
+        }
+        return next;
+      });
+    }
+    
     // 作成されたファイルを選択状態にする
     setSelectedPath(filePath);
+  };
+  
+  const handleToggleExpand = (path: string) => {
+    setExpandedPaths(prev => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
   };
 
   const handleFileDelete = (filePath: string, isDirectory: boolean) => {
@@ -186,6 +218,8 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
               selectedPath={selectedPath}
               onFileCreate={selectedRepo ? handleFileCreate : undefined}
               onFileDelete={selectedRepo ? handleFileDelete : undefined}
+              expandedPaths={expandedPaths}
+              onToggleExpand={handleToggleExpand}
             />
           </div>
           {selectedRepo && (
