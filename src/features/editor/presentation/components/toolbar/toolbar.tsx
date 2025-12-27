@@ -2,9 +2,16 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function Toolbar() {
   const { actions } = useEditor();
+  const isMobile = useIsMobile();
+
+  // PCでは非表示
+  if (!isMobile) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 left-1/2 flex -translate-x-1/2 items-center justify-center gap-4 rounded-full bg-accent/80 p-2 shadow-lg backdrop-blur-sm">
