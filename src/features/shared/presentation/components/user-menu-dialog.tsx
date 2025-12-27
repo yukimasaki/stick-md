@@ -24,7 +24,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { RepositorySelectionDialog } from '@/features/shared/presentation/components/repository-selection-dialog';
 import type { Session } from 'next-auth';
 
-interface UserMenuProps {
+interface UserMenuDialogProps {
   session: Session | null;
   /**
    * アバターのみ表示するか（ユーザー名を非表示）
@@ -38,9 +38,9 @@ interface UserMenuProps {
 }
 
 /**
- * ユーザーメニューコンポーネント（アバター + モーダル + ダイアログ）
+ * ユーザーメニューダイアログコンポーネント（アバター + モーダル + ダイアログ）
  */
-export function UserMenu({ session, avatarOnly = false, buttonClassName }: UserMenuProps) {
+export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }: UserMenuDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);

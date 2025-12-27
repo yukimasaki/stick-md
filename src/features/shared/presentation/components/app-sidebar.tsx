@@ -8,7 +8,7 @@ import { ExplorerContent } from "@/features/repository/presentation/components/e
 import { RepositoryContent } from "@/features/repository/presentation/components/repository-content"
 import { SaveButton } from "@/features/editor/presentation/components/save-button"
 import { BrandLogo } from "@/features/shared/presentation/components/brand-logo"
-import { UserMenu } from "@/features/shared/presentation/components/user-menu"
+import { UserMenuDialog } from "@/features/shared/presentation/components/user-menu-dialog"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -104,7 +104,7 @@ export function AppSidebar({ session }: AppSidebarProps) {
 
         {/* サイドバーフッター（PC時のみ） */}
         <div className="p-4 border-t flex items-center justify-start">
-          <UserMenu session={session} avatarOnly />
+          <UserMenuDialog session={session} avatarOnly />
         </div>
       </aside>
     );

@@ -7,7 +7,7 @@ import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-cont
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { BrandLogo } from '@/features/shared/presentation/components/brand-logo';
-import { UserMenu } from '@/features/shared/presentation/components/user-menu';
+import { UserMenuDialog } from '@/features/shared/presentation/components/user-menu-dialog';
 import type { Session } from 'next-auth';
 
 interface AppHeaderProps {
@@ -63,7 +63,7 @@ export function AppHeader({ session }: AppHeaderProps) {
         <BrandLogo />
       </div>
 
-      <UserMenu
+      <UserMenuDialog
         session={session}
         avatarOnly
         buttonClassName="px-2 py-1.5 text-sm touch-manipulation"
