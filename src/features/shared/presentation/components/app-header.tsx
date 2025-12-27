@@ -57,7 +57,7 @@ export function AppHeader({ session }: AppHeaderProps) {
           'flex items-center',
           'rounded-lg shadow-lg',
           isMobile 
-            ? 'h-12 px-4 top-4 left-4 right-4' // モバイル: 上下左右に余白、角丸
+            ? 'h-12 px-4 top-4 left-4 right-4 max-w-[425px] mx-auto' // モバイル/タブレット: 上下左右に余白、角丸、最大幅425px
             : 'h-9 top-0 left-0 right-0 rounded-b-none' // PC: 上部固定、角丸なし
         )}
       >
@@ -102,7 +102,6 @@ export function AppHeader({ session }: AppHeaderProps) {
                           <User className="w-5 h-5" />
                         </div>
                       )}
-                      <span className="text-sm font-medium truncate hidden sm:inline">{session.user?.name}</span>
                     </div>
                   </button>
                 </DropdownMenuTrigger>
