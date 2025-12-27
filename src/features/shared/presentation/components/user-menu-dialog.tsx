@@ -21,7 +21,7 @@ import { XIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { RepositorySelectionDialog } from '@/features/shared/presentation/components/repository-selection-dialog';
+import { RepositorySelectionDialog } from '@/features/repository/presentation/components/repository-selection-dialog';
 import type { Session } from 'next-auth';
 
 interface UserMenuDialogProps {
