@@ -17,10 +17,10 @@ import { handleFileSaveError } from '@/features/editor/presentation/utils/error-
 import * as E from 'fp-ts/Either';
 
 /**
- * モバイル用保存ボタンコンポーネント
- * Presentation Layer: モバイル向けのファイル保存ボタンを提供
+ * 保存ボタンコンポーネント（PC/Mobile共通）
+ * Presentation Layer: ファイル保存ボタンを提供
  */
-export function MobileSaveButton() {
+export function SaveButton() {
   const tabState = useSyncExternalStore(
     tabStore.subscribe,
     tabStore.getSnapshot,

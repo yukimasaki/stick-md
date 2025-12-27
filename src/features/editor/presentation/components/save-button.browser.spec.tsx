@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MobileSaveButton } from './mobile-save-button';
+import { SaveButton } from './save-button';
 import * as fileSaveService from '@/features/editor/application/services/file-save-service';
 import * as tabStore from '@/features/editor/application/stores/tab-store';
 import * as repositoryStore from '@/features/repository/application/stores/repository-store';
@@ -20,7 +20,7 @@ vi.mock('sonner', () => ({
   },
 }));
 
-describe('MobileSaveButton', () => {
+describe('SaveButton', () => {
   const mockTabState = {
     tabs: [
       {
@@ -65,7 +65,7 @@ describe('MobileSaveButton', () => {
   });
 
   it('保存ボタンが表示される', () => {
-    render(<MobileSaveButton />);
+    render(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThan(0);
   });
@@ -75,7 +75,7 @@ describe('MobileSaveButton', () => {
       TE.right(undefined) as TE.TaskEither<FileSaveError, void>
     );
 
-    render(<MobileSaveButton />);
+    render(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     // 最初のボタン（保存ボタン）をクリック
     fireEvent.click(buttons[0]);
@@ -92,7 +92,7 @@ describe('MobileSaveButton', () => {
     };
     vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(tabStateWithoutActive as TabState);
 
-    render(<MobileSaveButton />);
+    render(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     // 保存ボタンが無効化されていることを確認
     const saveButton = buttons.find(btn => btn.hasAttribute('disabled'));
