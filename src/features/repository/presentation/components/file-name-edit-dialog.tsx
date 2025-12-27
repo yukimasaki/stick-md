@@ -32,7 +32,7 @@ export function FileNameEditDialog({
   directoryPath,
   onFileCreated,
 }: FileNameEditDialogProps) {
-  const [fileName, setFileName] = useState('.md');
+  const [fileName, setFileName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,19 +44,11 @@ export function FileNameEditDialog({
     // ファイル名をリセット（DOM更新前）
     // Note: モーダルが開いたときに状態をリセットするのは、外部システム（DOM）との同期のため
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFileName('.md');
+    setFileName('');
     setIsCreating(false);
     // 次のフレームでフォーカス（DOM更新を待つ）
     const timeoutId = setTimeout(() => {
       inputRef.current?.focus();
-      // ファイル名の拡張子部分を選択（.mdの前まで）
-      if (inputRef.current) {
-        const input = inputRef.current;
-        const dotIndex = input.value.lastIndexOf('.');
-        if (dotIndex > 0) {
-          input.setSelectionRange(0, dotIndex);
-        }
-      }
     }, 0);
     return () => clearTimeout(timeoutId);
   }, [open]);
@@ -68,8 +60,11 @@ export function FileNameEditDialog({
 
     setIsCreating(true);
 
+    // ファイル名に.mdを追加
+    const fileNameWithExtension = fileName.trim() ? `${fileName.trim()}.md` : '.md';
+
     try {
-      const result = await createMarkdownFile(repository, directoryPath, fileName);
+      const result = await createMarkdownFile(repository, directoryPath, fileNameWithExtension);
 
       pipe(
         result,
@@ -119,14 +114,18 @@ export function FileNameEditDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Input
-              ref={inputRef}
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder=".md"
-              disabled={isCreating}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                ref={inputRef}
+                value={fileName}
+                onChange={(e) => setFileName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Enter file name"
+                disabled={isCreating}
+                className="flex-1"
+              />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">.md</span>
+            </div>
           </div>
         </div>
         <DialogFooter>

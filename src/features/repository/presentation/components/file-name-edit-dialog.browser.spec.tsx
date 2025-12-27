@@ -50,11 +50,12 @@ describe('FileNameEditDialog', () => {
       expect(screen.queryByText('Create New Markdown File')).toBeNull();
     });
 
-    it('ダイアログが開いたとき、ファイル名が「.md」で初期化される', () => {
+    it('ダイアログが開いたとき、ファイル名が空で初期化される', () => {
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      expect(input.value).toBe('.md');
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      expect(input.value).toBe('');
+      expect(screen.getByText('.md')).toBeDefined();
     });
   });
 
@@ -62,16 +63,17 @@ describe('FileNameEditDialog', () => {
     it('ファイル名を入力できる', () => {
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
-      expect(input.value).toBe('test.md');
+      expect(input.value).toBe('test');
+      expect(screen.getByText('.md')).toBeDefined();
     });
 
     it('ファイル名が空の場合、作成ボタンが無効化される', () => {
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
       fireEvent.change(input, { target: { value: '   ' } });
       
       const createButton = screen.getByText('Create') as HTMLButtonElement;
@@ -87,8 +89,8 @@ describe('FileNameEditDialog', () => {
 
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
       const createButton = screen.getByText('Create');
       fireEvent.click(createButton);
@@ -118,8 +120,8 @@ describe('FileNameEditDialog', () => {
         />
       );
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
       const createButton = screen.getByText('Create');
       fireEvent.click(createButton);
@@ -142,8 +144,8 @@ describe('FileNameEditDialog', () => {
 
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
       const createButton = screen.getByText('Create');
       fireEvent.click(createButton);
@@ -163,8 +165,8 @@ describe('FileNameEditDialog', () => {
 
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
       const createButton = screen.getByText('Create');
       fireEvent.click(createButton);
@@ -198,7 +200,7 @@ describe('FileNameEditDialog', () => {
       const onOpenChange = vi.fn();
       render(<FileNameEditDialog {...defaultProps} onOpenChange={onOpenChange} />);
       
-      const input = screen.getByPlaceholderText('.md');
+      const input = screen.getByPlaceholderText('Enter file name');
       fireEvent.keyDown(input, { key: 'Escape' });
       
       expect(onOpenChange).toHaveBeenCalledWith(false);
@@ -213,8 +215,8 @@ describe('FileNameEditDialog', () => {
 
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       fireEvent.keyDown(input, { key: 'Enter' });
 
       await waitFor(() => {
@@ -225,7 +227,7 @@ describe('FileNameEditDialog', () => {
     it('Shift+Enterキーではファイル作成が実行されない', async () => {
       render(<FileNameEditDialog {...defaultProps} />);
       
-      const input = screen.getByPlaceholderText('.md');
+      const input = screen.getByPlaceholderText('Enter file name');
       fireEvent.keyDown(input, { key: 'Enter', shiftKey: true });
 
       await waitFor(() => {
@@ -247,8 +249,8 @@ describe('FileNameEditDialog', () => {
         />
       );
       
-      const input = screen.getByPlaceholderText('.md') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test.md' } });
+      const input = screen.getByPlaceholderText('Enter file name') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'test' } });
       
       const createButton = screen.getByText('Create');
       fireEvent.click(createButton);
