@@ -20,7 +20,11 @@ import { RepositorySelectionDialog } from '@/features/repository/presentation/co
 import { useToolbarSettings } from '@/features/editor/presentation/hooks/use-toolbar-settings';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { useLocale } from '@/features/i18n/presentation/hooks/use-locale';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Session } from 'next-auth';
+import type { LocaleOption } from '@/features/i18n/domain/types';
+import type { Locale } from '@/features/i18n/domain/types';
 
 interface UserMenuDialogProps {
   session: Session | null;
@@ -45,6 +49,22 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   const { repositories, selectedRepositoryId } = useRepository();
   const { offset: toolbarOffset, updateOffset: updateToolbarOffset } = useToolbarSettings();
   const [toolbarOffsetInput, setToolbarOffsetInput] = useState<string>(toolbarOffset.toString());
+  const { locale, switchLocale, switchToAuto, isPending } = useLocale();
+  const [currentLocaleOption, setCurrentLocaleOption] = useState<LocaleOption>('auto');
+
+  // Cookieの有無を確認して現在の選択肢を設定
+  useEffect(() => {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('NEXT_LOCALE='))
+      ?.split('=')[1];
+    
+    if (cookieValue && (cookieValue === 'ja' || cookieValue === 'en')) {
+      setCurrentLocaleOption(cookieValue);
+    } else {
+      setCurrentLocaleOption('auto');
+    }
+  }, [locale]);
 
   const currentRepository = repositories.find((repo) => repo.id === selectedRepositoryId);
 
@@ -182,6 +202,30 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       />
                       <span className="text-sm text-muted-foreground">px</span>
                     </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm flex-1 min-w-0">言語</span>
+                    <Select
+                      value={currentLocaleOption}
+                      onValueChange={(value) => {
+                        if (value === 'auto') {
+                          switchToAuto();
+                        } else {
+                          switchLocale(value as Locale);
+                        }
+                      }}
+                      disabled={isPending}
+                    >
+                      <SelectTrigger className="w-32 h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="auto">自動検出</SelectItem>
+                        <SelectItem value="ja">日本語</SelectItem>
+                        <SelectItem value="en">English</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
