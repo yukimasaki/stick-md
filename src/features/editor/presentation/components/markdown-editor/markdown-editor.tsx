@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useSyncExternalStore } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
@@ -24,6 +24,9 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   );
   
   const activeTab = tabState.tabs.find(tab => tab.id === tabId || tab.id === tabState.activeTabId);
+  
+  // 初期読み込み中かどうかを管理するフラグ
+  const isInitializingRef = useRef(false);
 
   // アクティブタブの内容をエディタに読み込む
   useEffect(() => {
@@ -32,10 +35,19 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
     async function loadContent() {
       try {
         if (!activeTab?.content) return;
+        // 初期読み込み開始
+        isInitializingRef.current = true;
+        
         const blocks = await editor.tryParseMarkdownToBlocks(activeTab.content);
         editor.replaceBlocks(editor.document, blocks);
+        
+        // 初期読み込み完了（onChangeが非同期で発火する可能性があるため、少し遅延させる）
+        setTimeout(() => {
+          isInitializingRef.current = false;
+        }, 100);
       } catch (error) {
         console.error('Failed to load markdown content:', error);
+        isInitializingRef.current = false;
       }
     }
 
@@ -47,6 +59,11 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
     if (!editor || !activeTab) return;
 
     const cleanup = editor.onChange(async () => {
+      // 初期読み込み中は変更検知を無視
+      if (isInitializingRef.current) {
+        return;
+      }
+      
       try {
         const markdownContent = await editor.blocksToMarkdownLossy(editor.document);
         tabStore.updateTabContent(activeTab.id, markdownContent);
