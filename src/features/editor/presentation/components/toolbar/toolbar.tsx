@@ -4,11 +4,34 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useToolbarSettings } from '@/features/editor/presentation/hooks/use-toolbar-settings';
+
+const BASE_OFFSET = 24; // デフォルトのベース位置（24px）
 
 export function Toolbar() {
   const { actions } = useEditor();
   const isMobile = useIsMobile();
-  const [bottom, setBottom] = useState(24); // デフォルトは bottom-6 (24px)
+  const { offset: settingsOffset } = useToolbarSettings();
+  const [bottom, setBottom] = useState(BASE_OFFSET + settingsOffset);
+
+  // 設定値が変更されたときに位置を更新
+  useEffect(() => {
+    if (!isMobile || typeof window === 'undefined' || !window.visualViewport) {
+      setBottom(BASE_OFFSET + settingsOffset);
+      return;
+    }
+
+    const viewport = window.visualViewport;
+    const isKeyboardVisible = viewport.height < window.innerHeight;
+
+    if (isKeyboardVisible) {
+      const toolbarHeight = 64;
+      const calculatedBottom = window.innerHeight - viewport.height - toolbarHeight;
+      setBottom(Math.max(BASE_OFFSET + settingsOffset, calculatedBottom + BASE_OFFSET + settingsOffset));
+    } else {
+      setBottom(BASE_OFFSET + settingsOffset);
+    }
+  }, [isMobile, settingsOffset]);
 
   // Visual Viewport APIを使って仮想キーボードの真上に表示
   useEffect(() => {
@@ -26,15 +49,14 @@ export function Toolbar() {
 
       if (isKeyboardVisible) {
         // キーボードが表示されている場合、visualViewport.heightからツールバーの高さとオフセットを引く
-        // ツールバーの高さは約64px (h-12 + padding) + オフセット24px
+        // ツールバーの高さは約64px (h-12 + padding)
         const toolbarHeight = 64;
-        const offset = 24;
-        const calculatedBottom = window.innerHeight - viewport.height - toolbarHeight - offset;
-        // 負の値にならないようにする
-        setBottom(Math.max(24, calculatedBottom));
+        const calculatedBottom = window.innerHeight - viewport.height - toolbarHeight;
+        // ベースオフセット（24px）+ 設定されたオフセット値を加算し、負の値にならないようにする
+        setBottom(Math.max(BASE_OFFSET + settingsOffset, calculatedBottom + BASE_OFFSET + settingsOffset));
       } else {
-        // キーボードが非表示の場合は通常の位置
-        setBottom(24);
+        // キーボードが非表示の場合はベースオフセット（24px）+ 設定されたオフセット値の位置
+        setBottom(BASE_OFFSET + settingsOffset);
       }
     };
 
@@ -49,7 +71,7 @@ export function Toolbar() {
       window.visualViewport?.removeEventListener('resize', updatePosition);
       window.visualViewport?.removeEventListener('scroll', updatePosition);
     };
-  }, [isMobile]);
+  }, [isMobile, settingsOffset]);
 
   // PCでは非表示
   if (!isMobile) {

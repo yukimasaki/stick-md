@@ -17,6 +17,9 @@ import {
 import { AnimatedDialogContent } from '@/features/shared/presentation/components/animated-dialog-content';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { RepositorySelectionDialog } from '@/features/repository/presentation/components/repository-selection-dialog';
+import { useToolbarSettings } from '@/features/editor/presentation/hooks/use-toolbar-settings';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import type { Session } from 'next-auth';
 
 interface UserMenuDialogProps {
@@ -40,6 +43,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
   const { repositories, selectedRepositoryId } = useRepository();
+  const { offset: toolbarOffset, updateOffset: updateToolbarOffset } = useToolbarSettings();
 
   const currentRepository = repositories.find((repo) => repo.id === selectedRepositoryId);
 
@@ -123,7 +127,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
               {/* 一般セクション */}
               <div className="space-y-2">
                 <h2 className="text-sm font-semibold text-muted-foreground px-1">一般</h2>
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-white rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm flex-1 min-w-0">作業中のリポジトリ</span>
                     <Button
@@ -138,6 +142,26 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                         <span>リポジトリを選択</span>
                       )}
                     </Button>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm flex-1 min-w-0">ツールバー位置</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="200"
+                        value={toolbarOffset}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          if (!isNaN(value)) {
+                            updateToolbarOffset(value);
+                          }
+                        }}
+                        className="w-20 h-8 text-sm"
+                      />
+                      <span className="text-sm text-muted-foreground">px</span>
+                    </div>
                   </div>
                 </div>
               </div>
