@@ -30,12 +30,12 @@ export function EditorContainer() {
   const activeTab = state.tabs.find(tab => tab.id === state.activeTabId);
 
   return (
-    <main className="flex h-screen w-full flex-col overflow-hidden bg-background text-foreground">
+    <main className="flex h-full w-full flex-col overflow-hidden bg-background text-foreground">
       {/* Tab Bar */}
       {state.tabs.length > 0 && <TabBar />}
 
       {/* Editor Area */}
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-hidden relative min-h-0">
         {activeTab ? (
           <MarkdownEditor key={activeTab.id} tabId={activeTab.id} />
         ) : (

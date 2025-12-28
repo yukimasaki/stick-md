@@ -139,3 +139,41 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* BlockNote Editor スタイルカスタマイズ */
+@layer components {
+  /* エディタコンテナの余白調整（右側の余白を最小限に） */
+  .bn-editor,
+  .bn-editor .ProseMirror {
+    max-width: 100% !important;
+    /* 左側のパディングは親要素のpl-8を維持 */
+    padding-right: 0 !important;
+  }
+
+  /* モバイルでの見出しフォントサイズ調整 */
+  @media (max-width: 768px) {
+    /* h1のフォントサイズを調整（モバイルで8文字程度で折り返されないように） */
+    .bn-block-content[data-content-type="heading"][data-level="1"],
+    .bn-block[data-content-type="heading"][data-level="1"] .bn-block-content,
+    .bn-editor [data-content-type="heading"][data-level="1"] {
+      font-size: 1.5rem !important; /* デフォルトの2remから1.5remに縮小 */
+      line-height: 1.3 !important;
+    }
+    
+    /* h2のフォントサイズ調整 */
+    .bn-block-content[data-content-type="heading"][data-level="2"],
+    .bn-block[data-content-type="heading"][data-level="2"] .bn-block-content,
+    .bn-editor [data-content-type="heading"][data-level="2"] {
+      font-size: 1.25rem !important;
+      line-height: 1.3 !important;
+    }
+    
+    /* h3のフォントサイズ調整 */
+    .bn-block-content[data-content-type="heading"][data-level="3"],
+    .bn-block[data-content-type="heading"][data-level="3"] .bn-block-content,
+    .bn-editor [data-content-type="heading"][data-level="3"] {
+      font-size: 1.125rem !important;
+      line-height: 1.3 !important;
+    }
+  }
+}

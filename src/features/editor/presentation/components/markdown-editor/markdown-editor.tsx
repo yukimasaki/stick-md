@@ -130,7 +130,7 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   }
 
   return (
-    <div className="h-full w-full overflow-hidden bg-background p-4">
+    <div className="h-full w-full overflow-y-auto bg-background pl-0 pr-4 py-4">
       <Editor editor={editor} theme="light" />
     </div>
   );
