@@ -42,6 +42,11 @@ export function RepositorySelectionDialog({
     }));
   };
 
+  const handleClose = () => {
+    // 単にダイアログを閉じる（通知やサイドバー操作は行わない）
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
@@ -58,6 +63,7 @@ export function RepositorySelectionDialog({
             <RepositorySelector
               accessToken={session.accessToken as string | undefined}
               onCloneSuccess={handleCloneSuccess}
+              onClose={handleClose}
             />
           ) : (
             <div className="text-sm text-muted-foreground text-center py-4">

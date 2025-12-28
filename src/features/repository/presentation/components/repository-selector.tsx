@@ -14,9 +14,10 @@ import { useRepositorySelector } from '@/features/repository/presentation/hooks/
 interface RepositorySelectorProps {
   accessToken?: string;
   onCloneSuccess?: () => void;
+  onClose?: () => void;
 }
 
-export function RepositorySelector({ accessToken, onCloneSuccess }: RepositorySelectorProps) {
+export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: RepositorySelectorProps) {
   const {
     repositories,
     displayRepo,
@@ -25,9 +26,12 @@ export function RepositorySelector({ accessToken, onCloneSuccess }: RepositorySe
     isCloned,
     isCloning,
     cloneError,
+    isCurrentRepository,
     handleSelect,
     handleClone,
-  } = useRepositorySelector(accessToken, onCloneSuccess);
+    handleSwitchRepository,
+    handleClose,
+  } = useRepositorySelector(accessToken, onCloneSuccess, onClose);
 
   return (
     <div className="w-full px-2">
@@ -59,27 +63,47 @@ export function RepositorySelector({ accessToken, onCloneSuccess }: RepositorySe
         </SelectContent>
       </Select>
       
-      {/* Clone Button */}
+      {/* Clone Button or Switch Repository Button or Close Button */}
       {displayRepo && (
         <div className="mt-3 px-2">
-          <Button
-            onClick={handleClone}
-            disabled={isCloning || !accessToken || isCloned}
-            className="w-full"
-            size="sm"
-          >
-            {isCloning ? (
-              <>
-                <Download className="mr-2 h-4 w-4 animate-spin" />
-                Cloning...
-              </>
+          {isCloned ? (
+            isCurrentRepository ? (
+              <Button
+                onClick={handleClose}
+                className="w-full"
+                size="sm"
+              >
+                閉じる
+              </Button>
             ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                Clone
-              </>
-            )}
-          </Button>
+              <Button
+                onClick={handleSwitchRepository}
+                className="w-full"
+                size="sm"
+              >
+                作業リポジトリを切り替え
+              </Button>
+            )
+          ) : (
+            <Button
+              onClick={handleClone}
+              disabled={isCloning || !accessToken}
+              className="w-full"
+              size="sm"
+            >
+              {isCloning ? (
+                <>
+                  <Download className="mr-2 h-4 w-4 animate-spin" />
+                Cloning...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Clone
+                </>
+              )}
+            </Button>
+          )}
           {cloneError && (
             <div className="mt-2 text-xs text-destructive text-center">
               {cloneError}

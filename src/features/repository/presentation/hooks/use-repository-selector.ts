@@ -15,7 +15,8 @@ import { cloneRepositoryUseCase } from '@/features/repository/application/servic
  */
 export function useRepositorySelector(
   accessToken?: string,
-  onCloneSuccess?: () => void
+  onCloneSuccess?: () => void,
+  onClose?: () => void
 ) {
   const { repositories, selectedRepositoryId, isLoading, actions } = useRepository();
   
@@ -33,6 +34,9 @@ export function useRepositorySelector(
 
   // 表示用のリポジトリ
   const displayRepo = getDisplayRepository(repositories, selectionState);
+
+  // 現在の作業リポジトリかどうかを判定
+  const isCurrentRepository = displayRepo?.id === selectedRepositoryId;
 
   // リポジトリがクローン済みか確認
   useEffect(() => {
@@ -100,6 +104,26 @@ export function useRepositorySelector(
     }
   };
 
+  // 作業リポジトリを切り替え（クローン済みリポジトリの場合）
+  const handleSwitchRepository = useCallback(() => {
+    if (!displayRepo) return;
+    
+    // 作業リポジトリを切り替え
+    actions.selectRepository(displayRepo.id);
+    // 候補リポジトリをクリア（作業リポジトリに設定されたので）
+    setPendingRepositoryId(null);
+    // 成功時のコールバックを実行（ダイアログを閉じるなど）
+    onCloneSuccess?.();
+  }, [displayRepo, actions, onCloneSuccess]);
+
+  // 閉じる（現在の作業リポジトリの場合）
+  const handleClose = useCallback(() => {
+    // 候補リポジトリをクリア
+    setPendingRepositoryId(null);
+    // ダイアログを閉じる（クローン成功時の処理は実行しない）
+    onClose?.();
+  }, [onClose]);
+
   return {
     // 状態
     repositories,
@@ -109,8 +133,11 @@ export function useRepositorySelector(
     isCloned,
     isCloning,
     cloneError,
+    isCurrentRepository,
     // アクション
     handleSelect,
     handleClone,
+    handleSwitchRepository,
+    handleClose,
   };
 }
