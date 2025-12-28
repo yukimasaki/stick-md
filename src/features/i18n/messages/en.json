@@ -113,7 +113,11 @@
         "pulling": "Pulling..."
       }
     },
-    "signInRequired": "Please sign in to use repository features."
+    "signInRequired": "Please sign in to use repository features.",
+    "status": {
+      "stagedFiles": "Staged files",
+      "unstagedFiles": "Unstaged files"
+    }
   },
   "unsupportedFileDialog": {
     "title": "Unsupported File Format",
@@ -177,7 +181,15 @@
       "unexpectedCommitError": "An unexpected error occurred during git commit",
       "unexpectedLogError": "An unexpected error occurred during git log",
       "unexpectedPushError": "An unexpected error occurred during git push",
-      "unexpectedPullError": "An unexpected error occurred during git pull"
+      "unexpectedPullError": "An unexpected error occurred during git pull",
+      "repositoryNotFound": "Repository is not found",
+      "accessTokenNotFound": "Access token is not found",
+      "userInfoNotAvailable": "User information is not available. Please log in again.",
+      "failedToPull": "Failed to pull",
+      "failedToPush": "Failed to push",
+      "failedToGetCommitHistory": "Failed to get commit history",
+      "noCommitsFound": "No commits found in repository",
+      "unknownErrorOccurred": "Unknown error occurred"
     },
     "editor": {
       "noActiveTab": "No Active Tab",

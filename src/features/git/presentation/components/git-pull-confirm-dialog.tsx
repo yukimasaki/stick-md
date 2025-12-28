@@ -66,7 +66,7 @@ export function GitPullConfirmDialog({
       handleGitPullError(
         {
           type: 'UNKNOWN_ERROR',
-          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          message: error instanceof Error ? error.message : t('errors.git.unknownErrorOccurred'),
         },
         t
       );

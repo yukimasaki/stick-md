@@ -65,7 +65,7 @@ export function CommitHistory() {
     } catch (error) {
       handleGitLogError({
         type: 'UNKNOWN_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message: error instanceof Error ? error.message : t('errors.git.unknownErrorOccurred'),
       }, t);
     } finally {
       setIsLoading(false);

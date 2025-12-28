@@ -78,7 +78,7 @@ export function GitStatusUI() {
     } catch (error) {
       handleGitStatusError({
         type: 'UNKNOWN_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message: error instanceof Error ? error.message : t('errors.git.unknownErrorOccurred'),
       }, t);
     } finally {
       setIsLoading(false);
@@ -169,7 +169,7 @@ export function GitStatusUI() {
     } catch (error) {
       handleFileReadError({
         type: 'UNKNOWN_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message: error instanceof Error ? error.message : t('errors.git.unknownErrorOccurred'),
       }, t);
     }
   };
@@ -217,7 +217,7 @@ export function GitStatusUI() {
       {stagedFiles.length > 0 && (
         <AccordionItem value="staged" className="border-none">
           <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
-            Staged files ({stagedFiles.length})
+            {t('git.status.stagedFiles')} ({stagedFiles.length})
           </AccordionTrigger>
           <AccordionContent className="px-0">
             <div className="flex flex-col gap-0.5">
@@ -238,7 +238,7 @@ export function GitStatusUI() {
       {unstagedFiles.length > 0 && (
         <AccordionItem value="unstaged" className="border-none">
           <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
-            Unstaged files ({unstagedFiles.length})
+            {t('git.status.unstagedFiles')} ({unstagedFiles.length})
           </AccordionTrigger>
           <AccordionContent className="px-0">
             <div className="flex flex-col gap-0.5">

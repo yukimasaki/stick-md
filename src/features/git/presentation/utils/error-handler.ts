@@ -182,7 +182,9 @@ export function handleGitLogError(error: GitLogError, t: ReturnType<typeof useTr
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
       toast.error(t('errors.common.repositoryNotFound'), {
-        description: error.message,
+        description: error.message === 'Repository is not found' 
+          ? t('errors.git.repositoryNotFound')
+          : error.message,
       });
       break;
     case 'NO_COMMITS':
@@ -190,12 +192,18 @@ export function handleGitLogError(error: GitLogError, t: ReturnType<typeof useTr
       break;
     case 'GIT_LOG_ERROR':
       toast.error(t('errors.git.logError'), {
-        description: error.message,
+        description: error.message === 'No commits found in repository'
+          ? t('errors.git.noCommitsFound')
+          : error.message.startsWith('Failed to get commit history:')
+          ? `${t('errors.git.failedToGetCommitHistory')}: ${error.message.replace('Failed to get commit history: ', '')}`
+          : error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
       toast.error(t('errors.common.unknownError'), {
-        description: error.message,
+        description: error.message === 'An unknown error occurred while getting commit history'
+          ? t('errors.git.unexpectedLogError')
+          : error.message,
       });
       break;
     default:
@@ -213,17 +221,25 @@ export function handleGitPushError(error: GitPushError, t: ReturnType<typeof use
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
       toast.error(t('errors.common.repositoryNotFound'), {
-        description: error.message,
+        description: error.message === 'Repository is not found' 
+          ? t('errors.git.repositoryNotFound')
+          : error.message === 'Access token is not found'
+          ? t('errors.git.accessTokenNotFound')
+          : error.message,
       });
       break;
     case 'GIT_PUSH_ERROR':
       toast.error(t('errors.git.pushError'), {
-        description: error.message,
+        description: error.message.startsWith('Failed to push:')
+          ? `${t('errors.git.failedToPush')}: ${error.message.replace('Failed to push: ', '')}`
+          : error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
       toast.error(t('errors.common.unknownError'), {
-        description: error.message,
+        description: error.message === 'An unknown error occurred while pushing'
+          ? t('errors.git.unexpectedPushError')
+          : error.message,
       });
       break;
     default:
@@ -241,17 +257,27 @@ export function handleGitPullError(error: GitPullError, t: ReturnType<typeof use
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
       toast.error(t('errors.common.repositoryNotFound'), {
-        description: error.message,
+        description: error.message === 'Repository is not found' 
+          ? t('errors.git.repositoryNotFound')
+          : error.message === 'Access token is not found'
+          ? t('errors.git.accessTokenNotFound')
+          : error.message,
       });
       break;
     case 'GIT_PULL_ERROR':
       toast.error(t('errors.git.pullError'), {
-        description: error.message,
+        description: error.message.startsWith('Failed to pull:')
+          ? `${t('errors.git.failedToPull')}: ${error.message.replace('Failed to pull: ', '')}`
+          : error.message === 'User information is not available. Please log in again.'
+          ? t('errors.git.userInfoNotAvailable')
+          : error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
       toast.error(t('errors.common.unknownError'), {
-        description: error.message,
+        description: error.message === 'An unknown error occurred while pulling'
+          ? t('errors.git.unexpectedPullError')
+          : error.message,
       });
       break;
     default:

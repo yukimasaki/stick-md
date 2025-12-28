@@ -113,7 +113,11 @@
         "pulling": "プル中..."
       }
     },
-    "signInRequired": "リポジトリ機能を使用するにはサインインが必要です"
+    "signInRequired": "リポジトリ機能を使用するにはサインインが必要です",
+    "status": {
+      "stagedFiles": "ステージ済みファイル",
+      "unstagedFiles": "未ステージファイル"
+    }
   },
   "unsupportedFileDialog": {
     "title": "未対応のファイル形式",
@@ -177,7 +181,15 @@
       "unexpectedCommitError": "Gitコミット中に予期しないエラーが発生しました",
       "unexpectedLogError": "Gitログ取得中に予期しないエラーが発生しました",
       "unexpectedPushError": "Gitプッシュ中に予期しないエラーが発生しました",
-      "unexpectedPullError": "Gitプル中に予期しないエラーが発生しました"
+      "unexpectedPullError": "Gitプル中に予期しないエラーが発生しました",
+      "repositoryNotFound": "リポジトリが見つかりません",
+      "accessTokenNotFound": "アクセストークンが見つかりません",
+      "userInfoNotAvailable": "ユーザー情報が利用できません。再度ログインしてください。",
+      "failedToPull": "プルに失敗しました",
+      "failedToPush": "プッシュに失敗しました",
+      "failedToGetCommitHistory": "コミット履歴の取得に失敗しました",
+      "noCommitsFound": "リポジトリにコミットが見つかりません",
+      "unknownErrorOccurred": "不明なエラーが発生しました"
     },
     "editor": {
       "noActiveTab": "アクティブなタブがありません",
