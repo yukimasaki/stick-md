@@ -55,7 +55,12 @@ export function CommitHistory() {
       if (E.isRight(result)) {
         setCommits(result.right);
       } else {
-        handleGitLogError(result.left, t);
+        // NO_COMMITSの場合は空配列を設定（トーストは表示しない）
+        if (result.left.type === 'NO_COMMITS') {
+          setCommits([]);
+        } else {
+          handleGitLogError(result.left, t);
+        }
       }
     } catch (error) {
       handleGitLogError({
@@ -65,7 +70,7 @@ export function CommitHistory() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedRepo]);
+  }, [selectedRepo, t]);
 
   useEffect(() => {
     loadCommits();

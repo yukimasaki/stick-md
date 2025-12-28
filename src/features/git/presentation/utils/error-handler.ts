@@ -183,6 +183,9 @@ export function handleGitLogError(error: GitLogError, t: ReturnType<typeof useTr
         description: error.message,
       });
       break;
+    case 'NO_COMMITS':
+      // コミットがない場合は正常な状態なのでトーストを表示しない
+      break;
     case 'GIT_LOG_ERROR':
       toast.error(t('errors.git.logError'), {
         description: error.message,

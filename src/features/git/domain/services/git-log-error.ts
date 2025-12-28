@@ -4,6 +4,7 @@
  */
 export type GitLogError =
   | { type: 'REPOSITORY_NOT_FOUND'; message: string }
+  | { type: 'NO_COMMITS'; message: string }
   | { type: 'GIT_LOG_ERROR'; message: string }
   | { type: 'UNKNOWN_ERROR'; message: string };
 

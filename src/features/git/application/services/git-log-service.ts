@@ -22,6 +22,23 @@ function validateRepository(
 }
 
 /**
+ * コミットがない場合を示すエラーかどうかを判定
+ */
+function isNoCommitsError(error: Error): boolean {
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('no commits') ||
+    message.includes('head not found') ||
+    message.includes('reference not found') ||
+    message.includes('does not have any commits') ||
+    message.includes('could not find refs/heads') ||
+    message.includes('could not find ref') ||
+    message.includes('refs/heads/master') ||
+    message.includes('refs/heads/main')
+  );
+}
+
+/**
  * コミット履歴を取得
  * Application Layer: コミット履歴取得のユースケースを実装
  */
@@ -36,6 +53,13 @@ export function getCommitHistory(
         () => getLog(repo, limit),
         (error): GitLogError => {
           if (error instanceof Error) {
+            // コミットがない場合のエラーは正常な状態として扱う
+            if (isNoCommitsError(error)) {
+              return {
+                type: 'NO_COMMITS',
+                message: 'No commits found in repository',
+              };
+            }
             return {
               type: 'GIT_LOG_ERROR',
               message: `Failed to get commit history: ${error.message}`,
