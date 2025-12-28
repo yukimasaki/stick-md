@@ -5,6 +5,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     GitHub({
         // Default environment variables: AUTH_GITHUB_ID, AUTH_GITHUB_SECRET
+        authorization: {
+          params: {
+            scope: 'read:user repo',
+          },
+        },
     }),
   ],
   callbacks: {

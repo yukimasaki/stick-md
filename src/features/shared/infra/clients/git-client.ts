@@ -30,9 +30,12 @@ export function getFileSystem(): LightningFS {
 
 /**
  * リポジトリのクローン先ディレクトリパスを生成
+ * パスに使用できない文字をエスケープ
  */
 export function getRepositoryPath(repository: Repository): string {
-  return `/repos/${repository.full_name}`;
+  // パスに使用できない文字（:など）をエスケープ
+  const safePath = repository.full_name.replace(/[<>:"|?*\x00-\x1f]/g, '_');
+  return `/repos/${safePath}`;
 }
 
 /**
@@ -45,7 +48,9 @@ export async function cloneRepository(
 ): Promise<void> {
   const fs = getFileSystem();
   const dir = getRepositoryPath(repository);
-  const url = `https://github.com/${repository.full_name}.git`;
+  // プライベートリポジトリの認証: URLにトークンを埋め込む
+  // CORSプロキシを使用する場合、onAuthが正しく動作しない可能性があるため
+  const url = `https://${accessToken}@github.com/${repository.full_name}.git`;
 
   await git.clone({
     fs,
@@ -55,10 +60,7 @@ export async function cloneRepository(
     corsProxy: 'https://cors.isomorphic-git.org',
     singleBranch: true,
     // depth: 1を削除して全履歴を取得（コミット履歴表示のため）
-    onAuth: () => ({
-      username: accessToken,
-      password: '',
-    }),
+    // onAuthはURLにトークンを埋め込んでいるため不要
     onProgress: (progress) => {
       // プログレス情報をログに出力（必要に応じてUIに反映可能）
       if (progress.phase === 'indexing') {
