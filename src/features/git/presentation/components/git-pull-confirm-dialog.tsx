@@ -83,6 +83,7 @@ export function GitPullConfirmDialog({
       <AnimatedDialogContent
         open={open}
         title={t('git.pull.confirm.title')}
+        description={t('git.pull.confirm.description')}
         footer={
           <>
             <Button

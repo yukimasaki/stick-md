@@ -81,6 +81,7 @@ export function GitPushConfirmDialog({
       <AnimatedDialogContent
         open={open}
         title={t('git.push.confirm.title')}
+        description={t('git.push.confirm.description')}
         footer={
           <>
             <Button
