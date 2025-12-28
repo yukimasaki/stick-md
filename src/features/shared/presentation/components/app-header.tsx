@@ -28,6 +28,8 @@ export function AppHeader({ session }: AppHeaderProps) {
 
   // クライアントサイドでマウントされたことを確認（Hydrationエラーを防ぐ）
   useEffect(() => {
+    // Hydrationエラーを防ぐため、クライアントサイドでのみ状態を更新
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

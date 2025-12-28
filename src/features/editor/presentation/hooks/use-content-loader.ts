@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import type { BlockNoteEditor } from '@blocknote/core';
 import type { Tab } from '@/features/editor/domain/models/tab-state';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
@@ -55,7 +55,7 @@ export function useTabContentLoader(
 
       // タブが切り替わっていない場合、現在のエディタの内容を取得
       let currentEditorContent = '';
-      if (!isTabSwitched) {
+      if (!isTabSwitched && editor) {
         try {
           currentEditorContent = await editor.blocksToMarkdownLossy(editor.document);
         } catch (error) {
@@ -78,6 +78,11 @@ export function useTabContentLoader(
 
       // 初期読み込み開始
       state.isInitializing.current = true;
+
+      if (!editor) {
+        state.isInitializing.current = false;
+        return;
+      }
 
       const result = await loadContentToEditor(editor, activeTab.content);
       if (!result.success) {
@@ -122,6 +127,10 @@ export function useExternalContentLoader(
       const isTabSwitched = state.lastLoadedTabId.current !== currentTab.id;
 
       // 現在のエディタの内容を取得
+      if (!editor) {
+        return;
+      }
+
       let currentEditorContent = '';
       try {
         currentEditorContent = await editor.blocksToMarkdownLossy(editor.document);

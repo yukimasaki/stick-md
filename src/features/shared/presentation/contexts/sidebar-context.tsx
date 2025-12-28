@@ -19,6 +19,8 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 
   // モバイルではデフォルトで閉じた状態、PCでは常に開いた状態を維持
   useEffect(() => {
+    // デバイスタイプに応じて初期状態を設定（Hydrationエラーを防ぐため）
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(!isMobile);
   }, [isMobile]);
 

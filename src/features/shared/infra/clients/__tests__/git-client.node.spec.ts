@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   getRepositoryPath,
   getFileSystem,
@@ -10,8 +10,17 @@ import {
   getCurrentBranch,
 } from '../git-client';
 import { Repository } from '@/features/repository/domain/models/repository';
-import LightningFS from '@isomorphic-git/lightning-fs';
 import git from 'isomorphic-git';
+
+/**
+ * Stats型のモック
+ */
+interface MockStats {
+  isDirectory: () => boolean;
+  isFile: () => boolean;
+  size: number;
+  mtime: Date;
+}
 
 // LightningFSをモック
 vi.mock('@isomorphic-git/lightning-fs', () => {
@@ -170,7 +179,7 @@ describe('readFile', () => {
   it('ファイルを読み込む', async () => {
     const content = 'Hello, World!';
     const mockFs = getFileSystem();
-    vi.mocked(mockFs.promises.readFile).mockResolvedValue(content as any);
+    vi.mocked(mockFs.promises.readFile).mockResolvedValue(content as unknown as Uint8Array);
 
     const result = await readFile(mockRepository, 'test.md');
 
@@ -184,7 +193,7 @@ describe('readFile', () => {
   it('パスの先頭のスラッシュを正規化する', async () => {
     const content = 'Content';
     const mockFs = getFileSystem();
-    vi.mocked(mockFs.promises.readFile).mockResolvedValue(content as any);
+    vi.mocked(mockFs.promises.readFile).mockResolvedValue(content as unknown as Uint8Array);
 
     await readFile(mockRepository, '/test.md');
 
@@ -211,7 +220,13 @@ describe('createFile', () => {
     const content = 'Hello, World!';
     const mockFs = getFileSystem();
     vi.mocked(mockFs.promises.writeFile).mockResolvedValue(undefined);
-    vi.mocked(mockFs.promises.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    const mockStats: MockStats = {
+      isDirectory: () => true,
+      isFile: () => false,
+      size: 0,
+      mtime: new Date(),
+    };
+    vi.mocked(mockFs.promises.stat).mockResolvedValue(mockStats as unknown as Awaited<ReturnType<typeof mockFs.promises.stat>>);
 
     await createFile(mockRepository, 'test.md', content);
 
@@ -248,7 +263,13 @@ describe('createFile', () => {
     const content = 'Content';
     const mockFs = getFileSystem();
     vi.mocked(mockFs.promises.writeFile).mockResolvedValue(undefined);
-    vi.mocked(mockFs.promises.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    const mockStats: MockStats = {
+      isDirectory: () => true,
+      isFile: () => false,
+      size: 0,
+      mtime: new Date(),
+    };
+    vi.mocked(mockFs.promises.stat).mockResolvedValue(mockStats as unknown as Awaited<ReturnType<typeof mockFs.promises.stat>>);
 
     await createFile(mockRepository, '/test.md', content);
 
@@ -305,7 +326,13 @@ describe('ensureDirectoryExists', () => {
 
   it('ディレクトリが既に存在する場合、何もしない', async () => {
     const mockFs = getFileSystem();
-    vi.mocked(mockFs.promises.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    const mockStats: MockStats = {
+      isDirectory: () => true,
+      isFile: () => false,
+      size: 0,
+      mtime: new Date(),
+    };
+    vi.mocked(mockFs.promises.stat).mockResolvedValue(mockStats as unknown as Awaited<ReturnType<typeof mockFs.promises.stat>>);
 
     await ensureDirectoryExists(mockRepository, 'dir');
 

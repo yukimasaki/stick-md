@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSyncExternalStore } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';

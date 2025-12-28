@@ -22,6 +22,36 @@ vi.mock('sonner', () => ({
   },
 }));
 
+// 翻訳関数のモック
+const translations: Record<string, string> = {
+  'errors.common.repositoryNotFound': 'Repository Not Found',
+  'errors.common.fileNotFound': 'File Not Found',
+  'errors.common.unknownError': 'Unknown Error',
+  'errors.common.error': 'Error',
+  'errors.git.statusError': 'Git Status Error',
+  'errors.git.addError': 'Git Add Error',
+  'errors.git.resetError': 'Git Reset Error',
+  'errors.git.checkoutError': 'Git Checkout Error',
+  'errors.git.noStagedFiles': 'No Staged Files',
+  'errors.git.emptyCommitMessage': 'Empty Commit Message',
+  'errors.git.commitError': 'Git Commit Error',
+  'errors.git.logError': 'Git Log Error',
+  'errors.git.unexpectedStatusError': 'An unexpected error occurred during git status',
+  'errors.git.unexpectedAddError': 'An unexpected error occurred during git add',
+  'errors.git.unexpectedResetError': 'An unexpected error occurred during git reset',
+  'errors.git.unexpectedCheckoutError': 'An unexpected error occurred during git checkout',
+  'errors.git.unexpectedCommitError': 'An unexpected error occurred during git commit',
+  'errors.git.unexpectedLogError': 'An unexpected error occurred during git log',
+  'errors.git.repositoryNotFound': 'Repository is not found',
+  'errors.git.accessTokenNotFound': 'Access token is not found',
+  'errors.git.failedToPull': 'Failed to pull',
+  'errors.git.failedToPush': 'Failed to push',
+  'errors.git.failedToGetCommitHistory': 'Failed to get commit history',
+  'errors.git.noCommitsFound': 'No commits found in repository',
+};
+
+const mockT = ((key: string) => translations[key] || key) as ReturnType<typeof import('next-intl').useTranslations>;
+
 describe('handleGitStatusError', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -33,7 +63,7 @@ describe('handleGitStatusError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitStatusError(error);
+    handleGitStatusError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -46,7 +76,7 @@ describe('handleGitStatusError', () => {
       message: 'Failed to get git status',
     };
 
-    handleGitStatusError(error);
+    handleGitStatusError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Status Error', {
       description: 'Failed to get git status',
@@ -59,7 +89,7 @@ describe('handleGitStatusError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitStatusError(error);
+    handleGitStatusError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -72,7 +102,7 @@ describe('handleGitStatusError', () => {
       message: 'Unexpected error',
     } as unknown as GitStatusError;
 
-    handleGitStatusError(error);
+    handleGitStatusError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git status',
@@ -91,7 +121,7 @@ describe('handleGitAddError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitAddError(error);
+    handleGitAddError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -105,7 +135,7 @@ describe('handleGitAddError', () => {
       filePath: 'test.md',
     };
 
-    handleGitAddError(error);
+    handleGitAddError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Not Found', {
       description: 'File not found: test.md',
@@ -119,7 +149,7 @@ describe('handleGitAddError', () => {
       filePath: 'test.md',
     };
 
-    handleGitAddError(error);
+    handleGitAddError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Add Error', {
       description: 'Failed to add file to stage',
@@ -132,7 +162,7 @@ describe('handleGitAddError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitAddError(error);
+    handleGitAddError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -145,7 +175,7 @@ describe('handleGitAddError', () => {
       message: 'Unexpected error',
     } as unknown as GitAddError;
 
-    handleGitAddError(error);
+    handleGitAddError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git add',
@@ -164,7 +194,7 @@ describe('handleGitResetError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitResetError(error);
+    handleGitResetError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -178,7 +208,7 @@ describe('handleGitResetError', () => {
       filePath: 'test.md',
     };
 
-    handleGitResetError(error);
+    handleGitResetError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Not Found', {
       description: 'File not found: test.md',
@@ -192,7 +222,7 @@ describe('handleGitResetError', () => {
       filePath: 'test.md',
     };
 
-    handleGitResetError(error);
+    handleGitResetError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Reset Error', {
       description: 'Failed to reset file from stage',
@@ -205,7 +235,7 @@ describe('handleGitResetError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitResetError(error);
+    handleGitResetError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -218,7 +248,7 @@ describe('handleGitResetError', () => {
       message: 'Unexpected error',
     } as unknown as GitResetError;
 
-    handleGitResetError(error);
+    handleGitResetError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git reset',
@@ -237,7 +267,7 @@ describe('handleGitCheckoutError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitCheckoutError(error);
+    handleGitCheckoutError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -251,7 +281,7 @@ describe('handleGitCheckoutError', () => {
       filePath: 'test.md',
     };
 
-    handleGitCheckoutError(error);
+    handleGitCheckoutError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Not Found', {
       description: 'File not found: test.md',
@@ -265,7 +295,7 @@ describe('handleGitCheckoutError', () => {
       filePath: 'test.md',
     };
 
-    handleGitCheckoutError(error);
+    handleGitCheckoutError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Checkout Error', {
       description: 'Failed to checkout file',
@@ -278,7 +308,7 @@ describe('handleGitCheckoutError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitCheckoutError(error);
+    handleGitCheckoutError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -291,7 +321,7 @@ describe('handleGitCheckoutError', () => {
       message: 'Unexpected error',
     } as unknown as GitCheckoutError;
 
-    handleGitCheckoutError(error);
+    handleGitCheckoutError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git checkout',
@@ -310,7 +340,7 @@ describe('handleGitCommitError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -323,7 +353,7 @@ describe('handleGitCommitError', () => {
       message: 'No staged files to commit',
     };
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('No Staged Files', {
       description: 'No staged files to commit',
@@ -336,7 +366,7 @@ describe('handleGitCommitError', () => {
       message: 'Commit message cannot be empty',
     };
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Empty Commit Message', {
       description: 'Commit message cannot be empty',
@@ -349,7 +379,7 @@ describe('handleGitCommitError', () => {
       message: 'Failed to commit',
     };
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Commit Error', {
       description: 'Failed to commit',
@@ -362,7 +392,7 @@ describe('handleGitCommitError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -375,7 +405,7 @@ describe('handleGitCommitError', () => {
       message: 'Unexpected error',
     } as unknown as GitCommitError;
 
-    handleGitCommitError(error);
+    handleGitCommitError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git commit',
@@ -394,7 +424,7 @@ describe('handleGitLogError', () => {
       message: 'Repository is not found',
     };
 
-    handleGitLogError(error);
+    handleGitLogError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not found',
@@ -407,7 +437,7 @@ describe('handleGitLogError', () => {
       message: 'Failed to get commit history',
     };
 
-    handleGitLogError(error);
+    handleGitLogError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Git Log Error', {
       description: 'Failed to get commit history',
@@ -420,7 +450,7 @@ describe('handleGitLogError', () => {
       message: 'An unknown error occurred',
     };
 
-    handleGitLogError(error);
+    handleGitLogError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unknown error occurred',
@@ -433,7 +463,7 @@ describe('handleGitLogError', () => {
       message: 'Unexpected error',
     } as unknown as GitLogError;
 
-    handleGitLogError(error);
+    handleGitLogError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred during git log',

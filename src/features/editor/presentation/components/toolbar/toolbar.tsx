@@ -19,6 +19,8 @@ export function Toolbar() {
   // 設定値が変更されたときに位置を更新
   useEffect(() => {
     if (!isMobile || typeof window === 'undefined' || !window.visualViewport) {
+      // Hydrationエラーを防ぐため、クライアントサイドでのみ状態を更新
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBottom(BASE_OFFSET + settingsOffset);
       return;
     }

@@ -54,7 +54,7 @@ describe('addFileToStage', () => {
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result) && result.left.type === 'FILE_NOT_FOUND') {
-      expect(result.left.message).toBe(`File not found: ${filePath}`);
+      expect(result.left.message).toBe(`File not found: ${filePath}. The file may have been deleted.`);
       expect(result.left.filePath).toBe(filePath);
     }
     expect(addFile).toHaveBeenCalledWith(mockRepository, filePath);

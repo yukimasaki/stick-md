@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -44,6 +43,8 @@ interface UserMenuDialogProps {
  * ユーザーメニューダイアログコンポーネント（アバター + モーダル + ダイアログ）
  */
 export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }: UserMenuDialogProps) {
+  // avatarOnlyは将来の使用のために予約されている
+  void avatarOnly;
   const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);

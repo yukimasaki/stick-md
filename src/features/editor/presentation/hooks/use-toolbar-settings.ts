@@ -24,6 +24,8 @@ export function useToolbarSettings() {
           const parsed = parseInt(saved, 10);
           // バリデーション: -200-200pxの範囲
           if (!isNaN(parsed) && parsed >= -200 && parsed <= 200) {
+            // localStorageから読み込んだ値を設定（Hydrationエラーを防ぐため）
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setOffset(parsed);
           }
         }

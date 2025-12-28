@@ -11,6 +11,22 @@ vi.mock('sonner', () => ({
   },
 }));
 
+// 翻訳関数のモック
+const translations: Record<string, string> = {
+  'errors.common.repositoryNotFound': 'Repository Not Found',
+  'errors.common.fileNotFound': 'File Not Found',
+  'errors.common.fileSystemError': 'File System Error',
+  'errors.common.unknownError': 'Unknown Error',
+  'errors.common.error': 'Error',
+  'errors.repository.validationError': 'Validation Error',
+  'errors.repository.fileAlreadyExists': 'File Already Exists',
+  'errors.repository.directoryCreationFailed': 'Directory Creation Failed',
+  'errors.repository.fileCreationFailed': 'File Creation Failed',
+  'errors.repository.unexpectedError': 'An unexpected error occurred',
+};
+
+const mockT = ((key: string) => translations[key] || key) as ReturnType<typeof import('next-intl').useTranslations>;
+
 describe('handleFileCreationError', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -22,7 +38,7 @@ describe('handleFileCreationError', () => {
       message: 'Invalid file name',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Validation Error', {
       description: 'Invalid file name',
@@ -36,7 +52,7 @@ describe('handleFileCreationError', () => {
       filePath: 'test.md',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Already Exists', {
       description: 'File already exists: test.md',
@@ -50,7 +66,7 @@ describe('handleFileCreationError', () => {
       directoryPath: 'src/components',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Directory Creation Failed', {
       description: 'Failed to create directory: src/components',
@@ -64,7 +80,7 @@ describe('handleFileCreationError', () => {
       filePath: 'test.md',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Creation Failed', {
       description: 'Failed to create file: test.md',
@@ -77,7 +93,7 @@ describe('handleFileCreationError', () => {
       message: 'Repository is not cloned',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not cloned',
@@ -90,7 +106,7 @@ describe('handleFileCreationError', () => {
       message: 'An unexpected error occurred',
     };
 
-    handleFileCreationError(error);
+    handleFileCreationError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unexpected error occurred',
@@ -109,7 +125,7 @@ describe('handleFileDeletionError', () => {
       message: 'Repository is not cloned',
     };
 
-    handleFileDeletionError(error);
+    handleFileDeletionError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Repository Not Found', {
       description: 'Repository is not cloned',
@@ -123,7 +139,7 @@ describe('handleFileDeletionError', () => {
       filePath: 'test.md',
     };
 
-    handleFileDeletionError(error);
+    handleFileDeletionError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File Not Found', {
       description: 'File or directory not found: test.md',
@@ -137,7 +153,7 @@ describe('handleFileDeletionError', () => {
       filePath: 'test.md',
     };
 
-    handleFileDeletionError(error);
+    handleFileDeletionError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('File System Error', {
       description: 'Failed to delete file: test.md',
@@ -150,7 +166,7 @@ describe('handleFileDeletionError', () => {
       message: 'An unexpected error occurred',
     };
 
-    handleFileDeletionError(error);
+    handleFileDeletionError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Unknown Error', {
       description: 'An unexpected error occurred',
@@ -163,7 +179,7 @@ describe('handleFileDeletionError', () => {
       message: 'Unexpected error',
     } as unknown as FileDeletionError;
 
-    handleFileDeletionError(error);
+    handleFileDeletionError(error, mockT);
 
     expect(toast.error).toHaveBeenCalledWith('Error', {
       description: 'An unexpected error occurred',

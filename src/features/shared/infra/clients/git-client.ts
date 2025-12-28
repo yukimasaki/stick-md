@@ -332,7 +332,6 @@ export async function addFile(
 
   // パスを正規化（先頭の/を削除）
   const normalizedPath = filePath.replace(/^\/+/, '');
-  const fullPath = `${dir}/${normalizedPath}`;
 
   // ファイルのステータスを確認
   const statusMatrix = await git.statusMatrix({
