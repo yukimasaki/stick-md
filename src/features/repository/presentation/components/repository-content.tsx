@@ -17,7 +17,7 @@ export function RepositoryContent({ session }: RepositoryContentProps) {
       {/* Code Management Section */}
       {session && (
         <>
-          <CommitForm />
+          <CommitForm session={session} />
           
           <GitStatusUI />
           

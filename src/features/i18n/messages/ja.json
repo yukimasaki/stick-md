@@ -87,6 +87,30 @@
       "title": "履歴 ({count})",
       "noCommits": "コミットがありません"
     },
+    "push": {
+      "button": "プッシュ",
+      "success": {
+        "title": "プッシュ完了",
+        "description": "変更が正常にリモートにプッシュされました"
+      },
+      "confirm": {
+        "title": "プッシュの確認",
+        "cancel": "キャンセル",
+        "pushing": "プッシュ中..."
+      }
+    },
+    "pull": {
+      "button": "プル",
+      "success": {
+        "title": "プル完了",
+        "description": "リモートから正常に変更を取得しました"
+      },
+      "confirm": {
+        "title": "プルの確認",
+        "cancel": "キャンセル",
+        "pulling": "プル中..."
+      }
+    },
     "signInRequired": "リポジトリ機能を使用するにはサインインが必要です"
   },
   "unsupportedFileDialog": {
@@ -142,12 +166,16 @@
       "emptyCommitMessage": "コミットメッセージが空です",
       "commitError": "Gitコミットエラー",
       "logError": "Gitログエラー",
+      "pushError": "Gitプッシュエラー",
+      "pullError": "Gitプルエラー",
       "unexpectedStatusError": "Gitステータス中に予期しないエラーが発生しました",
       "unexpectedAddError": "Git追加中に予期しないエラーが発生しました",
       "unexpectedResetError": "Gitリセット中に予期しないエラーが発生しました",
       "unexpectedCheckoutError": "Gitチェックアウト中に予期しないエラーが発生しました",
       "unexpectedCommitError": "Gitコミット中に予期しないエラーが発生しました",
-      "unexpectedLogError": "Gitログ取得中に予期しないエラーが発生しました"
+      "unexpectedLogError": "Gitログ取得中に予期しないエラーが発生しました",
+      "unexpectedPushError": "Gitプッシュ中に予期しないエラーが発生しました",
+      "unexpectedPullError": "Gitプル中に予期しないエラーが発生しました"
     },
     "editor": {
       "noActiveTab": "アクティブなタブがありません",

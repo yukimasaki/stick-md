@@ -6,6 +6,8 @@ import type { GitResetError } from '@/features/git/domain/services/git-reset-err
 import type { GitCheckoutError } from '@/features/git/domain/services/git-checkout-error';
 import type { GitCommitError } from '@/features/git/domain/services/git-commit-error';
 import type { GitLogError } from '@/features/git/domain/services/git-log-error';
+import type { GitPushError } from '@/features/git/domain/services/git-push-error';
+import type { GitPullError } from '@/features/git/domain/services/git-pull-error';
 
 /**
  * Gitステータスエラーをtoastで表示
@@ -199,6 +201,62 @@ export function handleGitLogError(error: GitLogError, t: ReturnType<typeof useTr
     default:
       toast.error(t('errors.common.error'), {
         description: t('errors.git.unexpectedLogError'),
+      });
+  }
+}
+
+/**
+ * Gitプッシュエラーをtoastで表示
+ * Presentation Layer: エラーハンドリングのユーティリティ
+ */
+export function handleGitPushError(error: GitPushError, t: ReturnType<typeof useTranslations>): void {
+  switch (error.type) {
+    case 'REPOSITORY_NOT_FOUND':
+      toast.error(t('errors.common.repositoryNotFound'), {
+        description: error.message,
+      });
+      break;
+    case 'GIT_PUSH_ERROR':
+      toast.error(t('errors.git.pushError'), {
+        description: error.message,
+      });
+      break;
+    case 'UNKNOWN_ERROR':
+      toast.error(t('errors.common.unknownError'), {
+        description: error.message,
+      });
+      break;
+    default:
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedPushError'),
+      });
+  }
+}
+
+/**
+ * Gitプルエラーをtoastで表示
+ * Presentation Layer: エラーハンドリングのユーティリティ
+ */
+export function handleGitPullError(error: GitPullError, t: ReturnType<typeof useTranslations>): void {
+  switch (error.type) {
+    case 'REPOSITORY_NOT_FOUND':
+      toast.error(t('errors.common.repositoryNotFound'), {
+        description: error.message,
+      });
+      break;
+    case 'GIT_PULL_ERROR':
+      toast.error(t('errors.git.pullError'), {
+        description: error.message,
+      });
+      break;
+    case 'UNKNOWN_ERROR':
+      toast.error(t('errors.common.unknownError'), {
+        description: error.message,
+      });
+      break;
+    default:
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedPullError'),
       });
   }
 }

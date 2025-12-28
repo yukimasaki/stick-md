@@ -83,7 +83,7 @@ export function GitStatusUI() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedRepo]);
+  }, [selectedRepo, t]);
 
   useEffect(() => {
     loadStatus();

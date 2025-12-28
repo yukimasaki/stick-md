@@ -51,6 +51,48 @@ function mapGitHubRepoToDomain(repo: GitHubRepositoryResponse): Repository {
 }
 
 /**
+ * GitHub APIのユーザー情報レスポンス型
+ * Infrastructure Layer: 外部APIの型定義
+ */
+interface GitHubUserResponse {
+  login: string;
+  name: string | null;
+  email: string | null;
+  avatar_url: string;
+}
+
+/**
+ * ログインユーザーのGitHub情報を取得
+ * Infrastructure Layer: 外部サービス（GitHub API）との連携を担当
+ */
+export async function getGitHubUser(
+  accessToken: string
+): Promise<{ name: string; email: string }> {
+  const response = await fetchWithToken('/user', accessToken);
+  const data: GitHubUserResponse = await response.json();
+
+  // emailがnullの場合は、公開emailを取得する
+  let email = data.email;
+  if (!email) {
+    try {
+      const emailsResponse = await fetchWithToken('/user/emails', accessToken);
+      const emails: Array<{ email: string; primary: boolean; verified: boolean }> = await emailsResponse.json();
+      // プライマリで検証済みのemailを優先
+      const primaryEmail = emails.find((e) => e.primary && e.verified);
+      email = primaryEmail?.email || emails.find((e) => e.verified)?.email || emails[0]?.email || null;
+    } catch {
+      // email取得に失敗した場合は、login名を使用
+      email = `${data.login}@users.noreply.github.com`;
+    }
+  }
+
+  return {
+    name: data.name || data.login,
+    email: email || `${data.login}@users.noreply.github.com`,
+  };
+}
+
+/**
  * ログインユーザーのリポジトリ一覧を取得
  * Infrastructure Layer: 外部サービス（GitHub API）との連携を担当
  * 

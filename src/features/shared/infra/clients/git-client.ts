@@ -425,3 +425,95 @@ export async function getLog(
   return commits;
 }
 
+/**
+ * 現在のブランチ名を取得
+ * Infrastructure Layer: isomorphic-gitを使用したブランチ名取得
+ */
+export async function getCurrentBranch(
+  repository: Repository
+): Promise<string | null> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+
+  try {
+    const branch = await git.currentBranch({
+      fs,
+      dir,
+    });
+    return branch || null;
+  } catch {
+    // ブランチが存在しない場合（新規リポジトリなど）
+    return null;
+  }
+}
+
+/**
+ * リモートにプッシュ
+ * Infrastructure Layer: isomorphic-gitを使用したプッシュ操作
+ * 注意: pushは既存のコミットをプッシュするだけなので、author情報は不要
+ */
+export async function push(
+  repository: Repository,
+  accessToken: string
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+  const url = `https://${accessToken}@github.com/${repository.full_name}.git`;
+
+  // 現在のブランチを取得
+  const currentBranch = await getCurrentBranch(repository);
+  if (!currentBranch) {
+    throw new Error('No branch found. Please commit first to create a branch.');
+  }
+
+  await git.push({
+    fs,
+    http,
+    dir,
+    url,
+    corsProxy: 'https://cors.isomorphic-git.org',
+    remote: 'origin',
+    ref: currentBranch,
+    onProgress: (progress) => {
+      if (progress.phase === 'pushing') {
+        console.log(`Pushing: ${progress.loaded}/${progress.total}`);
+      }
+    },
+  });
+}
+
+/**
+ * リモートからプル
+ * Infrastructure Layer: isomorphic-gitを使用したプル操作
+ */
+export async function pull(
+  repository: Repository,
+  accessToken: string,
+  author: { name: string; email: string }
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+  const url = `https://${accessToken}@github.com/${repository.full_name}.git`;
+
+  // 現在のブランチを取得（存在しない場合はmainをデフォルトとして使用）
+  const currentBranch = await getCurrentBranch(repository);
+  const branch = currentBranch || 'main';
+
+  await git.pull({
+    fs,
+    http,
+    dir,
+    url,
+    corsProxy: 'https://cors.isomorphic-git.org',
+    remote: 'origin',
+    ref: branch,
+    singleBranch: true,
+    author,
+    onProgress: (progress) => {
+      if (progress.phase === 'fetching') {
+        console.log(`Fetching: ${progress.loaded}/${progress.total}`);
+      }
+    },
+  });
+}
+

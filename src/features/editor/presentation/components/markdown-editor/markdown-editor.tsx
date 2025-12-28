@@ -30,7 +30,10 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   // 前回読み込んだタブIDを保持（タブ切り替え検知用）
   const lastLoadedTabIdRef = useRef<string | null>(null);
 
-  // アクティブタブの内容をエディタに読み込む（タブ切り替え時のみ）
+  // 前回読み込んだタブの内容を保持（外部からの更新を検知するため）
+  const lastLoadedContentRef = useRef<string | null>(null);
+
+  // アクティブタブの内容をエディタに読み込む（タブ切り替え時または内容が変更された時）
   useEffect(() => {
     if (!editor || !activeTab?.content) return;
 
@@ -41,7 +44,10 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
         // タブが切り替わった場合は必ず読み込む
         const isTabSwitched = lastLoadedTabIdRef.current !== activeTab.id;
         
-        if (!isTabSwitched) {
+        // タブの内容が外部から更新された場合も読み込む（プルなど）
+        const isContentChanged = lastLoadedContentRef.current !== activeTab.content;
+        
+        if (!isTabSwitched && !isContentChanged) {
           // タブが切り替わっていない場合、現在のエディタの内容を取得して比較（無限ループ防止）
           const currentMarkdown = await editor.blocksToMarkdownLossy(editor.document);
           // 現在の内容とタブの内容が同じ場合は更新しない（IME入力中の再レンダリングを防ぐ）
@@ -56,8 +62,9 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
         const blocks = await editor.tryParseMarkdownToBlocks(activeTab.content);
         editor.replaceBlocks(editor.document, blocks);
         
-        // 読み込んだタブIDを記録
+        // 読み込んだタブIDと内容を記録
         lastLoadedTabIdRef.current = activeTab.id;
+        lastLoadedContentRef.current = activeTab.content;
         
         // 初期読み込み完了（onChangeが非同期で発火する可能性があるため、少し遅延させる）
         setTimeout(() => {
@@ -70,9 +77,9 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
     }
 
     loadContent();
-    // activeTab?.contentを依存配列から削除（IME入力中の再レンダリングを防ぐ）
+    // activeTab?.contentを依存配列に追加（外部からの更新を検知するため）
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor, activeTab?.id]);
+  }, [editor, activeTab?.id, activeTab?.content]);
 
   // エディタの変更を検知してタブのコンテンツを更新
   useEffect(() => {

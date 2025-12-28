@@ -87,6 +87,30 @@
       "title": "History ({count})",
       "noCommits": "No commits"
     },
+    "push": {
+      "button": "Push",
+      "success": {
+        "title": "Pushed",
+        "description": "Changes have been pushed to remote successfully"
+      },
+      "confirm": {
+        "title": "Confirm Push",
+        "cancel": "Cancel",
+        "pushing": "Pushing..."
+      }
+    },
+    "pull": {
+      "button": "Pull",
+      "success": {
+        "title": "Pulled",
+        "description": "Changes have been pulled from remote successfully"
+      },
+      "confirm": {
+        "title": "Confirm Pull",
+        "cancel": "Cancel",
+        "pulling": "Pulling..."
+      }
+    },
     "signInRequired": "Please sign in to use repository features."
   },
   "unsupportedFileDialog": {
@@ -142,12 +166,16 @@
       "emptyCommitMessage": "Empty Commit Message",
       "commitError": "Git Commit Error",
       "logError": "Git Log Error",
+      "pushError": "Git Push Error",
+      "pullError": "Git Pull Error",
       "unexpectedStatusError": "An unexpected error occurred during git status",
       "unexpectedAddError": "An unexpected error occurred during git add",
       "unexpectedResetError": "An unexpected error occurred during git reset",
       "unexpectedCheckoutError": "An unexpected error occurred during git checkout",
       "unexpectedCommitError": "An unexpected error occurred during git commit",
-      "unexpectedLogError": "An unexpected error occurred during git log"
+      "unexpectedLogError": "An unexpected error occurred during git log",
+      "unexpectedPushError": "An unexpected error occurred during git push",
+      "unexpectedPullError": "An unexpected error occurred during git pull"
     },
     "editor": {
       "noActiveTab": "No Active Tab",
