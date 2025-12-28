@@ -1,10 +1,48 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
 import { RepositorySelector } from './repository-selector';
 import { useRepositorySelector } from '@/features/repository/presentation/hooks/use-repository-selector';
 
+// window.matchMediaをモック
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
 // Mock useRepositorySelector
 vi.mock('@/features/repository/presentation/hooks/use-repository-selector');
+
+// モックメッセージ
+const mockMessages = {
+  repositorySelector: {
+    placeholder: 'Select a repository...',
+    loading: 'Loading repositories...',
+    noRepositories: 'No repositories found',
+    close: 'Close',
+    switchRepository: 'Switch Active Repository',
+    cloning: 'Cloning...',
+    clone: 'Clone',
+  },
+};
+
+// NextIntlClientProviderでラップするヘルパー関数
+const renderWithIntl = (ui: React.ReactElement) => {
+  return render(
+    <NextIntlClientProvider messages={mockMessages} locale="en">
+      {ui}
+    </NextIntlClientProvider>
+  );
+};
 
 afterEach(() => {
   cleanup();
@@ -34,7 +72,7 @@ describe('RepositorySelector', () => {
   it('renders Select component with placeholder', () => {
     vi.mocked(useRepositorySelector).mockReturnValue(defaultMockReturn);
 
-    render(<RepositorySelector />);
+    renderWithIntl(<RepositorySelector />);
     expect(screen.getByText('Select a repository...')).toBeDefined();
   });
 
@@ -46,7 +84,7 @@ describe('RepositorySelector', () => {
       displayRepoId: '1',
     });
 
-    render(<RepositorySelector />);
+    renderWithIntl(<RepositorySelector />);
     expect(screen.getByText('user/repo-1')).toBeDefined();
   });
 
@@ -56,7 +94,7 @@ describe('RepositorySelector', () => {
       isLoading: true,
     });
 
-    render(<RepositorySelector />);
+    renderWithIntl(<RepositorySelector />);
     const trigger = screen.getByRole('combobox');
     expect(trigger.hasAttribute('disabled')).toBe(true);
   });
@@ -64,7 +102,7 @@ describe('RepositorySelector', () => {
   it('renders Select when repositories are empty', () => {
     vi.mocked(useRepositorySelector).mockReturnValue(defaultMockReturn);
 
-    render(<RepositorySelector />);
+    renderWithIntl(<RepositorySelector />);
     const trigger = screen.getByRole('combobox');
     expect(trigger).toBeDefined();
   });
@@ -77,7 +115,7 @@ describe('RepositorySelector', () => {
       handleSelect: mockHandleSelect,
     });
 
-    render(<RepositorySelector />);
+    renderWithIntl(<RepositorySelector />);
     const trigger = screen.getByRole('combobox');
     expect(trigger).toBeDefined();
     expect(mockHandleSelect).toBeDefined();
@@ -93,7 +131,7 @@ describe('RepositorySelector', () => {
         isCloned: false,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       expect(screen.getByText('Clone')).toBeDefined();
     });
 
@@ -107,7 +145,7 @@ describe('RepositorySelector', () => {
         isCloning: true,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       const button = screen.getByText('Cloning...');
       expect(button).toBeDefined();
       expect(button.hasAttribute('disabled')).toBe(true);
@@ -124,7 +162,7 @@ describe('RepositorySelector', () => {
         handleClone: mockHandleClone,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       const button = screen.getByText('Clone');
       expect(button.hasAttribute('disabled')).toBe(true);
     });
@@ -140,7 +178,7 @@ describe('RepositorySelector', () => {
         handleClone: mockHandleClone,
       });
 
-      render(<RepositorySelector accessToken="test-token" />);
+      renderWithIntl(<RepositorySelector accessToken="test-token" />);
       const button = screen.getByText('Clone');
       fireEvent.click(button);
 
@@ -159,8 +197,8 @@ describe('RepositorySelector', () => {
         isCurrentRepository: false,
       });
 
-      render(<RepositorySelector />);
-      expect(screen.getByText('作業リポジトリを切り替え')).toBeDefined();
+      renderWithIntl(<RepositorySelector />);
+      expect(screen.getByText('Switch Active Repository')).toBeDefined();
       expect(screen.queryByText('Clone')).toBeNull();
       expect(screen.queryByText('閉じる')).toBeNull();
     });
@@ -177,8 +215,8 @@ describe('RepositorySelector', () => {
         handleSwitchRepository: mockHandleSwitchRepository,
       });
 
-      render(<RepositorySelector />);
-      const button = screen.getByText('作業リポジトリを切り替え');
+      renderWithIntl(<RepositorySelector />);
+      const button = screen.getByText('Switch Active Repository');
       fireEvent.click(button);
 
       expect(mockHandleSwitchRepository).toHaveBeenCalledTimes(1);
@@ -194,9 +232,9 @@ describe('RepositorySelector', () => {
         isCurrentRepository: false,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       expect(screen.queryByText('Clone')).toBeNull();
-      expect(screen.getByText('作業リポジトリを切り替え')).toBeDefined();
+      expect(screen.getByText('Switch Active Repository')).toBeDefined();
     });
   });
 
@@ -211,10 +249,10 @@ describe('RepositorySelector', () => {
         isCurrentRepository: true,
       });
 
-      render(<RepositorySelector />);
-      expect(screen.getByText('閉じる')).toBeDefined();
+      renderWithIntl(<RepositorySelector />);
+      expect(screen.getByText('Close')).toBeDefined();
       expect(screen.queryByText('Clone')).toBeNull();
-      expect(screen.queryByText('作業リポジトリを切り替え')).toBeNull();
+      expect(screen.queryByText('Switch Active Repository')).toBeNull();
     });
 
     it('calls handleClose when close button is clicked', () => {
@@ -229,8 +267,8 @@ describe('RepositorySelector', () => {
         handleClose: mockHandleClose,
       });
 
-      render(<RepositorySelector />);
-      const button = screen.getByText('閉じる');
+      renderWithIntl(<RepositorySelector />);
+      const button = screen.getByText('Close');
       fireEvent.click(button);
 
       expect(mockHandleClose).toHaveBeenCalledTimes(1);
@@ -246,10 +284,10 @@ describe('RepositorySelector', () => {
         isCurrentRepository: true,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       expect(screen.queryByText('Clone')).toBeNull();
-      expect(screen.queryByText('作業リポジトリを切り替え')).toBeNull();
-      expect(screen.getByText('閉じる')).toBeDefined();
+      expect(screen.queryByText('Switch Active Repository')).toBeNull();
+      expect(screen.getByText('Close')).toBeDefined();
     });
   });
 
@@ -264,7 +302,7 @@ describe('RepositorySelector', () => {
         cloneError: 'Failed to clone repository',
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       expect(screen.getByText('Failed to clone repository')).toBeDefined();
     });
 
@@ -278,7 +316,7 @@ describe('RepositorySelector', () => {
         cloneError: null,
       });
 
-      render(<RepositorySelector />);
+      renderWithIntl(<RepositorySelector />);
       expect(screen.queryByText(/Failed to clone/i)).toBeNull();
     });
   });

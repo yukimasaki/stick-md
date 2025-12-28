@@ -1,6 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
 import { SaveButton } from './save-button';
+
+// window.matchMediaをモック
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
 import * as fileSaveService from '@/features/editor/application/services/file-save-service';
 import * as tabStore from '@/features/editor/application/stores/tab-store';
 import * as repositoryStore from '@/features/repository/application/stores/repository-store';
@@ -8,6 +24,22 @@ import * as TE from 'fp-ts/TaskEither';
 import type { TabState } from '@/features/editor/domain/models/tab-state';
 import type { Repository } from '@/features/repository/domain/models/repository';
 import type { FileSaveError } from '@/features/editor/domain/services/file-save-error';
+
+// モックメッセージ
+const mockMessages = {
+  saveButton: {
+    tooltip: 'Save',
+  },
+};
+
+// NextIntlClientProviderでラップするヘルパー関数
+const renderWithIntl = (ui: React.ReactElement) => {
+  return render(
+    <NextIntlClientProvider messages={mockMessages} locale="en">
+      {ui}
+    </NextIntlClientProvider>
+  );
+};
 
 // モック
 vi.mock('@/features/editor/application/services/file-save-service');
@@ -65,7 +97,7 @@ describe('SaveButton', () => {
   });
 
   it('保存ボタンが表示される', () => {
-    render(<SaveButton />);
+    renderWithIntl(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThan(0);
   });
@@ -75,7 +107,7 @@ describe('SaveButton', () => {
       TE.right(undefined) as TE.TaskEither<FileSaveError, void>
     );
 
-    render(<SaveButton />);
+    renderWithIntl(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     // 最初のボタン（保存ボタン）をクリック
     fireEvent.click(buttons[0]);
@@ -92,7 +124,7 @@ describe('SaveButton', () => {
     };
     vi.mocked(tabStore.tabStore.getSnapshot).mockReturnValue(tabStateWithoutActive as TabState);
 
-    render(<SaveButton />);
+    renderWithIntl(<SaveButton />);
     const buttons = screen.getAllByRole('button');
     // 保存ボタンが無効化されていることを確認
     const saveButton = buttons.find(btn => btn.hasAttribute('disabled'));
