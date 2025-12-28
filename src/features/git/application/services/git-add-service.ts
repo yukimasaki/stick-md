@@ -23,6 +23,7 @@ function validateRepository(
 /**
  * ファイルをステージングに追加
  * Application Layer: ステージング追加のユースケースを実装
+ * 削除されたファイルの場合は自動的にgit.removeを使用
  */
 export function addFileToStage(
   repository: Repository | undefined,
@@ -34,10 +35,15 @@ export function addFileToStage(
       TE.tryCatch(
         () => addFile(repo, filePath),
         (error): GitAddError => {
-          if (error instanceof Error && error.message.includes('ENOENT')) {
+          // "Could not find" エラーは削除されたファイルをステージングしようとした場合に発生
+          if (error instanceof Error && (
+            error.message.includes('ENOENT') ||
+            error.message.includes('Could not find') ||
+            error.message.includes('could not find')
+          )) {
             return {
               type: 'FILE_NOT_FOUND',
-              message: `File not found: ${filePath}`,
+              message: `File not found: ${filePath}. The file may have been deleted.`,
               filePath,
             };
           }

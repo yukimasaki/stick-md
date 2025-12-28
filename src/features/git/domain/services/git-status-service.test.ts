@@ -240,17 +240,34 @@ describe('parseGitStatus', () => {
   it('workdirStatus === 0 の場合（削除されたファイル）、適切に処理される', () => {
     // statusMatrixの順序: [filepath, headStatus, workdirStatus, indexStatus]
     const statusMatrix: StatusResult = [
-      ['file1.md', 1, 0, 0], // ファイルが削除された（headStatus=1, workdirStatus=0, indexStatus=0）
+      ['file1.md', 1, 0, 0], // ファイルが削除され、ステージングされている（headStatus=1, workdirStatus=0, indexStatus=0）
     ];
 
     const result = parseGitStatus(statusMatrix);
 
     expect(E.isRight(result)).toBe(true);
     if (E.isRight(result)) {
-      // indexStatus === 0 なので Staged には表示されない
-      expect(result.right.staged).toEqual([]);
+      // headStatus !== 0 && workdirStatus === 0 && indexStatus === 0 なので Staged に表示される
+      expect(result.right.staged).toEqual(['file1.md']);
       // workdirStatus === indexStatus (0 === 0) なので Unstaged には表示されない
       expect(result.right.unstaged).toEqual([]);
+    }
+  });
+
+  it('削除されたファイルが未ステージの場合、Unstagedにのみ表示される', () => {
+    // statusMatrixの順序: [filepath, headStatus, workdirStatus, indexStatus]
+    const statusMatrix: StatusResult = [
+      ['file1.md', 1, 0, 1], // ファイルが削除されたが未ステージ（headStatus=1, workdirStatus=0, indexStatus=1）
+    ];
+
+    const result = parseGitStatus(statusMatrix);
+
+    expect(E.isRight(result)).toBe(true);
+    if (E.isRight(result)) {
+      // indexStatus === headStatus (1 === 1) なので Staged には表示されない
+      expect(result.right.staged).toEqual([]);
+      // workdirStatus !== indexStatus (0 !== 1) なので Unstaged に表示される
+      expect(result.right.unstaged).toEqual(['file1.md']);
     }
   });
 
@@ -258,18 +275,15 @@ describe('parseGitStatus', () => {
     // statusMatrixの順序: [filepath, headStatus, workdirStatus, indexStatus]
     const statusMatrix: StatusResult = [
       ['file1.md', 1, 0, 0], // 削除をステージング（headStatus=1, workdirStatus=0, indexStatus=0）
-      // 注: 実際には削除をステージングすると indexStatus が変わる可能性があるが、
-      // ここでは workdirStatus === indexStatus のケースをテスト
     ];
 
     const result = parseGitStatus(statusMatrix);
 
     expect(E.isRight(result)).toBe(true);
     if (E.isRight(result)) {
-      // indexStatus === 0 なので Staged には表示されない（削除のステージングは別のロジックが必要かも）
-      // このテストは現在の実装の動作を確認するため
-      expect(result.right.staged).toEqual([]);
-      // workdirStatus === indexStatus なので Unstaged には表示されない
+      // headStatus !== 0 && workdirStatus === 0 && indexStatus === 0 なので Staged に表示される
+      expect(result.right.staged).toEqual(['file1.md']);
+      // workdirStatus === indexStatus (0 === 0) なので Unstaged には表示されない
       expect(result.right.unstaged).toEqual([]);
     }
   });

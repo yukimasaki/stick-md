@@ -13,7 +13,9 @@ import type { GitStatusError } from './git-status-error';
  * - workdirStatus: 作業ディレクトリの状態（0=存在しない, 1=HEADと同じ, 2=HEADと異なる）
  * - indexStatus: インデックス（ステージングエリア）の状態（0=存在しない, 1=HEADと同じ, 2=作業ディレクトリと同じ, 3=作業ディレクトリともHEADとも異なる）
  * 
- * ステージ済み: indexStatus !== 0 かつ indexStatus !== headStatus
+ * ステージ済み:
+ *   - 通常の変更: indexStatus !== 0 かつ indexStatus !== headStatus
+ *   - 削除されたファイル: headStatus !== 0 && workdirStatus === 0 && indexStatus === 0
  * 未ステージ: workdirStatus !== indexStatus
  */
 export function parseGitStatus(
@@ -24,9 +26,14 @@ export function parseGitStatus(
 
   for (const [filepath, headStatus, workdirStatus, indexStatus] of statusMatrix) {
     // ステージ済み: インデックスが存在し、HEADと異なる（ステージングされている）
-    // 同じファイルがStagedとUnstagedの両方に表示される可能性がある（ステージング後にさらに変更された場合）
-    const isStaged = indexStatus !== 0 && indexStatus !== headStatus;
+    // または削除されたファイルがステージングされている場合
+    // 削除されたファイルをステージングした場合: headStatus !== 0 && workdirStatus === 0 && indexStatus === 0
+    const isStagedNormal = indexStatus !== 0 && indexStatus !== headStatus;
+    const isStagedDeleted = headStatus !== 0 && workdirStatus === 0 && indexStatus === 0;
+    const isStaged = isStagedNormal || isStagedDeleted;
+    
     // 未ステージ: 作業ディレクトリがインデックスと異なる（変更があるがステージングされていない、またはステージング後にさらに変更された）
+    // 削除されたファイルが未ステージの場合: headStatus !== 0 && workdirStatus === 0 && indexStatus !== 0
     const isUnstaged = workdirStatus !== indexStatus;
     
     if (isStaged) {

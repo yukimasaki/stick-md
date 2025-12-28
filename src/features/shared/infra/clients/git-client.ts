@@ -321,6 +321,7 @@ export async function getStatus(repository: Repository): Promise<StatusResult> {
 /**
  * ファイルをステージングに追加
  * Infrastructure Layer: isomorphic-gitを使用したステージング追加
+ * 削除されたファイルの場合はgit.removeを使用
  */
 export async function addFile(
   repository: Repository,
@@ -331,7 +332,34 @@ export async function addFile(
 
   // パスを正規化（先頭の/を削除）
   const normalizedPath = filePath.replace(/^\/+/, '');
+  const fullPath = `${dir}/${normalizedPath}`;
 
+  // ファイルのステータスを確認
+  const statusMatrix = await git.statusMatrix({
+    fs,
+    dir,
+    filter: (f) => f === normalizedPath,
+  });
+
+  // 該当ファイルのステータスを取得
+  const fileStatus = statusMatrix.find(([path]) => path === normalizedPath);
+  
+  // 削除されたファイルの場合（HEADに存在するが作業ディレクトリに存在しない）
+  if (fileStatus) {
+    const [, headStatus, workdirStatus] = fileStatus;
+    // headStatus !== 0 はHEADに存在する、workdirStatus === 0 は作業ディレクトリに存在しない
+    if (headStatus !== 0 && workdirStatus === 0) {
+      // 削除されたファイルをステージングするにはgit.removeを使用
+      await git.remove({
+        fs,
+        dir,
+        filepath: normalizedPath,
+      });
+      return;
+    }
+  }
+
+  // 通常のファイル追加
   await git.add({
     fs,
     dir,
