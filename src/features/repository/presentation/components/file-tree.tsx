@@ -186,17 +186,72 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
   const t = useTranslations();
   
   if (tree.length === 0) {
+    // コンテキストメニューが必要な場合（onFileCreateまたはonFileDeleteが提供されている場合）
+    const needsContextMenu = onFileCreate || onFileDelete;
+    
+    if (needsContextMenu) {
+      return (
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
+            <div 
+              className="p-4 text-sm text-muted-foreground text-center h-full"
+            >
+              {t('explorer.noFiles')}
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent className="z-75">
+            {onFileCreate && (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <FilePlus className="mr-2 h-4 w-4" />
+                  <span>{t('explorer.contextMenu.new')}</span>
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent className="z-75">
+                  <ContextMenuItem onClick={() => onFileCreate('')}>
+                    {t('explorer.contextMenu.markdown')}
+                  </ContextMenuItem>
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            )}
+          </ContextMenuContent>
+        </ContextMenu>
+      );
+    }
+    
+    // コンテキストメニューが不要な場合は通常の表示
+    return (
+      <div 
+        className="p-4 text-sm text-muted-foreground text-center h-full"
+      >
+        {t('explorer.noFiles')}
+      </div>
+    );
+  }
+
+  // コンテキストメニューが必要な場合（onFileCreateまたはonFileDeleteが提供されている場合）
+  const needsContextMenu = onFileCreate || onFileDelete;
+
+  if (needsContextMenu) {
     return (
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <div 
-            className="p-4 text-sm text-muted-foreground text-center h-full"
-          >
-            {t('explorer.noFiles')}
+          <div className="py-2 h-full">
+            {tree.map((node) => (
+              <FileTreeItem
+                key={node.path}
+                node={node}
+                onFileSelect={onFileSelect}
+                selectedPath={selectedPath}
+                onFileCreate={onFileCreate}
+                onFileDelete={onFileDelete}
+                expandedPaths={expandedPaths}
+                onToggleExpand={onToggleExpand}
+              />
+            ))}
           </div>
         </ContextMenuTrigger>
-        {onFileCreate && (
-          <ContextMenuContent className="z-75">
+        <ContextMenuContent className="z-75">
+          {onFileCreate && (
             <ContextMenuSub>
               <ContextMenuSubTrigger>
                 <FilePlus className="mr-2 h-4 w-4" />
@@ -208,8 +263,8 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
                 </ContextMenuItem>
               </ContextMenuSubContent>
             </ContextMenuSub>
-          </ContextMenuContent>
-        )}
+          )}
+        </ContextMenuContent>
       </ContextMenu>
     );
   }
