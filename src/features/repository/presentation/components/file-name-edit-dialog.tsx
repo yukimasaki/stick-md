@@ -133,7 +133,7 @@ export function FileNameEditDialog({
                 onKeyDown={handleKeyDown}
                 placeholder="Enter file name"
                 disabled={isCreating}
-                className="flex-1"
+                className="flex-1 text-base"
               />
               <span className="text-sm text-muted-foreground whitespace-nowrap">.md</span>
             </div>

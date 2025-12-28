@@ -178,7 +178,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                             e.currentTarget.blur();
                           }
                         }}
-                        className="w-20 h-8 text-sm"
+                        className="w-20 h-8 text-base"
                       />
                       <span className="text-sm text-muted-foreground">px</span>
                     </div>
