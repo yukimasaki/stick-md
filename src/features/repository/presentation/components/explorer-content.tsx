@@ -63,11 +63,12 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
     loadFileTree();
   }, [loadFileTree]);
 
-  // sessionがnullのときにファイルツリーをクリア
+  // sessionがnullのときにファイルツリーとタブをクリア
   useEffect(() => {
     if (!session) {
       setFileTree([]);
       setSelectedPath(undefined);
+      tabStore.clear();
     }
   }, [session]);
 

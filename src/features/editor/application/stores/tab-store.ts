@@ -330,6 +330,15 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
   };
 
   /**
+   * 全てのタブをクリア（ログアウト時など）
+   */
+  const clear = () => {
+    state = createEmptyTabState();
+    notify();
+    saveState();
+  };
+
+  /**
    * 状態を保存
    */
   const saveState = () => {
@@ -382,6 +391,7 @@ export const createTabStore = (persistenceService?: TabPersistenceService) => {
     updateTabContent,
     markTabAsDeleted,
     clearTabsByRepository,
+    clear,
     initialize
   };
 };
