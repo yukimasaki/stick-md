@@ -73,13 +73,13 @@ export function GitStatusUI() {
         setStagedFiles(result.right.staged);
         setUnstagedFiles(result.right.unstaged);
       } else {
-        handleGitStatusError(result.left);
+        handleGitStatusError(result.left, t);
       }
     } catch (error) {
       handleGitStatusError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+      }, t);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ export function GitStatusUI() {
       // CommitFormに再読み込みを通知
       window.dispatchEvent(new CustomEvent('git-status-changed'));
     } else {
-      handleGitAddError(result.left);
+      handleGitAddError(result.left, t);
     }
   };
 
@@ -123,7 +123,7 @@ export function GitStatusUI() {
       // CommitFormに再読み込みを通知
       window.dispatchEvent(new CustomEvent('git-status-changed'));
     } else {
-      handleGitResetError(result.left);
+      handleGitResetError(result.left, t);
     }
   };
 
@@ -139,7 +139,7 @@ export function GitStatusUI() {
       // CommitFormに再読み込みを通知
       window.dispatchEvent(new CustomEvent('git-status-changed'));
     } else {
-      handleGitCheckoutError(result.left);
+      handleGitCheckoutError(result.left, t);
     }
   };
 
@@ -158,7 +158,7 @@ export function GitStatusUI() {
         result,
         E.fold(
           (error) => {
-            handleFileReadError(error);
+            handleFileReadError(error, t);
           },
           (content) => {
             const fileName = filePath.split('/').pop() || filePath;
@@ -170,7 +170,7 @@ export function GitStatusUI() {
       handleFileReadError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+      }, t);
     }
   };
 

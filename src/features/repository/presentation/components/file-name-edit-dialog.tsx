@@ -66,7 +66,7 @@ export function FileNameEditDialog({
         result,
         E.fold(
           (error) => {
-            handleFileCreationError(error);
+            handleFileCreationError(error, t);
             setIsCreating(false);
           },
           (filePath) => {
@@ -80,7 +80,7 @@ export function FileNameEditDialog({
       handleFileCreationError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
+      }, t);
       setIsCreating(false);
     }
   };

@@ -39,7 +39,7 @@ export function SaveButton() {
     const result = await saveFile(tabState, repositoryState.repositories)();
 
     if (E.isLeft(result)) {
-      handleFileSaveError(result.left);
+      handleFileSaveError(result.left, t);
     } else {
       toast.success(t('saveButton.success.title'), {
         description: t('saveButton.success.description'),

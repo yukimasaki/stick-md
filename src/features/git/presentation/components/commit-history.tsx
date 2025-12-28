@@ -55,13 +55,13 @@ export function CommitHistory() {
       if (E.isRight(result)) {
         setCommits(result.right);
       } else {
-        handleGitLogError(result.left);
+        handleGitLogError(result.left, t);
       }
     } catch (error) {
       handleGitLogError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+      }, t);
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ export function CommitHistory() {
   if (commits.length === 0) {
     return (
       <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-        No commits
+        {t('git.commitHistory.noCommits')}
       </div>
     );
   }
@@ -122,7 +122,7 @@ export function CommitHistory() {
     >
       <AccordionItem value="history" className="border-none">
         <AccordionTrigger className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground hover:no-underline">
-          History ({commits.length})
+          {t('git.commitHistory.title', { count: commits.length })}
         </AccordionTrigger>
         <AccordionContent className="px-0">
           <div className="flex flex-col gap-0.5">

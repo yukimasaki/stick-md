@@ -3,6 +3,7 @@
 import { Plus, Minus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface FileStatusItemProps {
   filePath: string;
@@ -23,6 +24,7 @@ export function FileStatusItem({
   onDiscard,
   onClick,
 }: FileStatusItemProps) {
+  const t = useTranslations();
   const fileName = filePath.split('/').pop() || filePath;
 
   return (
@@ -48,7 +50,7 @@ export function FileStatusItem({
               e.stopPropagation();
               onAdd();
             }}
-            aria-label="Add to stage"
+            aria-label={t('ariaLabel.addToStage')}
           >
             <Plus className="h-3 w-3" />
           </Button>
@@ -62,7 +64,7 @@ export function FileStatusItem({
               e.stopPropagation();
               onRemove();
             }}
-            aria-label="Remove from stage"
+            aria-label={t('ariaLabel.removeFromStage')}
           >
             <Minus className="h-3 w-3" />
           </Button>
@@ -76,7 +78,7 @@ export function FileStatusItem({
               e.stopPropagation();
               onDiscard();
             }}
-            aria-label="Discard changes"
+            aria-label={t('ariaLabel.discardChanges')}
           >
             <X className="h-3 w-3" />
           </Button>

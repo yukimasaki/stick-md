@@ -5,10 +5,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToolbarSettings } from '@/features/editor/presentation/hooks/use-toolbar-settings';
+import { useTranslations } from 'next-intl';
 
 const BASE_OFFSET = 24; // デフォルトのベース位置（24px）
 
 export function Toolbar() {
+  const t = useTranslations();
   const { actions } = useEditor();
   const isMobile = useIsMobile();
   const { offset: settingsOffset } = useToolbarSettings();
@@ -86,7 +88,7 @@ export function Toolbar() {
       <button
         onClick={() => actions.moveCursor('left')}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm transition-colors hover:bg-accent active:scale-95"
-        aria-label="Move Cursor Left"
+        aria-label={t('ariaLabel.moveCursorLeft')}
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
@@ -96,7 +98,7 @@ export function Toolbar() {
       <button
         onClick={() => actions.moveCursor('right')}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm transition-colors hover:bg-accent active:scale-95"
-        aria-label="Move Cursor Right"
+        aria-label={t('ariaLabel.moveCursorRight')}
       >
         <ChevronRight className="h-6 w-6" />
       </button>

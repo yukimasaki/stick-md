@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { FileCreationError } from '@/features/repository/domain/services/file-creation-error';
 import type { FileDeletionError } from '@/features/repository/domain/services/file-deletion-error';
 
@@ -6,47 +7,47 @@ import type { FileDeletionError } from '@/features/repository/domain/services/fi
  * ファイル作成エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleFileCreationError(error: FileCreationError): void {
+export function handleFileCreationError(error: FileCreationError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'VALIDATION_ERROR':
-      toast.error('Validation Error', {
+      toast.error(t('errors.repository.validationError'), {
         description: error.message
       });
       break;
 
     case 'FILE_ALREADY_EXISTS':
-      toast.error('File Already Exists', {
+      toast.error(t('errors.repository.fileAlreadyExists'), {
         description: error.message
       });
       break;
 
     case 'DIRECTORY_CREATION_FAILED':
-      toast.error('Directory Creation Failed', {
+      toast.error(t('errors.repository.directoryCreationFailed'), {
         description: error.message
       });
       break;
 
     case 'FILE_CREATION_FAILED':
-      toast.error('File Creation Failed', {
+      toast.error(t('errors.repository.fileCreationFailed'), {
         description: error.message
       });
       break;
 
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message
       });
       break;
 
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message
       });
       break;
 
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred'
+      toast.error(t('errors.common.error'), {
+        description: t('errors.repository.unexpectedError')
       });
   }
 }
@@ -55,35 +56,35 @@ export function handleFileCreationError(error: FileCreationError): void {
  * ファイル削除エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleFileDeletionError(error: FileDeletionError): void {
+export function handleFileDeletionError(error: FileDeletionError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message
       });
       break;
 
     case 'FILE_NOT_FOUND':
-      toast.error('File Not Found', {
+      toast.error(t('errors.common.fileNotFound'), {
         description: error.message
       });
       break;
 
     case 'FILE_SYSTEM_ERROR':
-      toast.error('File System Error', {
+      toast.error(t('errors.common.fileSystemError'), {
         description: error.message
       });
       break;
 
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message
       });
       break;
 
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred'
+      toast.error(t('errors.common.error'), {
+        description: t('errors.repository.unexpectedError')
       });
   }
 }

@@ -83,6 +83,82 @@
         "description": "変更が正常にコミットされました"
       }
     },
+    "commitHistory": {
+      "title": "履歴 ({count})",
+      "noCommits": "コミットがありません"
+    },
     "signInRequired": "リポジトリ機能を使用するにはサインインが必要です"
+  },
+  "unsupportedFileDialog": {
+    "title": "未対応のファイル形式",
+    "description": "ファイル <strong>{filePath}</strong> は対応していません。現在、Markdownファイル（.md）のみサポートしています。",
+    "ok": "OK"
+  },
+  "fileDeletionDialog": {
+    "title": "{type, select, file {ファイル} directory {ディレクトリ} other {ファイル}}を削除",
+    "description": "<strong>{filePath}</strong> を削除してもよろしいですか？",
+    "directoryWarning": "この操作により、ディレクトリとその中身が完全に削除されます。",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "deleting": "削除中...",
+    "success": {
+      "file": "ファイルを削除しました",
+      "directory": "ディレクトリを削除しました"
+    }
+  },
+  "unsavedChangesDialog": {
+    "title": "未保存の変更があります",
+    "description": "このファイル（{fileName}）には保存されていない変更があります。保存しますか？",
+    "cancel": "キャンセル",
+    "discard": "破棄",
+    "save": "保存"
+  },
+  "ariaLabel": {
+    "moveCursorLeft": "カーソルを左に移動",
+    "moveCursorRight": "カーソルを右に移動",
+    "toggleSidebar": "サイドバーを切り替え",
+    "addToStage": "ステージに追加",
+    "removeFromStage": "ステージから削除",
+    "discardChanges": "変更を破棄",
+    "unsavedChanges": "未保存の変更",
+    "closeTab": "タブを閉じる",
+    "showMoreTabs": "さらにタブを表示"
+  },
+  "errors": {
+    "common": {
+      "repositoryNotFound": "リポジトリが見つかりません",
+      "fileNotFound": "ファイルが見つかりません",
+      "fileSystemError": "ファイルシステムエラー",
+      "unknownError": "不明なエラー",
+      "error": "エラー",
+      "unexpectedError": "予期しないエラーが発生しました"
+    },
+    "git": {
+      "statusError": "Gitステータスエラー",
+      "addError": "Git追加エラー",
+      "resetError": "Gitリセットエラー",
+      "checkoutError": "Gitチェックアウトエラー",
+      "noStagedFiles": "ステージされたファイルがありません",
+      "emptyCommitMessage": "コミットメッセージが空です",
+      "commitError": "Gitコミットエラー",
+      "logError": "Gitログエラー",
+      "unexpectedStatusError": "Gitステータス中に予期しないエラーが発生しました",
+      "unexpectedAddError": "Git追加中に予期しないエラーが発生しました",
+      "unexpectedResetError": "Gitリセット中に予期しないエラーが発生しました",
+      "unexpectedCheckoutError": "Gitチェックアウト中に予期しないエラーが発生しました",
+      "unexpectedCommitError": "Gitコミット中に予期しないエラーが発生しました",
+      "unexpectedLogError": "Gitログ取得中に予期しないエラーが発生しました"
+    },
+    "editor": {
+      "noActiveTab": "アクティブなタブがありません",
+      "unexpectedError": "予期しないエラーが発生しました"
+    },
+    "repository": {
+      "validationError": "バリデーションエラー",
+      "fileAlreadyExists": "ファイルが既に存在します",
+      "directoryCreationFailed": "ディレクトリの作成に失敗しました",
+      "fileCreationFailed": "ファイルの作成に失敗しました",
+      "unexpectedError": "予期しないエラーが発生しました"
+    }
   }
 }

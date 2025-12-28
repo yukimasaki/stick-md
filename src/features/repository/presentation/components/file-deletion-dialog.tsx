@@ -8,6 +8,7 @@ import { Repository } from '@/features/repository/domain/models/repository';
 import { deleteFileOrDirectory } from '@/features/repository/application/services/file-deletion-service';
 import { handleFileDeletionError } from '@/features/repository/presentation/utils/error-handler';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 
@@ -28,6 +29,7 @@ export function FileDeletionDialog({
   isDirectory,
   onDeleted,
 }: FileDeletionDialogProps) {
+  const t = useTranslations();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -44,13 +46,14 @@ export function FileDeletionDialog({
         result,
         E.fold(
           (error) => {
-            handleFileDeletionError(error);
+            handleFileDeletionError(error, t);
             setIsDeleting(false);
           },
           () => {
-            toast.success('Deleted', {
-              description: `${isDirectory ? 'Directory' : 'File'} deleted successfully: ${filePath}`
-            });
+            const successMessage = isDirectory
+              ? `${t('fileDeletionDialog.success.directory')}: ${filePath}`
+              : `${t('fileDeletionDialog.success.file')}: ${filePath}`;
+            toast.success(successMessage);
             onDeleted();
             onOpenChange(false);
             setIsDeleting(false);
@@ -61,7 +64,7 @@ export function FileDeletionDialog({
       handleFileDeletionError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
+      }, t);
       setIsDeleting(false);
     }
   };
@@ -74,13 +77,18 @@ export function FileDeletionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
         open={open}
-        title={`Delete ${isDirectory ? 'Directory' : 'File'}`}
+        title={t('fileDeletionDialog.title', {
+          type: isDirectory ? 'directory' : 'file'
+        })}
         description={
           <>
-            Are you sure you want to delete <strong>{filePath}</strong>?
+            {t.rich('fileDeletionDialog.description', {
+              filePath,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
             {isDirectory && (
               <span className="block mt-2 text-destructive">
-                This will permanently delete the directory and all its contents.
+                {t('fileDeletionDialog.directoryWarning')}
               </span>
             )}
           </>
@@ -93,7 +101,7 @@ export function FileDeletionDialog({
               onClick={handleCancel}
               disabled={isDeleting}
             >
-              Cancel
+              {t('fileDeletionDialog.cancel')}
             </Button>
             <Button
               type="button"
@@ -101,7 +109,7 @@ export function FileDeletionDialog({
               onClick={handleDelete}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? t('fileDeletionDialog.deleting') : t('fileDeletionDialog.delete')}
             </Button>
           </>
         }

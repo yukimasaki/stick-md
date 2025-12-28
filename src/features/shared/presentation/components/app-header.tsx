@@ -8,6 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { BrandLogo } from '@/features/shared/presentation/components/brand-logo';
 import { UserMenuDialog } from '@/features/shared/presentation/components/user-menu-dialog';
+import { useTranslations } from 'next-intl';
 import type { Session } from 'next-auth';
 
 interface AppHeaderProps {
@@ -20,6 +21,7 @@ interface AppHeaderProps {
  * Mobile/Tablet (1024px未満): ハンバーガーメニュー、ロゴ、ユーザーメニュー/ログインボタン
  */
 export function AppHeader({ session }: AppHeaderProps) {
+  const t = useTranslations();
   const { toggle } = useSidebar();
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
@@ -54,7 +56,7 @@ export function AppHeader({ session }: AppHeaderProps) {
         size="icon"
         onClick={toggle}
         className="h-10 w-10"
-        aria-label="Toggle Sidebar"
+        aria-label={t('ariaLabel.toggleSidebar')}
       >
         <Menu className="h-6 w-6" />
       </Button>

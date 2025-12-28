@@ -3,6 +3,7 @@
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AnimatedDialogContent } from '@/features/shared/presentation/components/animated-dialog-content';
+import { useTranslations } from 'next-intl';
 
 interface UnsupportedFileDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ export function UnsupportedFileDialog({
   onOpenChange,
   filePath,
 }: UnsupportedFileDialogProps) {
+  const t = useTranslations();
   const handleClose = () => {
     onOpenChange(false);
   };
@@ -23,16 +25,18 @@ export function UnsupportedFileDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
         open={open}
-        title="Unsupported File Format"
+        title={t('unsupportedFileDialog.title')}
         description={
           <>
-            The file <strong>{filePath}</strong> is not supported.
-            Currently, only Markdown files (.md) are supported.
+            {t.rich('unsupportedFileDialog.description', {
+              filePath,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </>
         }
         footer={
           <Button type="button" onClick={handleClose}>
-            OK
+            {t('unsupportedFileDialog.ok')}
           </Button>
         }
       />

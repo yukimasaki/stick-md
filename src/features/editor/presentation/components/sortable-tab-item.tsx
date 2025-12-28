@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import type { Tab } from '@/features/editor/domain/models/tab-state';
 
 interface SortableTabItemProps {
@@ -19,6 +20,7 @@ export function SortableTabItem({
   onTabClick,
   onTabClose,
 }: SortableTabItemProps) {
+  const t = useTranslations();
   const {
     attributes,
     listeners,
@@ -68,7 +70,7 @@ export function SortableTabItem({
       {tab.isDirty && (
         <span
           className="h-2 w-2 rounded-full bg-yellow-500 shrink-0"
-          aria-label="Unsaved changes"
+          aria-label={t('ariaLabel.unsavedChanges')}
         />
       )}
       <button
@@ -83,7 +85,7 @@ export function SortableTabItem({
           'transition-opacity',
           'hover:bg-accent rounded p-0.5 shrink-0'
         )}
-        aria-label="Close tab"
+        aria-label={t('ariaLabel.closeTab')}
       >
         <X className="h-3 w-3" />
       </button>

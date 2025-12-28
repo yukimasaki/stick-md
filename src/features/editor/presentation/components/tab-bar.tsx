@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSyncExternalStore } from 'react';
 import { X, Layers } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {
   DndContext,
   closestCenter,
@@ -31,6 +32,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 export function TabBar() {
+  const t = useTranslations();
   const state = useSyncExternalStore(
     tabStore.subscribe,
     tabStore.getSnapshot,
@@ -154,7 +156,7 @@ export function TabBar() {
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0 shrink-0 relative"
-              aria-label="Show more tabs"
+              aria-label={t('ariaLabel.showMoreTabs')}
             >
               <Layers className="h-4 w-4" />
               <Badge
@@ -198,7 +200,7 @@ export function TabBar() {
                   {tab.isDirty && (
                     <span
                       className="h-2 w-2 rounded-full bg-yellow-500 shrink-0"
-                      aria-label="Unsaved changes"
+                      aria-label={t('ariaLabel.unsavedChanges')}
                     />
                   )}
                   <button
@@ -207,7 +209,7 @@ export function TabBar() {
                       handleTabClose(e, tab.id);
                     }}
                     className="hover:bg-accent rounded p-0.5 shrink-0"
-                    aria-label="Close tab"
+                    aria-label={t('ariaLabel.closeTab')}
                   >
                     <X className="h-3 w-3" />
                   </button>

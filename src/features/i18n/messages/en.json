@@ -83,6 +83,82 @@
         "description": "Changes have been committed successfully"
       }
     },
+    "commitHistory": {
+      "title": "History ({count})",
+      "noCommits": "No commits"
+    },
     "signInRequired": "Please sign in to use repository features."
+  },
+  "unsupportedFileDialog": {
+    "title": "Unsupported File Format",
+    "description": "The file <strong>{filePath}</strong> is not supported. Currently, only Markdown files (.md) are supported.",
+    "ok": "OK"
+  },
+  "fileDeletionDialog": {
+    "title": "Delete {type, select, file {File} directory {Directory} other {File}}",
+    "description": "Are you sure you want to delete <strong>{filePath}</strong>?",
+    "directoryWarning": "This will permanently delete the directory and all its contents.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "success": {
+      "file": "File deleted successfully",
+      "directory": "Directory deleted successfully"
+    }
+  },
+  "unsavedChangesDialog": {
+    "title": "Unsaved Changes",
+    "description": "This file ({fileName}) has unsaved changes. Do you want to save?",
+    "cancel": "Cancel",
+    "discard": "Discard",
+    "save": "Save"
+  },
+  "ariaLabel": {
+    "moveCursorLeft": "Move Cursor Left",
+    "moveCursorRight": "Move Cursor Right",
+    "toggleSidebar": "Toggle Sidebar",
+    "addToStage": "Add to stage",
+    "removeFromStage": "Remove from stage",
+    "discardChanges": "Discard changes",
+    "unsavedChanges": "Unsaved changes",
+    "closeTab": "Close tab",
+    "showMoreTabs": "Show more tabs"
+  },
+  "errors": {
+    "common": {
+      "repositoryNotFound": "Repository Not Found",
+      "fileNotFound": "File Not Found",
+      "fileSystemError": "File System Error",
+      "unknownError": "Unknown Error",
+      "error": "Error",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "git": {
+      "statusError": "Git Status Error",
+      "addError": "Git Add Error",
+      "resetError": "Git Reset Error",
+      "checkoutError": "Git Checkout Error",
+      "noStagedFiles": "No Staged Files",
+      "emptyCommitMessage": "Empty Commit Message",
+      "commitError": "Git Commit Error",
+      "logError": "Git Log Error",
+      "unexpectedStatusError": "An unexpected error occurred during git status",
+      "unexpectedAddError": "An unexpected error occurred during git add",
+      "unexpectedResetError": "An unexpected error occurred during git reset",
+      "unexpectedCheckoutError": "An unexpected error occurred during git checkout",
+      "unexpectedCommitError": "An unexpected error occurred during git commit",
+      "unexpectedLogError": "An unexpected error occurred during git log"
+    },
+    "editor": {
+      "noActiveTab": "No Active Tab",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "repository": {
+      "validationError": "Validation Error",
+      "fileAlreadyExists": "File Already Exists",
+      "directoryCreationFailed": "Directory Creation Failed",
+      "fileCreationFailed": "File Creation Failed",
+      "unexpectedError": "An unexpected error occurred"
+    }
   }
 }

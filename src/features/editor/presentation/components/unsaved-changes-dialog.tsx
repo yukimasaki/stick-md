@@ -3,6 +3,7 @@
 import { Dialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AnimatedDialogContent } from '@/features/shared/presentation/components/animated-dialog-content';
+import { useTranslations } from 'next-intl';
 
 interface UnsavedChangesDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ export function UnsavedChangesDialog({
   onDiscard,
   fileName,
 }: UnsavedChangesDialogProps) {
+  const t = useTranslations();
   const handleSave = () => {
     onSave();
     onOpenChange(false);
@@ -37,18 +39,18 @@ export function UnsavedChangesDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
         open={open}
-        title="未保存の変更があります"
-        description={`このファイル（${fileName}）には保存されていない変更があります。保存しますか？`}
+        title={t('unsavedChangesDialog.title')}
+        description={t('unsavedChangesDialog.description', { fileName })}
         footer={
           <>
             <Button variant="outline" onClick={handleCancel}>
-              キャンセル
+              {t('unsavedChangesDialog.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDiscard}>
-              破棄
+              {t('unsavedChangesDialog.discard')}
             </Button>
             <Button onClick={handleSave}>
-              保存
+              {t('unsavedChangesDialog.save')}
             </Button>
           </>
         }

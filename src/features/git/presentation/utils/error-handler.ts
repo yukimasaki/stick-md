@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import type { GitStatusError } from '@/features/git/domain/services/git-status-error';
 import type { GitAddError } from '@/features/git/domain/services/git-add-error';
 import type { GitResetError } from '@/features/git/domain/services/git-reset-error';
@@ -10,26 +11,26 @@ import type { GitLogError } from '@/features/git/domain/services/git-log-error';
  * Gitステータスエラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitStatusError(error: GitStatusError): void {
+export function handleGitStatusError(error: GitStatusError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'GIT_STATUS_ERROR':
-      toast.error('Git Status Error', {
+      toast.error(t('errors.git.statusError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git status',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedStatusError'),
       });
   }
 }
@@ -38,31 +39,31 @@ export function handleGitStatusError(error: GitStatusError): void {
  * Gitステージング追加エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitAddError(error: GitAddError): void {
+export function handleGitAddError(error: GitAddError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'FILE_NOT_FOUND':
-      toast.error('File Not Found', {
+      toast.error(t('errors.common.fileNotFound'), {
         description: error.message,
       });
       break;
     case 'GIT_ADD_ERROR':
-      toast.error('Git Add Error', {
+      toast.error(t('errors.git.addError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git add',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedAddError'),
       });
   }
 }
@@ -71,31 +72,31 @@ export function handleGitAddError(error: GitAddError): void {
  * Gitステージング削除エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitResetError(error: GitResetError): void {
+export function handleGitResetError(error: GitResetError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'FILE_NOT_FOUND':
-      toast.error('File Not Found', {
+      toast.error(t('errors.common.fileNotFound'), {
         description: error.message,
       });
       break;
     case 'GIT_RESET_ERROR':
-      toast.error('Git Reset Error', {
+      toast.error(t('errors.git.resetError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git reset',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedResetError'),
       });
   }
 }
@@ -104,31 +105,31 @@ export function handleGitResetError(error: GitResetError): void {
  * Git変更破棄エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitCheckoutError(error: GitCheckoutError): void {
+export function handleGitCheckoutError(error: GitCheckoutError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'FILE_NOT_FOUND':
-      toast.error('File Not Found', {
+      toast.error(t('errors.common.fileNotFound'), {
         description: error.message,
       });
       break;
     case 'GIT_CHECKOUT_ERROR':
-      toast.error('Git Checkout Error', {
+      toast.error(t('errors.git.checkoutError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git checkout',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedCheckoutError'),
       });
   }
 }
@@ -137,36 +138,36 @@ export function handleGitCheckoutError(error: GitCheckoutError): void {
  * Gitコミットエラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitCommitError(error: GitCommitError): void {
+export function handleGitCommitError(error: GitCommitError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'NO_STAGED_FILES':
-      toast.error('No Staged Files', {
+      toast.error(t('errors.git.noStagedFiles'), {
         description: error.message,
       });
       break;
     case 'EMPTY_COMMIT_MESSAGE':
-      toast.error('Empty Commit Message', {
+      toast.error(t('errors.git.emptyCommitMessage'), {
         description: error.message,
       });
       break;
     case 'GIT_COMMIT_ERROR':
-      toast.error('Git Commit Error', {
+      toast.error(t('errors.git.commitError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git commit',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedCommitError'),
       });
   }
 }
@@ -175,26 +176,26 @@ export function handleGitCommitError(error: GitCommitError): void {
  * Gitログ取得エラーをtoastで表示
  * Presentation Layer: エラーハンドリングのユーティリティ
  */
-export function handleGitLogError(error: GitLogError): void {
+export function handleGitLogError(error: GitLogError, t: ReturnType<typeof useTranslations>): void {
   switch (error.type) {
     case 'REPOSITORY_NOT_FOUND':
-      toast.error('Repository Not Found', {
+      toast.error(t('errors.common.repositoryNotFound'), {
         description: error.message,
       });
       break;
     case 'GIT_LOG_ERROR':
-      toast.error('Git Log Error', {
+      toast.error(t('errors.git.logError'), {
         description: error.message,
       });
       break;
     case 'UNKNOWN_ERROR':
-      toast.error('Unknown Error', {
+      toast.error(t('errors.common.unknownError'), {
         description: error.message,
       });
       break;
     default:
-      toast.error('Error', {
-        description: 'An unexpected error occurred during git log',
+      toast.error(t('errors.common.error'), {
+        description: t('errors.git.unexpectedLogError'),
       });
   }
 }

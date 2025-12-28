@@ -44,13 +44,13 @@ export function CommitForm() {
       if (E.isRight(result)) {
         setStagedFiles(result.right.staged);
       } else {
-        handleGitStatusError(result.left);
+        handleGitStatusError(result.left, t);
       }
     } catch (error) {
       handleGitStatusError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+      }, t);
     }
   }, [selectedRepo]);
 
@@ -87,13 +87,13 @@ export function CommitForm() {
         window.dispatchEvent(new CustomEvent('git-status-changed'));
         window.dispatchEvent(new CustomEvent('git-commit-completed'));
       } else {
-        handleGitCommitError(result.left);
+        handleGitCommitError(result.left, t);
       }
     } catch (error) {
       handleGitCommitError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
-      });
+      }, t);
     } finally {
       setIsCommitting(false);
     }

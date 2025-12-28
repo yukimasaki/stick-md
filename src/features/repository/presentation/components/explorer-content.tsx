@@ -124,7 +124,7 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
         result,
         E.fold(
           (error) => {
-            handleFileReadError(error);
+            handleFileReadError(error, t);
           },
           (content) => {
             // ファイル名を取得（パスから最後の部分を抽出）
@@ -139,7 +139,7 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
       handleFileReadError({
         type: 'UNKNOWN_ERROR',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
+      }, t);
     }
   };
 
