@@ -3,7 +3,6 @@ import * as TE from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/function';
 import { Repository } from '@/features/repository/domain/models/repository';
 import { pull } from '@/features/shared/infra/clients/git-client';
-import { getGitHubUser } from '@/features/repository/infra/clients/github-client';
 import type { GitPullError } from '@/features/git/domain/services/git-pull-error';
 
 /**
@@ -45,30 +44,26 @@ function validateAccessToken(
 }
 
 /**
- * ユーザー情報を取得（セッション情報を優先、emailが取得できない場合のみGitHub APIから取得）
+ * セッション情報からユーザー情報を取得
+ * セッション情報がない場合はエラーを返す（再ログインが必要）
  */
-async function getUserInfo(
-  sessionUser: { name?: string | null; email?: string | null } | undefined,
-  accessToken: string
-): Promise<UserInfo> {
-  // セッション情報からnameとemailを取得
+function getUserInfo(
+  sessionUser: { name?: string | null; email?: string | null } | undefined
+): E.Either<GitPullError, UserInfo> {
   const sessionName = sessionUser?.name;
   const sessionEmail = sessionUser?.email;
 
-  // emailが取得できている場合はセッション情報を使用
-  if (sessionName && sessionEmail) {
-    return {
-      name: sessionName,
-      email: sessionEmail,
-    };
+  if (!sessionName || !sessionEmail) {
+    return E.left({
+      type: 'GIT_PULL_ERROR',
+      message: 'User information is not available. Please log in again.',
+    });
   }
 
-  // emailが取得できない場合はGitHub APIから取得
-  const githubUser = await getGitHubUser(accessToken);
-  return {
-    name: sessionName || githubUser.name,
-    email: sessionEmail || githubUser.email,
-  };
+  return E.right({
+    name: sessionName,
+    email: sessionEmail,
+  });
 }
 
 /**
@@ -87,38 +82,26 @@ export function pullChanges(
         validateAccessToken(accessToken),
         TE.fromEither,
         TE.chain((token) =>
-          // セッション情報を優先してユーザー情報を取得
-          TE.tryCatch(
-            () => getUserInfo(sessionUser, token),
-            (error): GitPullError => {
-              if (error instanceof Error) {
-                return {
-                  type: 'GIT_PULL_ERROR',
-                  message: `Failed to get user info: ${error.message}`,
-                };
-              }
-              return {
-                type: 'UNKNOWN_ERROR',
-                message: 'An unknown error occurred while getting user info',
-              };
-            }
-          )
-        ),
-        TE.chain((author) =>
-          TE.tryCatch(
-            () => pull(repo, accessToken!, author),
-            (error): GitPullError => {
-              if (error instanceof Error) {
-                return {
-                  type: 'GIT_PULL_ERROR',
-                  message: `Failed to pull: ${error.message}`,
-                };
-              }
-              return {
-                type: 'UNKNOWN_ERROR',
-                message: 'An unknown error occurred while pulling',
-              };
-            }
+          pipe(
+            getUserInfo(sessionUser),
+            TE.fromEither,
+            TE.chain((author) =>
+              TE.tryCatch(
+                () => pull(repo, token, author),
+                (error): GitPullError => {
+                  if (error instanceof Error) {
+                    return {
+                      type: 'GIT_PULL_ERROR',
+                      message: `Failed to pull: ${error.message}`,
+                    };
+                  }
+                  return {
+                    type: 'UNKNOWN_ERROR',
+                    message: 'An unknown error occurred while pulling',
+                  };
+                }
+              )
+            )
           )
         )
       )
