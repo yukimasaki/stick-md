@@ -2,6 +2,7 @@
 
 import { FileTreeNode } from '@/features/repository/domain/models/file-tree';
 import { File, Folder, FolderOpen, ChevronRight, ChevronDown, FilePlus, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import {
   ContextMenu,
@@ -43,6 +44,7 @@ function FileTreeItem({
   expandedPaths?: Set<string>;
   onToggleExpand?: (path: string) => void;
 }) {
+  const t = useTranslations();
   const isSelected = selectedPath === node.path;
   const hasChildren = node.children && node.children.length > 0;
   const isDirectory = node.type === 'directory';
@@ -116,11 +118,11 @@ function FileTreeItem({
               <ContextMenuSub>
                 <ContextMenuSubTrigger>
                   <FilePlus className="mr-2 h-4 w-4" />
-                  <span>New</span>
+                  <span>{t('explorer.contextMenu.new')}</span>
                 </ContextMenuSubTrigger>
                 <ContextMenuSubContent className="z-75">
                   <ContextMenuItem onClick={handleCreateFile}>
-                    Markdown (.md)
+                    {t('explorer.contextMenu.markdown')}
                   </ContextMenuItem>
                 </ContextMenuSubContent>
               </ContextMenuSub>
@@ -130,7 +132,7 @@ function FileTreeItem({
                 {onFileCreate && isDirectory && <ContextMenuSeparator />}
                 <ContextMenuItem onClick={handleDelete} variant="destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Delete</span>
+                  <span>{t('explorer.contextMenu.delete')}</span>
                 </ContextMenuItem>
               </>
             )}
@@ -181,6 +183,8 @@ function FileTreeItem({
 }
 
 export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFileDelete, expandedPaths, onToggleExpand }: FileTreeProps) {
+  const t = useTranslations();
+  
   if (tree.length === 0) {
     return (
       <ContextMenu>
@@ -188,7 +192,7 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
           <div 
             className="p-4 text-sm text-muted-foreground text-center h-full"
           >
-            No files available
+            {t('explorer.noFiles')}
           </div>
         </ContextMenuTrigger>
         {onFileCreate && (
@@ -196,11 +200,11 @@ export function FileTree({ tree, onFileSelect, selectedPath, onFileCreate, onFil
             <ContextMenuSub>
               <ContextMenuSubTrigger>
                 <FilePlus className="mr-2 h-4 w-4" />
-                <span>New</span>
+                <span>{t('explorer.contextMenu.new')}</span>
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="z-75">
                 <ContextMenuItem onClick={() => onFileCreate('')}>
-                  Markdown (.md)
+                  {t('explorer.contextMenu.markdown')}
                 </ContextMenuItem>
               </ContextMenuSubContent>
             </ContextMenuSub>

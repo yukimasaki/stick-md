@@ -12,6 +12,7 @@ import { UserMenuDialog } from "@/features/shared/presentation/components/user-m
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/features/shared/presentation/contexts/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useTranslations } from "next-intl"
 import type { Session } from "next-auth"
 
 interface AppSidebarProps {
@@ -34,6 +35,7 @@ function getSidebarClassName(isMobile: boolean) {
 }
 
 export function AppSidebar({ session }: AppSidebarProps) {
+  const t = useTranslations();
   const { isOpen, close } = useSidebar();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('explorer');
@@ -83,11 +85,11 @@ export function AppSidebar({ session }: AppSidebarProps) {
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="explorer" className="flex items-center justify-center gap-1.5 min-w-0">
                   <Folder className="h-4 w-4 shrink-0" />
-                  <span className="truncate">Explorer</span>
+                  <span className="truncate">{t('sidebar.explorer')}</span>
                 </TabsTrigger>
                 <TabsTrigger value="repository" className="flex items-center justify-center gap-1.5 min-w-0">
                   <Github className="h-4 w-4 shrink-0" />
-                  <span className="truncate">Repository</span>
+                  <span className="truncate">{t('sidebar.repository')}</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -137,11 +139,11 @@ export function AppSidebar({ session }: AppSidebarProps) {
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="explorer" className="flex items-center justify-center gap-1.5 min-w-0">
                     <Folder className="h-4 w-4 shrink-0" />
-                    <span className="truncate">Explorer</span>
+                    <span className="truncate">{t('sidebar.explorer')}</span>
                   </TabsTrigger>
                   <TabsTrigger value="repository" className="flex items-center justify-center gap-1.5 min-w-0">
                     <Github className="h-4 w-4 shrink-0" />
-                    <span className="truncate">Repository</span>
+                    <span className="truncate">{t('sidebar.repository')}</span>
                   </TabsTrigger>
                 </TabsList>
               </div>

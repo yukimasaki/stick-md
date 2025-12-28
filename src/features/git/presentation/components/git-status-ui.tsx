@@ -18,6 +18,7 @@ import { readFileContent } from '@/features/editor/application/services/file-rea
 import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
 import { pipe } from 'fp-ts/function';
 import { isSupportedFileFormat } from '@/features/editor/domain/services/file-format-service';
+import { useTranslations } from 'next-intl';
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +31,7 @@ import {
  * Presentation Layer: ステージ済み/未ステージファイルの一覧表示と操作
  */
 export function GitStatusUI() {
+  const t = useTranslations();
   const repositoryState = useSyncExternalStore(
     repositoryStore.subscribe,
     repositoryStore.getSnapshot,
@@ -175,7 +177,7 @@ export function GitStatusUI() {
   if (!selectedRepo) {
     return (
       <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-        Please select a repository
+        {t('git.selectRepository')}
       </div>
     );
   }
@@ -183,7 +185,7 @@ export function GitStatusUI() {
   if (isLoading) {
     return (
       <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-        Loading...
+        {t('git.loading')}
       </div>
     );
   }

@@ -1,2 +1,88 @@
-{}
-
+{
+  "userMenu": {
+    "title": "User Menu",
+    "description": "User settings and account management menu",
+    "general": {
+      "title": "General",
+      "activeRepository": "Active Repository",
+      "selectRepository": "Select Repository",
+      "toolbarPosition": "Toolbar Position",
+      "language": "Language",
+      "autoDetect": "Auto Detect",
+      "japanese": "Japanese",
+      "english": "English"
+    },
+    "account": {
+      "title": "Account",
+      "logoutFromDevice": "Log out from this device",
+      "logout": "Log out",
+      "login": "Login",
+      "logoutConfirm": "Confirm Logout",
+      "cancel": "Cancel"
+    },
+    "user": "User"
+  },
+  "sidebar": {
+    "explorer": "Explorer",
+    "repository": "Repository"
+  },
+  "saveButton": {
+    "tooltip": "Save",
+    "success": {
+      "title": "File saved",
+      "description": "The file has been saved successfully"
+    }
+  },
+  "fileDialog": {
+    "title": "Create New Markdown File",
+    "description": "Enter the file name. You can include a directory path (e.g., \"dir/file.md\").",
+    "placeholder": "Enter file name",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "create": "Create"
+  },
+  "repositoryDialog": {
+    "title": "Select Repository",
+    "selectPrompt": "Please select a repository",
+    "signInRequired": "Sign in required to select a repository",
+    "cloneSuccess": {
+      "title": "Repository cloned successfully",
+      "description": "You can check files in the explorer"
+    }
+  },
+  "repositorySelector": {
+    "placeholder": "Select a repository...",
+    "loading": "Loading repositories...",
+    "noRepositories": "No repositories found",
+    "close": "Close",
+    "switchRepository": "Switch Active Repository",
+    "cloning": "Cloning...",
+    "clone": "Clone"
+  },
+  "editor": {
+    "noFileOpen": "No file open"
+  },
+  "explorer": {
+    "loading": "Loading...",
+    "noFiles": "No files available",
+    "contextMenu": {
+      "new": "New",
+      "markdown": "Markdown (.md)",
+      "delete": "Delete"
+    }
+  },
+  "git": {
+    "selectRepository": "Please select a repository",
+    "loading": "Loading...",
+    "commit": {
+      "placeholder": "Commit message",
+      "button": "Commit",
+      "committing": "Committing...",
+      "success": {
+        "title": "Committed",
+        "description": "Changes have been committed successfully"
+      }
+    },
+    "signInRequired": "Please sign in to use repository features."
+  }
+}

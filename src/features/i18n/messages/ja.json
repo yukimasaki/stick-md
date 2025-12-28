@@ -1,2 +1,88 @@
-{}
-
+{
+  "userMenu": {
+    "title": "ユーザーメニュー",
+    "description": "ユーザー設定とアカウント管理メニュー",
+    "general": {
+      "title": "一般",
+      "activeRepository": "作業中のリポジトリ",
+      "selectRepository": "リポジトリを選択",
+      "toolbarPosition": "ツールバー位置",
+      "language": "言語",
+      "autoDetect": "自動検出",
+      "japanese": "日本語",
+      "english": "English"
+    },
+    "account": {
+      "title": "アカウント",
+      "logoutFromDevice": "このデバイスからログアウト",
+      "logout": "ログアウト",
+      "login": "ログイン",
+      "logoutConfirm": "ログアウトの確認",
+      "cancel": "キャンセル"
+    },
+    "user": "User"
+  },
+  "sidebar": {
+    "explorer": "エクスプローラ",
+    "repository": "リポジトリ"
+  },
+  "saveButton": {
+    "tooltip": "上書き保存",
+    "success": {
+      "title": "ファイルを保存しました",
+      "description": "ファイルの保存が完了しました"
+    }
+  },
+  "fileDialog": {
+    "title": "新しいMarkdownファイルを作成",
+    "description": "ファイル名を入力してください。ディレクトリパスを含めることもできます（例: \"dir/file.md\"）。",
+    "placeholder": "ファイル名を入力",
+    "cancel": "キャンセル",
+    "creating": "作成中...",
+    "create": "作成"
+  },
+  "repositoryDialog": {
+    "title": "リポジトリを選択",
+    "selectPrompt": "リポジトリを選択してください",
+    "signInRequired": "リポジトリを選択するにはサインインが必要です",
+    "cloneSuccess": {
+      "title": "リポジトリのクローンが完了しました",
+      "description": "エクスプローラーでファイルを確認できます"
+    }
+  },
+  "repositorySelector": {
+    "placeholder": "リポジトリを選択...",
+    "loading": "リポジトリを読み込み中...",
+    "noRepositories": "リポジトリが見つかりません",
+    "close": "閉じる",
+    "switchRepository": "作業リポジトリを切り替え",
+    "cloning": "クローン中...",
+    "clone": "クローン"
+  },
+  "editor": {
+    "noFileOpen": "ファイルが開かれていません"
+  },
+  "explorer": {
+    "loading": "読み込み中...",
+    "noFiles": "ファイルがありません",
+    "contextMenu": {
+      "new": "新規",
+      "markdown": "Markdown (.md)",
+      "delete": "削除"
+    }
+  },
+  "git": {
+    "selectRepository": "リポジトリを選択してください",
+    "loading": "読み込み中...",
+    "commit": {
+      "placeholder": "コミットメッセージ",
+      "button": "コミット",
+      "committing": "コミット中...",
+      "success": {
+        "title": "コミット完了",
+        "description": "変更が正常にコミットされました"
+      }
+    },
+    "signInRequired": "リポジトリ機能を使用するにはサインインが必要です"
+  }
+}

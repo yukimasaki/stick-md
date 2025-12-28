@@ -3,6 +3,7 @@
 import { GitStatusUI } from "@/features/git/presentation/components/git-status-ui"
 import { CommitForm } from "@/features/git/presentation/components/commit-form"
 import { CommitHistory } from "@/features/git/presentation/components/commit-history"
+import { useTranslations } from "next-intl"
 import type { Session } from "next-auth"
 
 interface RepositoryContentProps {
@@ -10,6 +11,7 @@ interface RepositoryContentProps {
 }
 
 export function RepositoryContent({ session }: RepositoryContentProps) {
+  const t = useTranslations();
   return (
     <div className="flex flex-col gap-2 p-2">
       {/* Code Management Section */}
@@ -26,7 +28,7 @@ export function RepositoryContent({ session }: RepositoryContentProps) {
       )}
       {!session && (
         <div className="text-xs text-muted-foreground text-center py-4">
-          Please sign in to use repository features.
+          {t('git.signInRequired')}
         </div>
       )}
     </div>

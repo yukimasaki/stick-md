@@ -13,11 +13,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useTranslations } from 'next-intl';
 /**
  * コミット履歴コンポーネント
  * Presentation Layer: コミット履歴の表示
  */
 export function CommitHistory() {
+  const t = useTranslations();
   const repositoryState = useSyncExternalStore(
     repositoryStore.subscribe,
     repositoryStore.getSnapshot,
@@ -84,7 +86,7 @@ export function CommitHistory() {
   if (!selectedRepo) {
     return (
       <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-        Please select a repository
+        {t('git.selectRepository')}
       </div>
     );
   }
@@ -92,7 +94,7 @@ export function CommitHistory() {
   if (isLoading) {
     return (
       <div className="px-2 py-4 text-xs text-muted-foreground text-center">
-        Loading...
+        {t('git.loading')}
       </div>
     );
   }

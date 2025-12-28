@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useLocale } from '@/features/i18n/presentation/hooks/use-locale';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslations } from 'next-intl';
 import type { Session } from 'next-auth';
 import type { LocaleOption } from '@/features/i18n/domain/types';
 import type { Locale } from '@/features/i18n/domain/types';
@@ -43,6 +44,7 @@ interface UserMenuDialogProps {
  * ユーザーメニューダイアログコンポーネント（アバター + モーダル + ダイアログ）
  */
 export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }: UserMenuDialogProps) {
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
@@ -102,7 +104,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={session.user.image}
-                  alt={session.user.name || 'User'}
+                  alt={session.user.name || t('userMenu.user')}
                   className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white"
                 />
               ) : (
@@ -114,8 +116,8 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
           </DialogTrigger>
           <AnimatedDialogContent
             open={isOpen}
-            title="ユーザーメニュー"
-            description="ユーザー設定とアカウント管理メニュー"
+            title={t('userMenu.title')}
+            description={t('userMenu.description')}
             backgroundColor="bg-gray-100"
             headerClassName="sr-only"
             showCloseButton={true}
@@ -128,7 +130,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={session.user.image}
-                      alt={session.user.name || 'User'}
+                      alt={session.user.name || t('userMenu.user')}
                       className="w-10 h-10 rounded-full shrink-0 border border-gray-300 p-px bg-white"
                     />
                   ) : (
@@ -138,7 +140,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                   )}
                   <div>
                     <div className="text-sm font-medium">
-                      {session.user?.email || session.user?.name || 'User'}
+                      {session.user?.email || session.user?.name || t('userMenu.user')}
                     </div>
                     {session.user?.name && session.user?.email && (
                       <div className="text-xs text-muted-foreground">{session.user.name}</div>
@@ -152,10 +154,10 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
             <div className="p-4 space-y-4">
               {/* 一般セクション */}
               <div className="space-y-2">
-                <h2 className="text-sm font-semibold text-muted-foreground px-1">一般</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground px-1">{t('userMenu.general.title')}</h2>
                 <div className="bg-white rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm flex-1 min-w-0">作業中のリポジトリ</span>
+                    <span className="text-sm flex-1 min-w-0">{t('userMenu.general.activeRepository')}</span>
                     <Button
                       variant="outline"
                       size="sm"
@@ -165,13 +167,13 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       {currentRepository ? (
                         <span className="truncate max-w-[120px]">{currentRepository.name}</span>
                       ) : (
-                        <span>リポジトリを選択</span>
+                        <span>{t('userMenu.general.selectRepository')}</span>
                       )}
                     </Button>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm flex-1 min-w-0">ツールバー位置</span>
+                    <span className="text-sm flex-1 min-w-0">{t('userMenu.general.toolbarPosition')}</span>
                     <div className="flex items-center gap-2 shrink-0">
                       <Input
                         type="number"
@@ -205,7 +207,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm flex-1 min-w-0">言語</span>
+                    <span className="text-sm flex-1 min-w-0">{t('userMenu.general.language')}</span>
                     <Select
                       value={currentLocaleOption}
                       onValueChange={(value) => {
@@ -221,9 +223,9 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="auto">自動検出</SelectItem>
-                        <SelectItem value="ja">日本語</SelectItem>
-                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="auto">{t('userMenu.general.autoDetect')}</SelectItem>
+                        <SelectItem value="ja">{t('userMenu.general.japanese')}</SelectItem>
+                        <SelectItem value="en">{t('userMenu.general.english')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -232,10 +234,10 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
 
               {/* アカウントセクション */}
               <div className="space-y-2">
-                <h2 className="text-sm font-semibold text-muted-foreground px-1">アカウント</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground px-1">{t('userMenu.account.title')}</h2>
                 <div className="bg-white rounded-lg p-4">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm flex-1 min-w-0">このデバイスからログアウト</span>
+                    <span className="text-sm flex-1 min-w-0">{t('userMenu.account.logoutFromDevice')}</span>
                     <Button
                       variant="outline"
                       size="sm"
@@ -245,7 +247,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       }}
                       className="shrink-0"
                     >
-                      <span>ログアウト</span>
+                      <span>{t('userMenu.account.logout')}</span>
                     </Button>
                   </div>
                 </div>
@@ -256,7 +258,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
       ) : (
         <Button variant="outline" size="sm" onClick={() => login()} className="h-8">
           <User className="h-4 w-4 mr-2" />
-          <span className="text-xs">ログイン</span>
+          <span className="text-xs">{t('userMenu.account.login')}</span>
         </Button>
       )}
 
@@ -264,15 +266,15 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ログアウトの確認</DialogTitle>
+            <DialogTitle>{t('userMenu.account.logoutConfirm')}</DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
-              キャンセル
+              {t('userMenu.account.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
-              ログアウト
+              {t('userMenu.account.logout')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -6,10 +6,12 @@ import { useSyncExternalStore } from 'react';
 import { Toolbar } from '@/features/editor/presentation/components/toolbar/toolbar';
 import { TabBar } from '@/features/editor/presentation/components/tab-bar';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
+import { useTranslations } from 'next-intl';
 
 const MarkdownEditor = dynamic(() => import('@/features/editor/presentation/components/markdown-editor/markdown-editor').then(mod => mod.MarkdownEditor), { ssr: false });
 
 export function EditorContainer() {
+  const t = useTranslations();
   const hasInitializedRef = useRef(false);
   const state = useSyncExternalStore(
     tabStore.subscribe,
@@ -38,7 +40,7 @@ export function EditorContainer() {
           <MarkdownEditor key={activeTab.id} tabId={activeTab.id} />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            No file open
+            {t('editor.noFileOpen')}
           </div>
         )}
       </div>

@@ -13,6 +13,7 @@ import { readFileContent } from '@/features/editor/application/services/file-rea
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { handleFileReadError } from '@/features/editor/presentation/utils/error-handler';
 import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
+import { useTranslations } from 'next-intl';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import type { Session } from 'next-auth';
@@ -22,6 +23,7 @@ interface ExplorerContentProps {
 }
 
 export function ExplorerContent({ session }: ExplorerContentProps) {
+  const t = useTranslations();
   const { repositories, selectedRepositoryId } = useRepository();
   const { close: closeSidebar } = useSidebar();
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
@@ -207,12 +209,14 @@ export function ExplorerContent({ session }: ExplorerContentProps) {
 
   return (
     <div className="flex flex-col h-full gap-2 p-2">
-      <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground shrink-0">
-        {selectedRepo ? selectedRepo.name : 'File Explorer'}
-      </div>
+      {selectedRepo && (
+        <div className="px-2 py-1.5 text-sm font-semibold text-sidebar-foreground shrink-0">
+          {selectedRepo.name}
+        </div>
+      )}
       {isLoading ? (
         <div className="p-4 text-sm text-muted-foreground text-center">
-          Loading...
+          {t('explorer.loading')}
         </div>
       ) : (
         <>

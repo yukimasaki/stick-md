@@ -8,6 +8,7 @@ import { AnimatedDialogContent } from '@/features/shared/presentation/components
 import { Repository } from '@/features/repository/domain/models/repository';
 import { createMarkdownFile } from '@/features/repository/application/services/file-creation-service';
 import { handleFileCreationError } from '@/features/repository/presentation/utils/error-handler';
+import { useTranslations } from 'next-intl';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 
@@ -26,6 +27,7 @@ export function FileNameEditDialog({
   directoryPath,
   onFileCreated,
 }: FileNameEditDialogProps) {
+  const t = useTranslations();
   const [fileName, setFileName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -101,8 +103,8 @@ export function FileNameEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
         open={open}
-        title="Create New Markdown File"
-        description="Enter the file name. You can include a directory path (e.g., &quot;dir/file.md&quot;)."
+        title={t('fileDialog.title')}
+        description={t('fileDialog.description')}
         footer={
           <>
             <Button
@@ -111,14 +113,14 @@ export function FileNameEditDialog({
               onClick={handleCancel}
               disabled={isCreating}
             >
-              Cancel
+              {t('fileDialog.cancel')}
             </Button>
             <Button
               type="button"
               onClick={handleCreate}
               disabled={isCreating || !fileName.trim()}
             >
-              {isCreating ? 'Creating...' : 'Create'}
+              {isCreating ? t('fileDialog.creating') : t('fileDialog.create')}
             </Button>
           </>
         }
@@ -131,7 +133,7 @@ export function FileNameEditDialog({
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter file name"
+                placeholder={t('fileDialog.placeholder')}
                 disabled={isCreating}
                 className="flex-1 text-base"
               />

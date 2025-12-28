@@ -11,12 +11,14 @@ import { commitChanges } from '@/features/git/application/services/git-commit-se
 import { getRepositoryStatus } from '@/features/git/application/services/git-status-service';
 import { handleGitCommitError } from '@/features/git/presentation/utils/error-handler';
 import { handleGitStatusError } from '@/features/git/presentation/utils/error-handler';
+import { useTranslations } from 'next-intl';
 
 /**
  * コミットフォームコンポーネント
  * Presentation Layer: コミットメッセージ入力とコミットボタンを提供
  */
 export function CommitForm() {
+  const t = useTranslations();
   const repositoryState = useSyncExternalStore(
     repositoryStore.subscribe,
     repositoryStore.getSnapshot,
@@ -76,8 +78,8 @@ export function CommitForm() {
     try {
       const result = await commitChanges(selectedRepo, commitMessage, stagedFiles)();
       if (E.isRight(result)) {
-        toast.success('Committed', {
-          description: 'Changes have been committed successfully',
+        toast.success(t('git.commit.success.title'), {
+          description: t('git.commit.success.description'),
         });
         setCommitMessage('');
         await loadStatus();
@@ -102,7 +104,7 @@ export function CommitForm() {
   return (
     <div className="flex flex-col gap-2 p-2">
       <Textarea
-        placeholder="Commit message"
+        placeholder={t('git.commit.placeholder')}
         value={commitMessage}
         onChange={(e) => setCommitMessage(e.target.value)}
         className="min-h-[80px] resize-none"
@@ -112,7 +114,7 @@ export function CommitForm() {
         disabled={isCommitDisabled}
         className="w-full"
       >
-        {isCommitting ? 'Committing...' : 'Commit'}
+        {isCommitting ? t('git.commit.committing') : t('git.commit.button')}
       </Button>
     </div>
   );

@@ -14,6 +14,7 @@ import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { repositoryStore } from '@/features/repository/application/stores/repository-store';
 import { saveFile } from '@/features/editor/application/services/file-save-service';
 import { handleFileSaveError } from '@/features/editor/presentation/utils/error-handler';
+import { useTranslations } from 'next-intl';
 import * as E from 'fp-ts/Either';
 
 /**
@@ -21,6 +22,7 @@ import * as E from 'fp-ts/Either';
  * Presentation Layer: ファイル保存ボタンを提供
  */
 export function SaveButton() {
+  const t = useTranslations();
   const tabState = useSyncExternalStore(
     tabStore.subscribe,
     tabStore.getSnapshot,
@@ -39,8 +41,8 @@ export function SaveButton() {
     if (E.isLeft(result)) {
       handleFileSaveError(result.left);
     } else {
-      toast.success('File saved', {
-        description: 'The file has been saved successfully',
+      toast.success(t('saveButton.success.title'), {
+        description: t('saveButton.success.description'),
       });
       // GitステータスUIに再読み込みを通知
       window.dispatchEvent(new CustomEvent('git-status-changed'));
@@ -62,7 +64,7 @@ export function SaveButton() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>上書き保存</p>
+          <p>{t('saveButton.tooltip')}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

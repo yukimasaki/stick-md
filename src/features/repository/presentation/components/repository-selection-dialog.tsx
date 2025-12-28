@@ -6,6 +6,7 @@ import { AnimatedDialogContent } from '@/features/shared/presentation/components
 import { RepositorySelector } from '@/features/repository/presentation/components/repository-selector';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/features/shared/presentation/contexts/sidebar-context';
+import { useTranslations } from 'next-intl';
 import type { Session } from 'next-auth';
 
 interface RepositorySelectionDialogProps {
@@ -22,13 +23,14 @@ export function RepositorySelectionDialog({
   onOpenChange,
   session,
 }: RepositorySelectionDialogProps) {
+  const t = useTranslations();
   const isMobile = useIsMobile();
   const { open: openSidebar } = useSidebar();
 
   const handleCloneSuccess = () => {
     // クローン成功時の通知
-    toast.success('リポジトリのクローンが完了しました', {
-      description: 'エクスプローラーでファイルを確認できます',
+    toast.success(t('repositoryDialog.cloneSuccess.title'), {
+      description: t('repositoryDialog.cloneSuccess.description'),
     });
     // モーダルを閉じる
     onOpenChange(false);
@@ -51,11 +53,11 @@ export function RepositorySelectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <AnimatedDialogContent
         open={open}
-        title="リポジトリを選択"
+        title={t('repositoryDialog.title')}
         description={
           session
-            ? 'リポジトリを選択してください'
-            : 'リポジトリを選択するにはサインインが必要です'
+            ? t('repositoryDialog.selectPrompt')
+            : t('repositoryDialog.signInRequired')
         }
       >
         <div className="px-6 pb-6">
@@ -67,7 +69,7 @@ export function RepositorySelectionDialog({
             />
           ) : (
             <div className="text-sm text-muted-foreground text-center py-4">
-              リポジトリを選択するにはサインインが必要です
+              {t('repositoryDialog.signInRequired')}
             </div>
           )}
         </div>

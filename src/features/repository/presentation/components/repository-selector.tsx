@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRepositorySelector } from '@/features/repository/presentation/hooks/use-repository-selector';
+import { useTranslations } from 'next-intl';
 
 interface RepositorySelectorProps {
   accessToken?: string;
@@ -18,6 +19,7 @@ interface RepositorySelectorProps {
 }
 
 export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: RepositorySelectorProps) {
+  const t = useTranslations();
   const {
     repositories,
     displayRepo,
@@ -42,16 +44,16 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
         disabled={isLoading}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select a repository..." />
+          <SelectValue placeholder={t('repositorySelector.placeholder')} />
         </SelectTrigger>
         <SelectContent className="z-80">
           {isLoading ? (
             <div className="p-2 text-sm text-center text-muted-foreground">
-              Loading repositories...
+              {t('repositorySelector.loading')}
             </div>
           ) : repositories.length === 0 ? (
             <div className="p-2 text-sm text-center text-muted-foreground">
-              No repositories found
+              {t('repositorySelector.noRepositories')}
             </div>
           ) : (
             repositories.map((repo) => (
@@ -73,7 +75,7 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
                 className="w-full"
                 size="sm"
               >
-                閉じる
+                {t('repositorySelector.close')}
               </Button>
             ) : (
               <Button
@@ -81,7 +83,7 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
                 className="w-full"
                 size="sm"
               >
-                作業リポジトリを切り替え
+                {t('repositorySelector.switchRepository')}
               </Button>
             )
           ) : (
@@ -94,12 +96,12 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
               {isCloning ? (
                 <>
                   <Download className="mr-2 h-4 w-4 animate-spin" />
-                Cloning...
+                {t('repositorySelector.cloning')}
                 </>
               ) : (
                 <>
                   <Download className="mr-2 h-4 w-4" />
-                  Clone
+                  {t('repositorySelector.clone')}
                 </>
               )}
             </Button>
