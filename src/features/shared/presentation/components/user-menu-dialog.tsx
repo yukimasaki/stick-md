@@ -1,7 +1,7 @@
 'use client';
 
 import { User, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { login, logout } from '@/app/_actions/auth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -44,8 +44,14 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   const [showRepositoryDialog, setShowRepositoryDialog] = useState(false);
   const { repositories, selectedRepositoryId } = useRepository();
   const { offset: toolbarOffset, updateOffset: updateToolbarOffset } = useToolbarSettings();
+  const [toolbarOffsetInput, setToolbarOffsetInput] = useState<string>(toolbarOffset.toString());
 
   const currentRepository = repositories.find((repo) => repo.id === selectedRepositoryId);
+
+  // toolbarOffsetが変更されたときにローカルステートを更新
+  useEffect(() => {
+    setToolbarOffsetInput(toolbarOffset.toString());
+  }, [toolbarOffset]);
 
   const handleLogout = () => {
     setShowLogoutDialog(false);
@@ -149,13 +155,27 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                     <div className="flex items-center gap-2 shrink-0">
                       <Input
                         type="number"
-                        min="0"
+                        min="-200"
                         max="200"
-                        value={toolbarOffset}
+                        value={toolbarOffsetInput}
                         onChange={(e) => {
+                          // 入力中は空文字列も許可
+                          setToolbarOffsetInput(e.target.value);
+                        }}
+                        onBlur={(e) => {
+                          // フォーカスが外れたときに確定
                           const value = parseInt(e.target.value, 10);
-                          if (!isNaN(value)) {
+                          if (!isNaN(value) && value >= -200 && value <= 200) {
                             updateToolbarOffset(value);
+                          } else {
+                            // 無効な値の場合は元の値に戻す
+                            setToolbarOffsetInput(toolbarOffset.toString());
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Enterキーで確定
+                          if (e.key === 'Enter') {
+                            e.currentTarget.blur();
                           }
                         }}
                         className="w-20 h-8 text-sm"

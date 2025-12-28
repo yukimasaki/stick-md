@@ -18,24 +18,24 @@ export function useToolbarSettings() {
       return;
     }
 
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved !== null) {
-        const parsed = parseInt(saved, 10);
-        // バリデーション: 0-200pxの範囲
-        if (!isNaN(parsed) && parsed >= 0 && parsed <= 200) {
-          setOffset(parsed);
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved !== null) {
+          const parsed = parseInt(saved, 10);
+          // バリデーション: -200-200pxの範囲
+          if (!isNaN(parsed) && parsed >= -200 && parsed <= 200) {
+            setOffset(parsed);
+          }
         }
+      } catch (error) {
+        console.error('Failed to load toolbar settings from localStorage:', error);
       }
-    } catch (error) {
-      console.error('Failed to load toolbar settings from localStorage:', error);
-    }
   }, []);
 
   // オフセット値を更新（LocalStorageにも保存）
   const updateOffset = (newOffset: number) => {
-    // バリデーション: 0-200pxの範囲
-    const validatedOffset = Math.max(0, Math.min(200, Math.round(newOffset)));
+    // バリデーション: -200-200pxの範囲
+    const validatedOffset = Math.max(-200, Math.min(200, Math.round(newOffset)));
 
     try {
       localStorage.setItem(STORAGE_KEY, validatedOffset.toString());
