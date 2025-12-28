@@ -415,7 +415,8 @@ export async function checkoutFile(
  */
 export async function commit(
   repository: Repository,
-  message: string
+  message: string,
+  author: { name: string; email: string }
 ): Promise<string> {
   const fs = getFileSystem();
   const dir = getRepositoryPath(repository);
@@ -424,10 +425,7 @@ export async function commit(
     fs,
     dir,
     message,
-    author: {
-      name: 'Stick MD',
-      email: 'stick-md@example.com',
-    },
+    author,
   });
 
   return sha;

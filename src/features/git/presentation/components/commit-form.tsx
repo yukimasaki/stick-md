@@ -82,7 +82,12 @@ export function CommitForm({ session }: CommitFormProps) {
 
     setIsCommitting(true);
     try {
-      const result = await commitChanges(selectedRepo, commitMessage, stagedFiles)();
+      const result = await commitChanges(
+        selectedRepo,
+        commitMessage,
+        stagedFiles,
+        session?.user
+      )();
       if (E.isRight(result)) {
         toast.success(t('git.commit.success.title'), {
           description: t('git.commit.success.description'),

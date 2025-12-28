@@ -17,6 +17,11 @@ describe('commitChanges', () => {
     private: false,
   };
 
+  const mockSessionUser = {
+    name: 'Test User',
+    email: 'test@example.com',
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -27,13 +32,16 @@ describe('commitChanges', () => {
     const commitSha = 'abc123';
     vi.mocked(commit).mockResolvedValueOnce(commitSha);
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isRight(result)).toBe(true);
     if (E.isRight(result)) {
       expect(result.right).toBe(commitSha);
     }
-    expect(commit).toHaveBeenCalledWith(mockRepository, message);
+    expect(commit).toHaveBeenCalledWith(mockRepository, message, {
+      name: 'Test User',
+      email: 'test@example.com',
+    });
     expect(commit).toHaveBeenCalledTimes(1);
   });
 
@@ -41,7 +49,7 @@ describe('commitChanges', () => {
     const message = 'feat: add new feature';
     const stagedFiles = ['file1.md'];
 
-    const result = await commitChanges(undefined, message, stagedFiles)();
+    const result = await commitChanges(undefined, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
@@ -55,7 +63,7 @@ describe('commitChanges', () => {
     const message = '';
     const stagedFiles = ['file1.md'];
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
@@ -69,7 +77,7 @@ describe('commitChanges', () => {
     const message = '   ';
     const stagedFiles = ['file1.md'];
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
@@ -83,12 +91,60 @@ describe('commitChanges', () => {
     const message = 'feat: add new feature';
     const stagedFiles: string[] = [];
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
       expect(result.left.type).toBe('NO_STAGED_FILES');
       expect(result.left.message).toBe('No staged files to commit');
+    }
+    expect(commit).not.toHaveBeenCalled();
+  });
+
+  it('セッション情報がない場合、GIT_COMMIT_ERRORを返す', async () => {
+    const message = 'feat: add new feature';
+    const stagedFiles = ['file1.md'];
+
+    const result = await commitChanges(mockRepository, message, stagedFiles, undefined)();
+
+    expect(E.isLeft(result)).toBe(true);
+    if (E.isLeft(result)) {
+      expect(result.left.type).toBe('GIT_COMMIT_ERROR');
+      expect(result.left.message).toBe('User information is not available. Please log in again.');
+    }
+    expect(commit).not.toHaveBeenCalled();
+  });
+
+  it('セッションのnameがない場合、GIT_COMMIT_ERRORを返す', async () => {
+    const message = 'feat: add new feature';
+    const stagedFiles = ['file1.md'];
+    const sessionUserWithoutName = {
+      email: 'test@example.com',
+    };
+
+    const result = await commitChanges(mockRepository, message, stagedFiles, sessionUserWithoutName)();
+
+    expect(E.isLeft(result)).toBe(true);
+    if (E.isLeft(result)) {
+      expect(result.left.type).toBe('GIT_COMMIT_ERROR');
+      expect(result.left.message).toBe('User information is not available. Please log in again.');
+    }
+    expect(commit).not.toHaveBeenCalled();
+  });
+
+  it('セッションのemailがない場合、GIT_COMMIT_ERRORを返す', async () => {
+    const message = 'feat: add new feature';
+    const stagedFiles = ['file1.md'];
+    const sessionUserWithoutEmail = {
+      name: 'Test User',
+    };
+
+    const result = await commitChanges(mockRepository, message, stagedFiles, sessionUserWithoutEmail)();
+
+    expect(E.isLeft(result)).toBe(true);
+    if (E.isLeft(result)) {
+      expect(result.left.type).toBe('GIT_COMMIT_ERROR');
+      expect(result.left.message).toBe('User information is not available. Please log in again.');
     }
     expect(commit).not.toHaveBeenCalled();
   });
@@ -99,14 +155,17 @@ describe('commitChanges', () => {
     const error = new Error('Git commit failed');
     vi.mocked(commit).mockRejectedValueOnce(error);
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
       expect(result.left.type).toBe('GIT_COMMIT_ERROR');
       expect(result.left.message).toContain('Failed to commit');
     }
-    expect(commit).toHaveBeenCalledWith(mockRepository, message);
+    expect(commit).toHaveBeenCalledWith(mockRepository, message, {
+      name: 'Test User',
+      email: 'test@example.com',
+    });
   });
 
   it('予期しないエラーが発生した場合、UNKNOWN_ERRORを返す', async () => {
@@ -115,14 +174,17 @@ describe('commitChanges', () => {
     const error = 'Unexpected error';
     vi.mocked(commit).mockRejectedValueOnce(error);
 
-    const result = await commitChanges(mockRepository, message, stagedFiles)();
+    const result = await commitChanges(mockRepository, message, stagedFiles, mockSessionUser)();
 
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
       expect(result.left.type).toBe('UNKNOWN_ERROR');
       expect(result.left.message).toBe('An unknown error occurred while committing');
     }
-    expect(commit).toHaveBeenCalledWith(mockRepository, message);
+    expect(commit).toHaveBeenCalledWith(mockRepository, message, {
+      name: 'Test User',
+      email: 'test@example.com',
+    });
   });
 });
 

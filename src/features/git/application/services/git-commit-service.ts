@@ -7,6 +7,14 @@ import { validateCommitMessage, validateStagedFiles } from '@/features/git/domai
 import type { GitCommitError } from '@/features/git/domain/services/git-commit-error';
 
 /**
+ * ユーザー情報の型定義
+ */
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
+/**
  * リポジトリの存在を検証
  */
 function validateRepository(
@@ -22,13 +30,37 @@ function validateRepository(
 }
 
 /**
+ * セッション情報からユーザー情報を取得
+ * セッション情報がない場合はエラーを返す（再ログインが必要）
+ */
+function getUserInfo(
+  sessionUser: { name?: string | null; email?: string | null } | undefined
+): E.Either<GitCommitError, UserInfo> {
+  const sessionName = sessionUser?.name;
+  const sessionEmail = sessionUser?.email;
+
+  if (!sessionName || !sessionEmail) {
+    return E.left({
+      type: 'GIT_COMMIT_ERROR',
+      message: 'User information is not available. Please log in again.',
+    });
+  }
+
+  return E.right({
+    name: sessionName,
+    email: sessionEmail,
+  });
+}
+
+/**
  * 変更をコミット
  * Application Layer: コミットのユースケースを実装
  */
 export function commitChanges(
   repository: Repository | undefined,
   message: string,
-  stagedFiles: string[]
+  stagedFiles: string[],
+  sessionUser?: { name?: string | null; email?: string | null }
 ): TE.TaskEither<GitCommitError, string> {
   return pipe(
     TE.fromEither(validateRepository(repository)),
@@ -38,20 +70,26 @@ export function commitChanges(
         E.chain(() => validateStagedFiles(stagedFiles)),
         TE.fromEither,
         TE.chain(() =>
-          TE.tryCatch(
-            () => commit(repo, message),
-            (error): GitCommitError => {
-              if (error instanceof Error) {
-                return {
-                  type: 'GIT_COMMIT_ERROR',
-                  message: `Failed to commit: ${error.message}`,
-                };
-              }
-              return {
-                type: 'UNKNOWN_ERROR',
-                message: 'An unknown error occurred while committing',
-              };
-            }
+          pipe(
+            getUserInfo(sessionUser),
+            TE.fromEither,
+            TE.chain((author) =>
+              TE.tryCatch(
+                () => commit(repo, message, author),
+                (error): GitCommitError => {
+                  if (error instanceof Error) {
+                    return {
+                      type: 'GIT_COMMIT_ERROR',
+                      message: `Failed to commit: ${error.message}`,
+                    };
+                  }
+                  return {
+                    type: 'UNKNOWN_ERROR',
+                    message: 'An unknown error occurred while committing',
+                  };
+                }
+              )
+            )
           )
         )
       )
