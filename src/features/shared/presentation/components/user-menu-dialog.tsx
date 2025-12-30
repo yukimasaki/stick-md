@@ -25,6 +25,7 @@ import { useTranslations } from 'next-intl';
 import type { Session } from 'next-auth';
 import type { LocaleOption } from '@/features/i18n/domain/types';
 import type { Locale } from '@/features/i18n/domain/types';
+import { tabStore } from '@/features/editor/application/stores/tab-store';
 
 interface UserMenuDialogProps {
   session: Session | null;
@@ -79,6 +80,8 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   const handleLogout = () => {
     setShowLogoutDialog(false);
     setIsOpen(false);
+    // ログアウト前に開いているタブをすべて閉じる
+    tabStore.clear();
     logout();
   };
 
