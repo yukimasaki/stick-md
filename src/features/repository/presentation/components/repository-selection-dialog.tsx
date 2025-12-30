@@ -27,11 +27,13 @@ export function RepositorySelectionDialog({
   const isMobile = useIsMobile();
   const { open: openSidebar } = useSidebar();
 
-  const handleCloneSuccess = () => {
-    // クローン成功時の通知
-    toast.success(t('repositoryDialog.cloneSuccess.title'), {
-      description: t('repositoryDialog.cloneSuccess.description'),
-    });
+  const handleCloneSuccess = (options?: { skipToast?: boolean }) => {
+    // クローン成功時の通知（リポジトリ作成時はスキップ）
+    if (!options?.skipToast) {
+      toast.success(t('repositoryDialog.cloneSuccess.title'), {
+        description: t('repositoryDialog.cloneSuccess.description'),
+      });
+    }
     // モーダルを閉じる
     onOpenChange(false);
     // モバイルの場合、サイドバーを開く

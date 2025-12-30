@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useRepository } from '@/features/repository/presentation/hooks/use-repository';
 import { 
   getDisplayRepository, 
@@ -8,6 +9,11 @@ import {
   type RepositorySelectionState 
 } from '@/features/repository/application/services/repository-selection-service';
 import { cloneRepositoryUseCase } from '@/features/repository/application/services/clone-service';
+import { createRepositoryUseCase } from '@/features/repository/application/services/create-repository-service';
+import { getUserRepositories } from '@/app/_actions/repository';
+import { useTranslations } from 'next-intl';
+import * as E from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
 
 /**
  * リポジトリセレクターの状態とロジック
@@ -15,9 +21,10 @@ import { cloneRepositoryUseCase } from '@/features/repository/application/servic
  */
 export function useRepositorySelector(
   accessToken?: string,
-  onCloneSuccess?: () => void,
+  onCloneSuccess?: (options?: { skipToast?: boolean }) => void,
   onClose?: () => void
 ) {
+  const t = useTranslations();
   const { repositories, selectedRepositoryId, isLoading, actions } = useRepository();
   
   // ビジネスロジック状態
@@ -25,6 +32,8 @@ export function useRepositorySelector(
   const [isCloned, setIsCloned] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   // リポジトリ選択状態
   const selectionState: RepositorySelectionState = {
@@ -124,6 +133,90 @@ export function useRepositorySelector(
     onClose?.();
   }, [onClose]);
 
+  // リポジトリ作成
+  const handleCreateRepository = useCallback(async (repositoryName: string) => {
+    if (!accessToken) {
+      toast.error(t('repositoryNameDialog.validation.invalid'));
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      const result = await createRepositoryUseCase(accessToken, repositoryName, false)();
+
+      pipe(
+        result,
+        E.fold(
+          (error) => {
+            let errorMessage = '';
+            switch (error.type) {
+              case 'EMPTY_NAME':
+              case 'INVALID_LENGTH':
+              case 'INVALID_CHARACTER':
+              case 'INVALID_START_OR_END':
+              case 'CONSECUTIVE_DOTS':
+              case 'RESERVED_NAME':
+                errorMessage = t('repositoryNameDialog.validation.invalid');
+                break;
+              case 'GITHUB_API_ERROR':
+              case 'GIT_INIT_ERROR':
+              case 'USER_INFO_ERROR':
+              case 'UNKNOWN_ERROR':
+                errorMessage = error.message;
+                break;
+              default:
+                errorMessage = t('repositoryNameDialog.validation.invalid');
+            }
+            toast.error(errorMessage);
+            setIsCreating(false);
+          },
+          async (repository) => {
+            // リポジトリリストを再取得
+            try {
+              const updatedRepos = await getUserRepositories();
+              actions.setRepositories(updatedRepos);
+              
+              // 作成したリポジトリを選択状態にする
+              actions.selectRepository(repository.id);
+              
+              // 成功メッセージを表示
+              toast.success(t('repositoryNameDialog.success.title', { name: repository.name }), {
+                description: t('repositoryNameDialog.success.description'),
+              });
+
+              // クローン完了後にファイルツリーを更新するためのイベントを発火
+              window.dispatchEvent(new CustomEvent('repository-cloned', { 
+                detail: { repositoryId: repository.id } 
+              }));
+
+              // ダイアログを閉じる
+              setShowCreateDialog(false);
+              setIsCreating(false);
+              
+              // 成功時のコールバックはonCreationCompleteで実行されるため、ここでは呼び出さない
+            } catch (err) {
+              console.error('Failed to refresh repository list:', err);
+              // リポジトリリストの更新に失敗しても、作成したリポジトリは選択状態にする
+              actions.selectRepository(repository.id);
+              toast.success(t('repositoryNameDialog.success.title', { name: repository.name }), {
+                description: t('repositoryNameDialog.success.description'),
+              });
+              setShowCreateDialog(false);
+              setIsCreating(false);
+              // 成功時のコールバックはonCreationCompleteで実行されるため、ここでは呼び出さない
+            }
+          }
+        )
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t('repositoryNameDialog.validation.invalid')
+      );
+      setIsCreating(false);
+    }
+  }, [accessToken, actions, onCloneSuccess, t]);
+
   return {
     // 状態
     repositories,
@@ -134,10 +227,14 @@ export function useRepositorySelector(
     isCloning,
     cloneError,
     isCurrentRepository,
+    showCreateDialog,
+    isCreating,
     // アクション
     handleSelect,
     handleClone,
     handleSwitchRepository,
     handleClose,
+    handleCreateRepository,
+    setShowCreateDialog,
   };
 }

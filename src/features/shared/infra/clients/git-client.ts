@@ -542,3 +542,71 @@ export async function pull(
   });
 }
 
+/**
+ * リポジトリを初期化
+ * Infrastructure Layer: isomorphic-gitを使用したリポジトリ初期化
+ * 
+ * @param repository - リポジトリ
+ * @param accessToken - GitHubアクセストークン
+ * @param author - コミット作成者情報
+ */
+export async function initRepository(
+  repository: Repository,
+  accessToken: string,
+  author: { name: string; email: string }
+): Promise<void> {
+  const fs = getFileSystem();
+  const dir = getRepositoryPath(repository);
+  const url = `https://${accessToken}@github.com/${repository.full_name}.git`;
+
+  // リポジトリを初期化
+  await git.init({
+    fs,
+    dir,
+    defaultBranch: 'main',
+  });
+
+  // README.mdを作成（初期コミット用）
+  const readmePath = `${dir}/README.md`;
+  await fs.promises.writeFile(readmePath, `# ${repository.name}\n\n`, 'utf8');
+
+  // ファイルをステージング
+  await git.add({
+    fs,
+    dir,
+    filepath: 'README.md',
+  });
+
+  // 初期コミットを作成
+  await git.commit({
+    fs,
+    dir,
+    message: 'Initial commit',
+    author,
+  });
+
+  // リモートを追加
+  await git.addRemote({
+    fs,
+    dir,
+    remote: 'origin',
+    url,
+  });
+
+  // リモートにプッシュ
+  await git.push({
+    fs,
+    http,
+    dir,
+    url,
+    corsProxy: 'https://cors.isomorphic-git.org',
+    remote: 'origin',
+    ref: 'main',
+    onProgress: (progress) => {
+      if (progress.phase === 'pushing') {
+        console.log(`Pushing: ${progress.loaded}/${progress.total}`);
+      }
+    },
+  });
+}
+

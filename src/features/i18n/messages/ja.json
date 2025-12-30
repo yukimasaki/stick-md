@@ -57,7 +57,24 @@
     "close": "閉じる",
     "switchRepository": "作業リポジトリを切り替え",
     "cloning": "クローン中...",
-    "clone": "クローン"
+    "clone": "クローン",
+    "createRepository": "リポジトリを作成"
+  },
+  "repositoryNameDialog": {
+    "title": "リポジトリを作成",
+    "description": "リポジトリ名を入力してください",
+    "placeholder": "リポジトリ名を入力...",
+    "cancel": "キャンセル",
+    "create": "作成する",
+    "creating": "作成中...",
+    "validation": {
+      "empty": "リポジトリ名を入力してください",
+      "invalid": "無効なリポジトリ名です"
+    },
+    "success": {
+      "title": "リモートリポジトリ「{name}」を作成しました",
+      "description": "リポジトリが選択されました"
+    }
   },
   "editor": {
     "noFileOpen": "ファイルが開かれていません"

@@ -135,3 +135,43 @@ export async function getUserRepositories(
   return allRepos;
 }
 
+/**
+ * リポジトリを作成
+ * Infrastructure Layer: 外部サービス（GitHub API）との連携を担当
+ * 
+ * @param accessToken - GitHubアクセストークン
+ * @param name - リポジトリ名
+ * @param isPrivate - プライベートリポジトリかどうか（デフォルト: false）
+ * @returns 作成されたリポジトリ
+ */
+export async function createRepository(
+  accessToken: string,
+  name: string,
+  isPrivate: boolean = false
+): Promise<Repository> {
+  const response = await fetch(`${GITHUB_API_BASE_URL}/user/repos`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'stick-md',
+    },
+    body: JSON.stringify({
+      name,
+      private: isPrivate,
+      auto_init: false, // 初期コミットはローカルで作成するためfalse
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      `GitHub API error: ${response.status} ${response.statusText}. ${errorData.message || ''}`
+    );
+  }
+
+  const data: GitHubRepositoryResponse = await response.json();
+  return mapGitHubRepoToDomain(data);
+}
+

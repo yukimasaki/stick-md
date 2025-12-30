@@ -57,7 +57,24 @@
     "close": "Close",
     "switchRepository": "Switch Active Repository",
     "cloning": "Cloning...",
-    "clone": "Clone"
+    "clone": "Clone",
+    "createRepository": "Create Repository"
+  },
+  "repositoryNameDialog": {
+    "title": "Create Repository",
+    "description": "Please enter a repository name",
+    "placeholder": "Enter repository name...",
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating...",
+    "validation": {
+      "empty": "Please enter a repository name",
+      "invalid": "Invalid repository name"
+    },
+    "success": {
+      "title": "Created remote repository \"{name}\"",
+      "description": "Repository has been selected"
+    }
   },
   "editor": {
     "noFileOpen": "No file open"

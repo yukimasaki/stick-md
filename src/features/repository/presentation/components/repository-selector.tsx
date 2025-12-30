@@ -1,6 +1,6 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,12 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRepositorySelector } from '@/features/repository/presentation/hooks/use-repository-selector';
+import { RepositoryNameInputDialog } from '@/features/repository/presentation/components/repository-name-input-dialog';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 interface RepositorySelectorProps {
   accessToken?: string;
-  onCloneSuccess?: () => void;
+  onCloneSuccess?: (options?: { skipToast?: boolean }) => void;
   onClose?: () => void;
 }
 
@@ -36,10 +37,25 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
     handleClone,
     handleSwitchRepository,
     handleClose,
+    handleCreateRepository,
+    showCreateDialog,
+    setShowCreateDialog,
+    isCreating,
   } = useRepositorySelector(accessToken, onCloneSuccess, onClose);
 
   return (
     <div className="w-full px-2">
+      {/* 「リポジトリを作成」ボタン */}
+      <Button
+        onClick={() => setShowCreateDialog(true)}
+        className="w-full mb-3"
+        size="sm"
+        variant="outline"
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        {t('repositorySelector.createRepository')}
+      </Button>
+
       {/* Selectコンポーネント */}
       <Select
         value={displayRepoId}
@@ -135,6 +151,19 @@ export function RepositorySelector({ accessToken, onCloneSuccess, onClose }: Rep
           )}
         </div>
       )}
+
+      {/* リポジトリ名入力ダイアログ */}
+      <RepositoryNameInputDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onRepositoryCreated={handleCreateRepository}
+        isCreating={isCreating}
+        onCreationComplete={() => {
+          setShowCreateDialog(false);
+          // リポジトリ作成時はトーストをスキップ（既に成功メッセージを表示済み）
+          onCloneSuccess?.({ skipToast: true });
+        }}
+      />
     </div>
   );
 }

@@ -4,6 +4,24 @@ import { NextIntlClientProvider } from 'next-intl';
 import { RepositorySelector } from './repository-selector';
 import { useRepositorySelector } from '@/features/repository/presentation/hooks/use-repository-selector';
 
+// next-authをモック（next/serverの依存を回避）
+vi.mock('next-auth', () => ({
+  default: vi.fn(() => ({
+    handlers: {},
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    auth: vi.fn(),
+  })),
+}));
+
+// next/serverをモック
+vi.mock('next/server', () => ({}));
+
+// Server Actionをモック
+vi.mock('@/app/_actions/repository', () => ({
+  getUserRepositories: vi.fn(),
+}));
+
 // window.matchMediaをモック
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -32,6 +50,23 @@ const mockMessages = {
     switchRepository: 'Switch Active Repository',
     cloning: 'Cloning...',
     clone: 'Clone',
+    createRepository: 'Create Repository',
+  },
+  repositoryNameDialog: {
+    title: 'Create Repository',
+    description: 'Please enter a repository name',
+    placeholder: 'Enter repository name...',
+    cancel: 'Cancel',
+    create: 'Create',
+    creating: 'Creating...',
+    validation: {
+      empty: 'Please enter a repository name',
+      invalid: 'Invalid repository name',
+    },
+    success: {
+      title: 'Created remote repository "{name}"',
+      description: 'Repository has been selected',
+    },
   },
 };
 
@@ -63,10 +98,14 @@ describe('RepositorySelector', () => {
     isCloning: false,
     cloneError: null,
     isCurrentRepository: false,
+    showCreateDialog: false,
+    isCreating: false,
     handleSelect: vi.fn(),
     handleClone: vi.fn(),
     handleSwitchRepository: vi.fn(),
     handleClose: vi.fn(),
+    handleCreateRepository: vi.fn(),
+    setShowCreateDialog: vi.fn(),
   };
 
   it('renders Select component with placeholder', () => {
