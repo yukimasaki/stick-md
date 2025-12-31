@@ -10,7 +10,11 @@
       "language": "言語",
       "autoDetect": "自動検出",
       "japanese": "日本語",
-      "english": "English"
+      "english": "English",
+      "theme": "テーマ",
+      "system": "システム",
+      "light": "ライト",
+      "dark": "ダーク"
     },
     "account": {
       "title": "アカウント",

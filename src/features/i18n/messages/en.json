@@ -10,7 +10,11 @@
       "language": "Language",
       "autoDetect": "Auto Detect",
       "japanese": "Japanese",
-      "english": "English"
+      "english": "English",
+      "theme": "Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
     },
     "account": {
       "title": "Account",

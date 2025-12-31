@@ -22,6 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { useLocale } from '@/features/i18n/presentation/hooks/use-locale';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
 import type { Session } from 'next-auth';
 import type { LocaleOption } from '@/features/i18n/domain/types';
 import type { Locale } from '@/features/i18n/domain/types';
@@ -55,6 +56,8 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   const [toolbarOffsetInput, setToolbarOffsetInput] = useState<string>(toolbarOffset.toString());
   const { locale, switchLocale, switchToAuto, isPending } = useLocale();
   const [currentLocaleOption, setCurrentLocaleOption] = useState<LocaleOption>('auto');
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // Cookieの有無を確認して現在の選択肢を設定
   useEffect(() => {
@@ -76,6 +79,14 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
   useEffect(() => {
     setToolbarOffsetInput(toolbarOffset.toString());
   }, [toolbarOffset]);
+
+  // テーマのマウント状態を確認（ハイドレーションエラー回避）
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 現在のテーマオプションを取得（システム設定の場合は'system'を返す）
+  const currentThemeOption = mounted ? (theme || 'system') : 'system';
 
   const handleLogout = () => {
     setShowLogoutDialog(false);
@@ -230,6 +241,26 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                         <SelectItem value="auto">{t('userMenu.general.autoDetect')}</SelectItem>
                         <SelectItem value="ja">{t('userMenu.general.japanese')}</SelectItem>
                         <SelectItem value="en">{t('userMenu.general.english')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm flex-1 min-w-0">{t('userMenu.general.theme')}</span>
+                    <Select
+                      value={currentThemeOption}
+                      onValueChange={(value) => {
+                        setTheme(value);
+                      }}
+                      disabled={!mounted}
+                    >
+                      <SelectTrigger className="w-32 h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="system">{t('userMenu.general.system')}</SelectItem>
+                        <SelectItem value="light">{t('userMenu.general.light')}</SelectItem>
+                        <SelectItem value="dark">{t('userMenu.general.dark')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
