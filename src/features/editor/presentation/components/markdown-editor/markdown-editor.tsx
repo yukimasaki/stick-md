@@ -56,8 +56,10 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   }
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-background pl-0 pr-4 py-4">
-      <Editor editor={editor} theme={blockNoteTheme} />
+    <div className="h-full w-full flex flex-col px-0 py-4" style={{ backgroundColor: blockNoteTheme === 'dark' ? 'rgb(31, 31, 31)' : undefined }}>
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <Editor editor={editor} theme={blockNoteTheme} />
+      </div>
     </div>
   );
 }
