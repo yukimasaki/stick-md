@@ -405,6 +405,8 @@ export async function checkoutFile(
     fs,
     dir,
     filepaths: [normalizedPath],
+    ref: 'HEAD', // 明示的にHEADからチェックアウト
+    force: true, // 強制的にチェックアウト（変更を上書き）
   });
 }
 

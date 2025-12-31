@@ -54,7 +54,13 @@ export function discardFileChanges(
     ),
     TE.chain((statusMatrix) => {
       // 該当ファイルのステータスを検索
-      const fileStatus = statusMatrix.find(([path]) => path === filePath);
+      // パスが一致しない場合、正規化して比較
+      const fileStatus = statusMatrix.find(([path]) => {
+        if (path === filePath) return true;
+        const normalizedFilePath = filePath.replace(/^\/+/, '');
+        const normalizedPath = path.replace(/^\/+/, '');
+        return normalizedPath === normalizedFilePath;
+      });
       
       if (!fileStatus) {
         return TE.left<GitCheckoutError, void>({

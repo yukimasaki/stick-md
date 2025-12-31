@@ -157,5 +157,89 @@ describe('discardFileChanges', () => {
     }
     expect(checkoutFile).toHaveBeenCalledWith(mockRepository, filePath);
   });
+
+  it('ファイルパスが先頭に/を含む場合、正規化して検索する', async () => {
+    const filePath = '/test.md'; // 先頭に/を含む
+    const statusMatrix: StatusResult = [
+      ['test.md', 1, 2, 1], // statusMatrix内のパスは/を含まない
+    ];
+    vi.mocked(getStatus).mockResolvedValueOnce(statusMatrix);
+    vi.mocked(checkoutFile).mockResolvedValueOnce(undefined);
+
+    const result = await discardFileChanges(mockRepository, filePath)();
+
+    expect(E.isRight(result)).toBe(true);
+    expect(getStatus).toHaveBeenCalledWith(mockRepository);
+    expect(checkoutFile).toHaveBeenCalledWith(mockRepository, filePath);
+    expect(deleteFile).not.toHaveBeenCalled();
+  });
+
+  it('ファイルパスが先頭に複数の/を含む場合、正規化して検索する', async () => {
+    const filePath = '///test.md'; // 複数の/を含む
+    const statusMatrix: StatusResult = [
+      ['test.md', 1, 2, 1],
+    ];
+    vi.mocked(getStatus).mockResolvedValueOnce(statusMatrix);
+    vi.mocked(checkoutFile).mockResolvedValueOnce(undefined);
+
+    const result = await discardFileChanges(mockRepository, filePath)();
+
+    expect(E.isRight(result)).toBe(true);
+    expect(checkoutFile).toHaveBeenCalledWith(mockRepository, filePath);
+  });
+
+  it('新規ファイルのパスが先頭に/を含む場合、正規化して検索する', async () => {
+    const filePath = '/new-file.md';
+    const statusMatrix: StatusResult = [
+      ['new-file.md', 0, 2, 0], // 新規ファイル
+    ];
+    vi.mocked(getStatus).mockResolvedValueOnce(statusMatrix);
+    vi.mocked(deleteFile).mockResolvedValueOnce(undefined);
+
+    const result = await discardFileChanges(mockRepository, filePath)();
+
+    expect(E.isRight(result)).toBe(true);
+    expect(getStatus).toHaveBeenCalledWith(mockRepository);
+    expect(deleteFile).toHaveBeenCalledWith(mockRepository, filePath);
+    expect(checkoutFile).not.toHaveBeenCalled();
+  });
+
+  it('checkoutがGIT_CHECKOUT_ERRORを返す場合、適切なエラーを返す', async () => {
+    const filePath = 'test.md';
+    const statusMatrix: StatusResult = [
+      [filePath, 1, 2, 1], // 既存ファイル
+    ];
+    vi.mocked(getStatus).mockResolvedValueOnce(statusMatrix);
+    const error = new Error('Failed to checkout file');
+    vi.mocked(checkoutFile).mockRejectedValueOnce(error);
+
+    const result = await discardFileChanges(mockRepository, filePath)();
+
+    expect(E.isLeft(result)).toBe(true);
+    if (E.isLeft(result) && result.left.type === 'GIT_CHECKOUT_ERROR') {
+      expect(result.left.message).toBe('Failed to checkout file: Failed to checkout file');
+      expect(result.left.filePath).toBe(filePath);
+    }
+    expect(checkoutFile).toHaveBeenCalledWith(mockRepository, filePath);
+  });
+
+  it('deleteFileがGIT_CHECKOUT_ERRORを返す場合、適切なエラーを返す', async () => {
+    const filePath = 'new-file.md';
+    const statusMatrix: StatusResult = [
+      [filePath, 0, 2, 0], // 新規ファイル
+    ];
+    vi.mocked(getStatus).mockResolvedValueOnce(statusMatrix);
+    const error = new Error('Failed to delete file');
+    vi.mocked(deleteFile).mockRejectedValueOnce(error);
+
+    const result = await discardFileChanges(mockRepository, filePath)();
+
+    expect(E.isLeft(result)).toBe(true);
+    if (E.isLeft(result) && result.left.type === 'GIT_CHECKOUT_ERROR') {
+      expect(result.left.message).toBe('Failed to delete file: Failed to delete file');
+      expect(result.left.filePath).toBe(filePath);
+    }
+    expect(deleteFile).toHaveBeenCalledWith(mockRepository, filePath);
+  });
 });
 
