@@ -32,6 +32,10 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@shikijs/core": "^3.20.0",
+    "@shikijs/engine-javascript": "^3.20.0",
+    "@shikijs/langs-precompiled": "^3.20.0",
+    "@shikijs/themes": "^3.20.0",
     "@tiptap/extension-floating-menu": "^3.14.0",
     "@tiptap/extension-gapcursor": "^3.14.0",
     "@tiptap/pm": "^3.14.0",
@@ -49,6 +53,7 @@
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "shiki-codegen": "^3.20.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "use-debounce": "^10.0.6"
