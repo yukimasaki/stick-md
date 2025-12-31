@@ -177,7 +177,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       variant="outline"
                       size="sm"
                       onClick={handleRepositorySelect}
-                      className="shrink-0"
+                      className="shrink-0 min-w-[140px]"
                     >
                       {currentRepository ? (
                         <span className="truncate max-w-[120px]">{currentRepository.name}</span>
@@ -189,7 +189,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                   <Separator />
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm flex-1 min-w-0">{t('userMenu.general.toolbarPosition')}</span>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0 min-w-[140px]">
                       <Input
                         type="number"
                         min="-200"
@@ -234,7 +234,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       }}
                       disabled={isPending}
                     >
-                      <SelectTrigger className="w-32 h-8 text-sm">
+                      <SelectTrigger className="w-40 h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -254,7 +254,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                       }}
                       disabled={!mounted}
                     >
-                      <SelectTrigger className="w-32 h-8 text-sm">
+                      <SelectTrigger className="w-40 h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -280,7 +280,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                         setIsOpen(false);
                         setShowLogoutDialog(true);
                       }}
-                      className="shrink-0"
+                      className="shrink-0 min-w-[140px]"
                     >
                       <span>{t('userMenu.account.logout')}</span>
                     </Button>
