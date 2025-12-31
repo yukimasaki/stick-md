@@ -120,10 +120,10 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                 <img
                   src={session.user.image}
                   alt={session.user.name || t('userMenu.user')}
-                  className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white"
+                  className="w-8 h-8 rounded-full shrink-0 border border-border p-px bg-card"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full shrink-0 border border-gray-300 p-px bg-white flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full shrink-0 border border-border p-px bg-card flex items-center justify-center">
                   <User className="w-5 h-5" />
                 </div>
               )}
@@ -133,12 +133,12 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
             open={isOpen}
             title={t('userMenu.title')}
             description={t('userMenu.description')}
-            backgroundColor="bg-gray-100"
+            backgroundColor="bg-muted"
             headerClassName="sr-only"
             showCloseButton={true}
           >
             {/* ユーザー情報ヘッダー */}
-            <div className="p-4 border-b bg-white rounded-t-lg">
+            <div className="p-4 border-b border-border bg-card rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {session.user?.image ? (
@@ -146,10 +146,10 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
                     <img
                       src={session.user.image}
                       alt={session.user.name || t('userMenu.user')}
-                      className="w-10 h-10 rounded-full shrink-0 border border-gray-300 p-px bg-white"
+                      className="w-10 h-10 rounded-full shrink-0 border border-border p-px bg-card"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full shrink-0 border border-gray-300 p-px bg-white flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full shrink-0 border border-border p-px bg-card flex items-center justify-center">
                       <User className="w-6 h-6" />
                     </div>
                   )}
@@ -170,7 +170,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
               {/* 一般セクション */}
               <div className="space-y-2">
                 <h2 className="text-sm font-semibold text-muted-foreground px-1">{t('userMenu.general.title')}</h2>
-                <div className="bg-white rounded-lg p-4 space-y-3">
+                <div className="bg-card rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm flex-1 min-w-0">{t('userMenu.general.activeRepository')}</span>
                     <Button
@@ -270,7 +270,7 @@ export function UserMenuDialog({ session, avatarOnly = false, buttonClassName }:
               {/* アカウントセクション */}
               <div className="space-y-2">
                 <h2 className="text-sm font-semibold text-muted-foreground px-1">{t('userMenu.account.title')}</h2>
-                <div className="bg-white rounded-lg p-4">
+                <div className="bg-card rounded-lg p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm flex-1 min-w-0">{t('userMenu.account.logoutFromDevice')}</span>
                     <Button
