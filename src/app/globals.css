@@ -98,19 +98,19 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.18 0.015 240);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.22 0.02 240);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.22 0.02 240);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.28 0.02 240);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.28 0.02 240);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.28 0.02 240);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 20%);
@@ -121,11 +121,11 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
+  --sidebar: oklch(0.22 0.02 240);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent: oklch(0.28 0.02 240);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 20%);
   --sidebar-ring: oklch(0.556 0 0);
@@ -148,6 +148,46 @@
     max-width: 100% !important;
     /* 左側のパディングは親要素のpl-8を維持 */
     padding-right: 0 !important;
+  }
+
+  /* ダークモード時のBlockNoteView（.bn-editor）のスタイル統一 */
+  .dark .bn-editor,
+  .dark .bn-editor .ProseMirror {
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+
+  /* ダークモード時のエディタ内の各種要素の色調整 */
+  .dark .bn-editor .bn-block-content,
+  .dark .bn-editor .bn-inline-content,
+  .dark .bn-editor p,
+  .dark .bn-editor h1,
+  .dark .bn-editor h2,
+  .dark .bn-editor h3,
+  .dark .bn-editor h4,
+  .dark .bn-editor h5,
+  .dark .bn-editor h6,
+  .dark .bn-editor li,
+  .dark .bn-editor code,
+  .dark .bn-editor pre {
+    color: var(--foreground) !important;
+  }
+
+  /* ダークモード時のエディタ内のリンク色 */
+  .dark .bn-editor a {
+    color: var(--primary) !important;
+  }
+
+  /* ダークモード時のエディタ内のコードブロック背景 */
+  .dark .bn-editor pre,
+  .dark .bn-editor code {
+    background-color: var(--muted) !important;
+  }
+
+  /* ダークモード時のエディタ内のボーダー色 */
+  .dark .bn-editor .bn-block,
+  .dark .bn-editor .bn-block-content {
+    border-color: var(--border) !important;
   }
 
   /* モバイルでの見出しフォントサイズ調整 */
