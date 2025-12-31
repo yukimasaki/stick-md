@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useSyncExternalStore } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
+import { useTheme } from 'next-themes';
 import { useEditor } from '@/features/editor/presentation/hooks/use-editor';
 import { tabStore } from '@/features/editor/application/stores/tab-store';
 import { useEditorState } from '@/features/editor/presentation/hooks/use-editor-state';
@@ -21,6 +22,7 @@ interface MarkdownEditorProps {
 export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   const editor = useCreateBlockNote();
   const { lastCursorMove } = useEditor();
+  const { theme, systemTheme } = useTheme();
   const tabState = useSyncExternalStore(
     tabStore.subscribe,
     tabStore.getSnapshot,
@@ -45,13 +47,17 @@ export function MarkdownEditor({ tabId }: MarkdownEditorProps) {
   // カーソル移動処理
   useCursorMovement(editor, lastCursorMove);
 
+  // テーマの決定（システム設定の場合はsystemThemeを使用）
+  const editorTheme = theme === 'system' ? (systemTheme || 'light') : theme;
+  const blockNoteTheme = (editorTheme === 'dark' ? 'dark' : 'light') as 'light' | 'dark';
+
   if (!editor) {
     return <div>Loading Editor...</div>;
   }
 
   return (
     <div className="h-full w-full overflow-y-auto bg-background pl-0 pr-4 py-4">
-      <Editor editor={editor} theme="light" />
+      <Editor editor={editor} theme={blockNoteTheme} />
     </div>
   );
 }
